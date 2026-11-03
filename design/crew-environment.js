@@ -13,7 +13,7 @@
 import { Mesh, Group, BufferGeometry, BufferAttribute, ShaderMaterial, TextureLoader, Texture, PointLight }
   from '/space-test-site/design/vendor/three/three.module.min.js';
 
-const ASSET_ROOT = '/clone-workspace/reference-clones/endurosat/assets';
+const ASSET_ROOT = '/space-test-site/design/assets/environment';
 const REPEAT = 1000;
 const MIRRORED_REPEAT = 1002;
 const NEAREST = 1003;
