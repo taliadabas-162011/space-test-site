@@ -1,4 +1,4 @@
-import { createCrewStage } from '/space-test-site/design/crew-motion-stage.js?v=astronaut-4';
+import { createCrewStage } from '/space-test-site/design/crew-motion-stage.js?v=astronaut-5';
 import { renderObservationCheckin, renderObservationIdentity, renderObservationOverview, renderObservationProfile, renderObservationMobile, updateObservationCheckin } from '/space-test-site/design/crew-observation-ui.js?v=astronaut-3';
 import { renderAnatomyUI, setAnatomyCategory, setAnatomyMetric } from '/space-test-site/design/crew-anatomy-ui.js?v=astronaut-3';
 import { renderEmergencyGuide } from '/space-test-site/design/crew-guidance.js?v=astronaut-3';

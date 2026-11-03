@@ -4,10 +4,10 @@ import { DRACOLoader } from '/space-test-site/design/vendor/three/examples/jsm/l
 import {
   loadScarsCameraPaths, createScarsCameraRig, advanceSelectionAngle,
   maintainBlendedDistance, SELECTION_FRAME, INTRO_DURATION_SECONDS,
-} from '/space-test-site/design/scars-camera-paths.js';
+} from '/space-test-site/design/scars-camera-paths.js?v=astronaut-5';
 import { loadScarsMotion, createScarsPerformer } from '/space-test-site/design/scars-motion.js';
 import { createAstronautMotionRefinement } from '/space-test-site/design/astronaut-motion-refinement.js';
-import { createCrewEnvironment } from '/space-test-site/design/crew-environment.js?v=astronaut-3';
+import { createCrewEnvironment } from '/space-test-site/design/crew-environment.js?v=astronaut-4';
 
 const MODEL_URL = '/space-test-site/design/astronaut-preview/assets/grab3d.glb';
 const MODEL_HEIGHT = 1.9;
