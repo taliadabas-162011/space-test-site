@@ -2,7 +2,7 @@
 // Coordinates in this file are adapted for a Three.js scene; the original
 // paths remain available through sampleSource(). See camera-mechanics.md.
 
-const CAMERA_DATA_URL = '/clone-workspace/scars/02-extraction/camera-paths.raw';
+const CAMERA_DATA_URL = '/space-test-site/design/assets/camera-paths.raw';
 const TAU = Math.PI * 2;
 const COUNT = 3;
 export const SELECTION_FRAME = 200;
