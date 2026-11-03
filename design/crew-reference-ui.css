@@ -1,0 +1,107 @@
+/* A scene-first adaptation of the captured references: Vibrant's concentric
+   hotspot and Scars' sparse edge typography, without opaque UI panels. */
+@media (min-width:768px){
+  .crew-orbit .orbit-actors:before{content:'';position:absolute;inset:auto 0 0;height:34%;background:linear-gradient(0deg,rgba(2,8,18,.82),transparent);pointer-events:none;transition:opacity .5s ease}
+  .crew-orbit[data-mode="person"] .orbit-actors:before{opacity:0}
+  .crew-orbit .orbit-actor-label,.crew-orbit .orbit-actor:first-child .orbit-actor-label{top:calc(100% + 8px);left:50%;right:auto;width:230px;transform:translateX(-50%);text-align:center}
+  .crew-orbit .orbit-actor-label h2{font-size:19px;font-weight:400;margin:5px 0}
+  .crew-orbit .orbit-actor-label button{margin-top:3px;padding:5px 0;font-size:9px}
+  .crew-orbit .orbit-actor-readings,.crew-orbit .orbit-actor:first-child .orbit-actor-readings{top:calc(100% + 89px);left:50%;right:auto;transform:translateX(-50%);flex-direction:row;gap:18px;text-align:center}
+  .crew-orbit .orbit-actor-readings .orbit-vital{width:auto;white-space:nowrap}
+  .crew-orbit .orbit-actor-readings .orbit-vital:before,.crew-orbit .orbit-actor-readings .orbit-vital:after{display:none}
+  .crew-orbit .orbit-actor-readings .orbit-vital>span{display:inline;font-size:8px}
+  .crew-orbit .orbit-actor-readings .orbit-vital strong{display:inline;margin-left:5px;font-size:14px;font-weight:400}
+  .crew-orbit .orbit-actor-readings .orbit-vital em{display:none}
+}
+.crew-orbit .orbit-profile-name{top:25%;left:7%;max-width:24vw}
+.crew-orbit .orbit-profile-name h2{font-size:clamp(30px,3.25vw,50px);font-weight:400;line-height:1.02;letter-spacing:-.055em}
+.crew-orbit .orbit-profile-name>p,.crew-orbit .orbit-section-label{color:#a9d7ed;font-size:10px;letter-spacing:.16em}
+.crew-orbit .orbit-profile-actions{left:7%;top:auto;bottom:8%;gap:0}
+.crew-orbit .orbit-profile-actions button{display:flex;justify-content:space-between;align-items:center;width:210px;padding:12px 0;font-size:11px;letter-spacing:.09em;text-shadow:0 2px 14px #020812}
+.crew-orbit .orbit-profile-actions button span{margin:0;color:inherit;font-size:inherit}
+.crew-orbit .orbit-profile-actions button i{color:#8bd9ff;font-size:16px;font-style:normal;transition:transform .3s ease}
+.crew-orbit .orbit-profile-actions button:hover i{transform:translate(3px,-3px)}
+.orbit-name-mask{display:inline-block;overflow:hidden;vertical-align:bottom}
+.orbit-name-mask>span{display:block}
+.crew-orbit[data-transitioning="false"] .orbit-name-mask>span{animation:crew-name-reveal .85s cubic-bezier(.22,1,.36,1) both}
+.crew-orbit[data-transitioning="false"] .orbit-name-mask:nth-child(2)>span{animation-delay:.09s}
+.crew-orbit[data-transitioning="false"] .orbit-profile-readings .reference-reading-heading,.crew-orbit[data-transitioning="false"] .orbit-profile-readings .reference-vital-primary,.crew-orbit[data-transitioning="false"] .orbit-profile-readings .reference-vital-secondary{animation:crew-detail-reveal .7s cubic-bezier(.22,1,.36,1) both}
+.crew-orbit[data-transitioning="false"] .orbit-profile-readings .reference-vital-primary{animation-delay:.08s}
+.crew-orbit[data-transitioning="false"] .orbit-profile-readings .reference-vital-secondary{animation-delay:.16s}
+.orbit-scanline{position:fixed;z-index:2;width:min(22vw,230px);height:2px;transform:translate(-50%,-50%);background:linear-gradient(90deg,transparent,#9ae8ff 25%,#f1fdff 50%,#9ae8ff 75%,transparent);box-shadow:0 0 13px #61d7ff;opacity:0;pointer-events:none;transition:opacity .2s ease}
+.crew-orbit[data-scanning="true"] .orbit-scanline{opacity:.8}
+@keyframes crew-name-reveal{from{transform:translateY(105%);opacity:.2}to{transform:translateY(0);opacity:1}}
+@keyframes crew-detail-reveal{from{clip-path:inset(0 0 100% 0);transform:translateY(10px);opacity:0}to{clip-path:inset(0);transform:translateY(0);opacity:1}}
+@media(min-width:768px){.crew-orbit .orbit-switch{left:auto;right:6%;bottom:5%;transform:none}.crew-orbit .orbit-gesture{left:auto;right:6%;bottom:10%;transform:none}}
+.crew-orbit[data-recording="true"] .orbit-profile-actions{visibility:hidden;pointer-events:none}
+.crew-orbit .orbit-profile-readings{top:23%;right:6%;width:clamp(190px,20vw,290px);text-shadow:0 2px 20px #03101d}
+.reference-reading-heading,.reference-checkin-heading{display:flex;align-items:center;gap:12px}
+.reference-reading-heading .orbit-section-label,.reference-checkin-heading .orbit-section-label{margin:0}
+.reference-heading-marker{position:relative;display:block;flex:0 0 20px;width:20px;height:20px;border:1px solid rgba(220,246,255,.78);border-radius:50%;box-shadow:0 0 14px rgba(104,191,240,.26)}
+.reference-heading-marker:before{content:'';position:absolute;inset:5px;border:1px solid #d8f6ff;border-radius:50%;background:#fff;box-shadow:0 0 10px #8bd9ff}
+.crew-orbit .orbit-profile-readings .orbit-vital{display:block;padding:0;border:0}
+.crew-orbit .orbit-profile-readings .reference-vital-primary{margin:34px 0 35px}
+.crew-orbit .orbit-profile-readings .orbit-vital>span{color:#c0d5e0;font-size:10px;letter-spacing:.08em}
+.crew-orbit .orbit-profile-readings .orbit-vital strong{margin:8px 0 0;text-align:left;font-size:clamp(26px,2.4vw,38px);font-weight:400;letter-spacing:-.05em}
+.crew-orbit .orbit-profile-readings .reference-vital-primary strong{font-size:clamp(58px,6vw,86px);line-height:.9}
+.crew-orbit .orbit-profile-readings .orbit-vital strong small{margin-left:5px;color:#acd6eb;font-size:12px;font-weight:400;letter-spacing:0}
+.crew-orbit .orbit-profile-readings .orbit-vital em{margin-top:8px;text-align:left;color:#a7bdca;font-size:10px}
+.reference-vital-secondary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));row-gap:26px;column-gap:16px}
+.reference-vital-secondary .orbit-vital:last-child{grid-column:1/-1}
+.crew-orbit .orbit-form{position:absolute;top:auto;bottom:0;left:0;right:0;width:100%;padding:32px 7% 3%;color:#f4fbff;background:linear-gradient(0deg,rgba(3,10,18,.96),rgba(3,10,18,.79) 72%,transparent);animation:reference-form-in .65s cubic-bezier(.22,1,.36,1) both}
+.crew-orbit .orbit-form[hidden]{display:none}
+.reference-checkin-heading{align-items:flex-start}
+.reference-checkin-heading .reference-heading-marker{margin-top:4px}
+.reference-checkin-heading h3{margin:7px 0 0;font-size:clamp(20px,2vw,29px);font-weight:400;letter-spacing:-.04em;line-height:1.1}
+.reference-checkin-note{align-self:flex-end;margin:0 0 2px auto;color:#b8cbd5;font-size:11px;letter-spacing:.01em}
+.reference-input-strip{display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) minmax(0,1.3fr) repeat(3,minmax(0,1fr));column-gap:clamp(12px,2vw,30px);margin:25px 0 22px}
+.crew-orbit .orbit-form .reference-measure,.crew-orbit .orbit-form .reference-pressure legend,.crew-orbit .orbit-form .reference-symptoms{color:#bed3df;font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase}
+.reference-input-strip fieldset{min-width:0;margin:0;padding:0;border:0}
+.reference-input-strip legend small{color:#91aebf;font-size:9px;font-weight:400;text-transform:none}
+.reference-input-line{display:flex;align-items:baseline;min-width:0;gap:8px;margin-top:8px;padding-bottom:7px;border-bottom:1px solid rgba(174,218,237,.5)}
+.crew-orbit .orbit-form .reference-input-line input{width:100%;min-width:0;height:auto;margin:0;padding:0;border:0;border-radius:0;background:none;color:#fff;font:400 clamp(22px,2.1vw,30px)/1 Orbit Magnetik,sans-serif;letter-spacing:-.045em;appearance:textfield;-moz-appearance:textfield}
+.crew-orbit .orbit-form .reference-input-line input::-webkit-inner-spin-button,.crew-orbit .orbit-form .reference-input-line input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.crew-orbit .orbit-form .reference-input-line input::placeholder{color:rgba(198,220,231,.47)}
+.reference-input-line small,.reference-slash{flex:none;color:#a5c7d7;font-size:12px;letter-spacing:0}
+.reference-pressure .reference-input-line label{flex:1;min-width:0}
+.reference-pressure .reference-input-line label input{text-align:center}
+.reference-checkin-footer{display:flex;align-items:end;justify-content:space-between;gap:24px}
+.crew-orbit .orbit-form .reference-symptoms{display:block;width:min(560px,60%);min-width:0}
+.crew-orbit .orbit-form .reference-symptoms select{display:block;width:100%;height:32px;margin-top:5px;padding:0 22px 0 0;border:0;border-bottom:1px solid rgba(174,218,237,.5);border-radius:0;color:#f5fbff;background:transparent;font:400 13px Orbit Magnetik,sans-serif;letter-spacing:0;text-transform:none;cursor:pointer}
+.crew-orbit .orbit-form .reference-symptoms select option{color:#fff;background:#091a28}
+.crew-orbit .orbit-form-actions{flex:none;display:flex;align-items:center;gap:25px;margin:0}
+.crew-orbit .orbit-form-actions button{padding:9px 0;border:0;color:#bed0dc;font-size:10px;letter-spacing:.1em}
+.crew-orbit .orbit-form-actions .reference-save{border-bottom:1px solid #9cdaf2;color:#f1fbff}
+.crew-orbit .orbit-form-actions .reference-save span{margin-left:6px;color:#9cddff;font-size:16px}
+.crew-orbit .orbit-error{margin:8px 0 0;color:#ffc0b5;font-size:12px}
+.reference-sr-only{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;clip-path:inset(50%)}
+@keyframes reference-form-in{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:767px){
+  .crew-orbit[data-mode="person"] .orbit-canvas{left:0;width:100%;mask-image:linear-gradient(to bottom,transparent,#000 20px,#000 calc(100% - 30px),transparent)}
+  .crew-orbit .orbit-profile{pointer-events:auto;touch-action:pan-y}
+  .crew-orbit .orbit-profile-name{top:16%;left:18px;max-width:150px}
+  .crew-orbit .orbit-profile-name h2{font-size:27px}
+  .crew-orbit .orbit-profile-actions{top:31%;bottom:auto;left:18px}
+  .crew-orbit .orbit-profile-actions button{width:145px;padding:8px 0}
+  .orbit-scanline{width:150px}
+  .crew-orbit .orbit-profile-readings{top:calc(95px + 48dvh);right:18px;left:18px;bottom:auto;width:auto;display:block;padding-bottom:75px}
+  .crew-orbit .orbit-profile-readings .reference-vital-primary{margin:20px 0}
+  .crew-orbit .orbit-profile-readings .reference-vital-primary strong{font-size:48px}
+  .reference-vital-secondary{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+  .reference-vital-secondary .orbit-vital:last-child{grid-column:auto}
+  .crew-orbit .orbit-profile-readings .reference-vital-secondary .orbit-vital strong{font-size:21px}
+  .crew-orbit .orbit-profile-readings .orbit-vital>span{white-space:normal}
+  .crew-orbit .orbit-form{top:calc(95px + 48dvh);right:0;bottom:auto;left:0;width:auto;padding:20px 18px 35px;background:linear-gradient(0deg,rgba(3,10,18,.97),rgba(3,10,18,.82) 80%,transparent)}
+  .crew-orbit[data-recording="true"] .orbit-canvas{height:30dvh}
+  .crew-orbit[data-recording="true"] .orbit-form{top:calc(95px + 30dvh)}
+  .reference-checkin-note{font-size:10px;text-align:right}
+  .reference-input-strip{grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;margin:22px 0}
+  .crew-orbit .orbit-form .reference-input-line input{font-size:22px}
+  .reference-checkin-footer{align-items:stretch;flex-direction:column;gap:17px}
+  .crew-orbit .orbit-form .reference-symptoms{width:100%}
+  .crew-orbit .orbit-form .reference-symptoms select{font-size:16px}
+  .crew-orbit .orbit-form-actions{justify-content:space-between}
+}
+@media(max-width:767px) and (max-height:760px){.crew-orbit[data-mode="person"] .orbit-canvas{left:0;width:100%}.crew-orbit .orbit-profile-readings,.crew-orbit .orbit-form{top:calc(95px + 37dvh)}}
+@media(max-width:380px){.reference-vital-secondary{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:18px}.reference-vital-secondary .orbit-vital:last-child{grid-column:1/-1}}
+@media(prefers-reduced-motion:reduce){.crew-orbit .orbit-form,.crew-orbit[data-transitioning="false"] .orbit-name-mask>span,.crew-orbit[data-transitioning="false"] .orbit-profile-readings .reference-reading-heading,.crew-orbit[data-transitioning="false"] .orbit-profile-readings .reference-vital-primary,.crew-orbit[data-transitioning="false"] .orbit-profile-readings .reference-vital-secondary{animation:none}}

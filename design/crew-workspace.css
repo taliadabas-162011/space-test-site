@@ -1,0 +1,47 @@
+/* Keep the controls anchored while the camera moves, and let phone content flow. */
+.orbit-profile-identity{display:contents}
+.crew-orbit[data-mode="person"][data-transitioning="true"]:not([data-recording="true"]):not([data-anatomy="true"]):not([data-panel]) .orbit-profile-actions{visibility:visible;opacity:1!important;pointer-events:auto;animation:none}
+.crew-orbit[data-panel="history"] .orbit-profile-name .observation-status{visibility:hidden}
+
+/* A two-column check-in keeps the common measurements and symptom prompt together. */
+@media(min-width:1024px){
+  .crew-orbit .orbit-form:not([hidden]){display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);grid-template-areas:"head head" "symptoms measures" "daily measures" "time measures" "guide measures" ". measures" "footer footer";grid-template-rows:auto max-content max-content max-content max-content minmax(0,1fr) auto;align-content:start;column-gap:34px;row-gap:0;top:12%;right:4%;bottom:4%;width:min(50vw,760px);padding-right:8px}
+  .orbit-form>.observation-checkin-head{grid-area:head;margin-bottom:24px}
+  .crew-orbit .orbit-form>.observation-symptom-section{grid-area:symptoms;margin:0}
+  .crew-orbit .orbit-form>.observation-group{grid-area:measures;margin:0}
+  .orbit-form>.observation-daily-context{grid-area:daily;align-self:start;margin-top:16px}
+  .orbit-form>.observation-time{grid-area:time;align-self:start;margin-top:14px}
+  .orbit-form>.observation-guide{grid-area:guide;align-self:start;margin-top:14px}
+  .orbit-form>.observation-footer{grid-area:footer;position:sticky;bottom:-20px;margin-top:18px}
+  .crew-orbit[data-recording="true"] .orbit-profile:before{inset:0 0 0 43%;background:linear-gradient(90deg,transparent,rgba(3,10,18,.55) 20%,rgba(3,10,18,.78) 52%)}
+  .crew-orbit .orbit-form .observation-symptom-section>legend,.crew-orbit .orbit-form .observation-group>legend{font-size:17px}
+  .crew-orbit .orbit-form .observation-vital-fields .observation-field,.crew-orbit .orbit-form .observation-pressure{grid-template-columns:minmax(0,1fr) minmax(125px,.8fr);gap:10px}
+  .observation-symptom-tags{column-gap:12px}
+}
+@media(max-width:767px) and (orientation:portrait){
+  .crew-orbit .orbit-profile-identity{display:flex;position:relative;flex-direction:column;align-items:flex-start;width:150px;min-height:calc(95px + 48dvh - 16dvh);margin:16dvh 18px 0;pointer-events:none}
+  .crew-orbit .orbit-profile-identity .orbit-profile-name{position:relative;top:auto;left:auto;right:auto;width:100%;max-width:none;flex:none}
+  .crew-orbit .orbit-profile-identity .orbit-profile-actions,.crew-orbit .orbit-profile:has(.observation-status) .orbit-profile-actions{position:relative;top:auto;left:auto;right:auto;bottom:auto;flex:none;gap:0;margin-top:18px}
+  .crew-orbit .orbit-profile-identity .orbit-profile-actions button{width:150px;padding:8px 0}
+  .crew-orbit .orbit-profile-readings{position:relative;top:auto;right:auto;bottom:auto;left:auto;width:auto;margin:0 18px;padding-bottom:75px}
+  .crew-orbit[data-recording="true"] .orbit-profile-identity .observation-status-reported,.crew-orbit[data-recording="true"] .orbit-profile-identity .observation-status small{display:none}
+}
+@media(max-width:767px) and (max-height:760px) and (orientation:portrait){.crew-orbit .orbit-profile-identity{min-height:calc(95px + 37dvh - 16dvh)}}
+@media(min-width:1024px){
+  .crew-orbit[data-recording="true"] .orbit-profile:before{background:linear-gradient(90deg,transparent,rgba(3,10,18,.78) 16%,rgba(3,10,18,.9) 42%)}
+  .crew-orbit .orbit-form .observation-symptom-note{margin-top:12px}
+  .observation-symptom-tags{margin-top:5px}
+  .observation-symptom-tags label{min-height:31px}
+  .observation-symptom-meta{margin-top:12px}
+  .crew-orbit .orbit-form .observation-emergency-link{margin-top:5px}
+  .crew-orbit .orbit-form .observation-urgent{margin-top:8px}
+  .crew-orbit .orbit-form .observation-note-field textarea{min-height:44px}
+}
+.observation-context-pair{grid-template-columns:1fr}
+.observation-glucose-context{display:none}
+.observation-group:has(input[name="glucose"]:not(:placeholder-shown)) .observation-glucose-context{display:block;visibility:visible}
+@media(max-width:767px) and (orientation:portrait){.crew-orbit .orbit-profile-readings{margin-top:16px}}
+@media(max-width:767px) and (orientation:portrait){
+  .crew-orbit[data-recording="true"] .orbit-canvas{top:95px;left:52%;width:48%;height:20dvh}
+  .crew-orbit[data-recording="true"] .orbit-form{top:calc(105px + 20dvh)}
+}

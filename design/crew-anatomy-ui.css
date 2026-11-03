@@ -1,0 +1,158 @@
+/* The frame and person remain visible. The ring is adapted from the captured
+   Vibrant hotspots; navigation uses Scars' open edge-anchored typography. */
+@font-face{font-family:Crew Reference Conduit;src:url('/clone-workspace/scars/05-build/site/assets/fonts/fh_ConduitITCPro-Medium_ncsa-9f24d0b4bddfa84a03b2c88488e3f046.woff') format('woff');font-weight:500;font-display:swap}
+.crew-anatomy{position:absolute;inset:0;pointer-events:none;color:#f2f9fd;text-shadow:0 2px 20px #03101d;animation:crew-anatomy-enter .55s cubic-bezier(.22,1,.36,1) both}
+.crew-anatomy[hidden],.crew-anatomy-view[hidden]{display:none}
+.crew-anatomy button{pointer-events:auto;cursor:pointer}
+.crew-orbit[data-anatomy="true"]:not([data-anatomy-ready="true"]) .crew-anatomy-content,.crew-orbit[data-anatomy="true"]:not([data-anatomy-ready="true"]) .crew-anatomy-hotspots{visibility:hidden;opacity:0;pointer-events:none}
+.crew-orbit[data-anatomy="true"]:not([data-anatomy-ready="true"]) .crew-anatomy-hotspot{pointer-events:none}
+.crew-anatomy-content,.crew-anatomy-hotspots{transition:opacity .45s ease}
+.crew-orbit[data-anatomy="true"] .orbit-profile-readings,.crew-orbit[data-anatomy="true"] .orbit-switch,.crew-orbit[data-anatomy="true"] .orbit-gesture,.crew-orbit[data-anatomy="true"] [data-anatomy]{display:none}
+.crew-orbit[data-recording="true"] .crew-anatomy{visibility:hidden;pointer-events:none}
+.crew-anatomy-exit{position:absolute;top:11%;right:4%;padding:8px 0;border:0;border-bottom:1px solid rgba(126,197,235,.65);border-radius:0;background:none;color:#d7ebf6;font:600 10px Orbit Magnetik,sans-serif;letter-spacing:.08em;text-transform:uppercase}
+.crew-anatomy-exit:hover{color:#7cd1ff;border-color:#7cd1ff}
+.crew-anatomy-content{position:absolute;top:22%;right:6%;width:clamp(205px,21vw,300px)}
+@media(min-width:768px){.crew-anatomy-content{bottom:13%;overflow-y:auto;overscroll-behavior:contain;pointer-events:auto;scrollbar-width:thin;scrollbar-color:#638b9e transparent}}
+.crew-anatomy-kicker{display:flex;align-items:center;gap:11px;color:#a9d7ed;font:500 11px Crew Reference Conduit,Orbit Magnetik,sans-serif;letter-spacing:.16em;text-transform:uppercase}
+.crew-anatomy-ring{position:relative;display:block;width:20px;height:20px;flex:0 0 20px;border:1px solid rgba(220,246,255,.78);border-radius:50%;box-shadow:0 0 14px rgba(104,191,240,.26)}
+.crew-anatomy-ring:before{content:'';position:absolute;inset:5px;border:1px solid #d8f6ff;border-radius:50%;background:#fff;box-shadow:0 0 10px #8bd9ff}
+.crew-anatomy-view h3{margin:20px 0 5px;font-size:clamp(27px,2.6vw,42px);line-height:1.03;font-weight:400;letter-spacing:-.045em}
+.crew-anatomy-measure-primary{margin-top:33px}
+.crew-anatomy-label,.crew-anatomy-symptoms>span{display:block;color:#c0d5e0;font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+.crew-anatomy-measure strong{display:block;margin-top:8px;color:#f5fcff;font-size:clamp(25px,2.2vw,34px);font-weight:400;line-height:1;letter-spacing:-.05em;white-space:nowrap}
+.crew-anatomy-measure-primary strong{font-size:clamp(56px,5.5vw,80px);line-height:.94}
+.crew-anatomy-measure strong small{margin-left:5px;color:#acd6eb;font-size:12px;font-weight:400;letter-spacing:0}
+.crew-anatomy-provenance{display:block;margin-top:8px;color:#a7bdca;font-size:10px}
+.crew-anatomy-history{margin:15px 0 0;padding:0;max-width:240px}
+.crew-anatomy-history figcaption{display:flex;justify-content:space-between;gap:8px;color:#bdd5e1;font-size:9px;letter-spacing:.05em;text-transform:uppercase}
+.crew-anatomy-history svg{display:block;width:100%;height:33px;margin:8px 0 5px;overflow:visible}
+.crew-anatomy-history-line{fill:none;stroke:#c5eeff;stroke-width:1.5;vector-effect:non-scaling-stroke}
+.crew-anatomy-history-line-second{stroke:#76a7be;stroke-dasharray:3 2}
+.crew-anatomy-history-legend{display:flex;gap:12px;margin:6px 0;color:#b9d0dc;font-size:9px}
+.crew-anatomy-history-legend span:before{content:'';display:inline-block;width:10px;height:1px;margin:0 5px 3px 0;background:#c5eeff}
+.crew-anatomy-history-legend span+span:before{background:repeating-linear-gradient(90deg,#76a7be 0 3px,transparent 3px 5px)}
+.crew-anatomy-history-scale,.crew-anatomy-history-range{color:#a7bdca;font-size:9px;line-height:1.45}
+.crew-anatomy-history-range{display:flex;justify-content:space-between;gap:8px;margin-top:3px}
+.crew-anatomy-secondary .crew-anatomy-history-range{display:block}
+.crew-anatomy-secondary .crew-anatomy-history-range span{display:block}
+.crew-anatomy-secondary .crew-anatomy-history-range span+span:before{content:'to '}
+.crew-anatomy-secondary{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:20px;margin-top:33px}
+.crew-anatomy-symptoms{margin-top:30px}.crew-anatomy-symptoms p{margin:8px 0 0;color:#d0dee6;font-size:11px;line-height:1.45}
+.crew-anatomy-symptoms[data-status="concerning"] p{color:#ffd397}.crew-anatomy-symptoms[data-status="urgent"] p{color:#ffaca3}
+.crew-anatomy-hotspots{position:absolute;inset:0;z-index:2;pointer-events:none}
+.crew-anatomy-hotspot{position:absolute;display:block;width:44px;height:44px;margin:0;padding:0;border:0;border-radius:50%;background:transparent;color:#f5fcff;transform:translate(-50%,-50%);font:400 12px Orbit Magnetik,sans-serif;text-align:left;overflow:visible}
+.crew-anatomy-hotspot--head{left:var(--anatomy-head-x,50%);top:var(--anatomy-head-y,25%)}
+.crew-anatomy-hotspot--chest{left:var(--anatomy-chest-x,50%);top:var(--anatomy-chest-y,40%)}
+.crew-anatomy-hotspot--abdomen{left:var(--anatomy-abdomen-x,50%);top:var(--anatomy-abdomen-y,53%)}
+.crew-anatomy-hotspot-ring{position:absolute;top:50%;left:50%;display:block;width:34px;height:34px;border:1px solid rgba(239,250,255,.8);border-radius:50%;background:rgba(211,240,255,.1);box-shadow:0 0 18px rgba(119,211,255,.25);transform:translate(-50%,-50%);transition:background .3s ease,border-color .3s ease,box-shadow .3s ease}
+.crew-anatomy-hotspot-ring:before{content:'';position:absolute;top:50%;left:50%;width:6px;height:6px;border-radius:50%;background:#fff;box-shadow:0 0 10px #b0e7ff;transform:translate(-50%,-50%)}
+.crew-anatomy-hotspot-ring:after{content:'';position:absolute;inset:-1px;border:1px solid #e1f8ff;border-radius:50%;opacity:0}
+.crew-anatomy-hotspot-ring img{position:absolute;inset:-25%;width:150%;height:150%;opacity:.34;animation:crew-hotspot-spin 10s linear infinite;pointer-events:none}
+.crew-anatomy-hotspot-label{position:absolute;top:50%;left:calc(100% + 5px);display:flex;align-items:center;gap:8px;white-space:nowrap;transform:translateY(-50%);color:#d5eaf3;font:500 14px Orbit Magnetik,sans-serif;letter-spacing:.01em;text-transform:none;opacity:.85;transition:color .3s ease,opacity .3s ease}
+.crew-anatomy-hotspot-label>span{display:block}
+.crew-anatomy-hotspot-label i{font-style:normal;color:#b4e7ff;opacity:0;transform:translate(-5px,5px);transition:opacity .3s ease,transform .3s ease}
+.crew-anatomy-hotspot[aria-pressed="true"] .crew-anatomy-hotspot-ring,.crew-anatomy-hotspot:hover .crew-anatomy-hotspot-ring,.crew-anatomy-hotspot:focus-visible .crew-anatomy-hotspot-ring{border-color:#fff;background:rgba(178,232,255,.25);box-shadow:0 0 23px rgba(145,219,255,.55)}
+.crew-anatomy-hotspot:hover .crew-anatomy-hotspot-ring:after,.crew-anatomy-hotspot:focus-visible .crew-anatomy-hotspot-ring:after{animation:crew-hotspot-pulse 1.5s linear infinite}
+.crew-anatomy-hotspot[aria-pressed="true"] .crew-anatomy-hotspot-label,.crew-anatomy-hotspot:hover .crew-anatomy-hotspot-label,.crew-anatomy-hotspot:focus-visible .crew-anatomy-hotspot-label{color:#fff;opacity:1}
+.crew-anatomy-hotspot:hover .crew-anatomy-hotspot-label i,.crew-anatomy-hotspot:focus-visible .crew-anatomy-hotspot-label i{opacity:1;transform:translate(0,0)}
+@keyframes crew-anatomy-enter{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes crew-hotspot-spin{to{transform:rotate(-1turn)}}
+@keyframes crew-hotspot-pulse{0%{opacity:.8;transform:scale(1)}100%{opacity:0;transform:scale(1.5)}}
+@keyframes crew-anatomy-mask-in{from{opacity:0;clip-path:inset(0 0 100% 0);transform:translateY(10px)}to{opacity:1;clip-path:inset(0);transform:translateY(0)}}
+@media(max-width:767px){
+  .crew-anatomy-exit{top:70px;right:18px}
+  .crew-anatomy-hotspot--head{left:var(--anatomy-head-x,60%);top:var(--anatomy-head-y,calc(95px + 8.64dvh))}
+  .crew-anatomy-hotspot--chest{left:var(--anatomy-chest-x,60%);top:var(--anatomy-chest-y,calc(95px + 17.76dvh))}
+  .crew-anatomy-hotspot--abdomen{left:var(--anatomy-abdomen-x,60%);top:var(--anatomy-abdomen-y,calc(95px + 26.4dvh))}
+  .crew-anatomy-hotspot-label{font-size:12px}
+  .crew-anatomy-hotspot--chest .crew-anatomy-hotspot-label{right:calc(100% + 5px);left:auto;flex-direction:row-reverse}
+  .crew-anatomy-content{top:calc(110px + 48dvh);right:18px;bottom:auto;left:18px;width:auto;padding-bottom:70px;overflow:visible}
+  .crew-anatomy-view h3{margin-top:16px;font-size:28px}
+  .crew-anatomy-measure-primary{margin-top:22px}.crew-anatomy-measure-primary strong{font-size:50px}
+  .crew-anatomy-secondary{grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;margin-top:23px}
+}
+@media(max-width:767px) and (max-height:760px){.crew-anatomy-hotspot--head{top:var(--anatomy-head-y,calc(95px + 6.66dvh))}.crew-anatomy-hotspot--chest{top:var(--anatomy-chest-y,calc(95px + 13.69dvh))}.crew-anatomy-hotspot--abdomen{top:var(--anatomy-abdomen-y,calc(95px + 20.35dvh))}.crew-anatomy-content{top:calc(110px + 37dvh)}}
+@media(max-width:767px) and (orientation:landscape){.crew-anatomy-exit{top:40px}.crew-anatomy-content{top:72px;right:18px;bottom:14px;left:auto;width:31%;padding:0 4px 18px 0;overflow-y:auto;pointer-events:auto}}
+@media(prefers-reduced-motion:reduce){.crew-anatomy,.crew-anatomy-hotspot-ring img,.crew-anatomy-hotspot-label>span,.crew-anatomy-view .crew-anatomy-kicker,.crew-anatomy-view h3,.crew-anatomy-view .crew-anatomy-measure-primary,.crew-anatomy-view .crew-anatomy-secondary,.crew-anatomy-view .crew-anatomy-symptoms{animation:none}.crew-anatomy-hotspot:hover .crew-anatomy-hotspot-ring:after,.crew-anatomy-hotspot:focus-visible .crew-anatomy-hotspot-ring:after{animation:none}.crew-anatomy-hotspot-ring,.crew-anatomy-hotspot-label,.crew-anatomy-hotspot-label i{transition:none}}
+@media(prefers-reduced-motion:reduce){.crew-orbit[data-anatomy-ready="true"] .crew-anatomy-view *{animation:none}.crew-anatomy-content,.crew-anatomy-hotspots{transition:none}}
+
+/* One reading is in focus; related readings and guidance open in place. */
+.crew-anatomy-content{pointer-events:auto}
+@media(min-width:768px){.crew-anatomy-content{top:23%;bottom:10%;width:clamp(260px,26vw,370px)}}
+.crew-anatomy-view h3{margin:0 0 26px;font-size:clamp(32px,3vw,45px);line-height:1;font-weight:400;letter-spacing:-.04em}
+.crew-anatomy-metric-switch{display:flex;flex-wrap:wrap;gap:8px 22px}
+.crew-anatomy-metric-switch button{padding:5px 0 9px;border:0;border-bottom:1px solid transparent;border-radius:0;background:none;color:#aac2ce;font:400 14px/1.25 Orbit Magnetik,sans-serif;text-align:left;transition:color .25s ease,border-color .25s ease}
+.crew-anatomy-metric-switch button[aria-pressed="true"]{color:#fff;border-bottom-color:#bbebff}
+.crew-anatomy-metric-switch button:hover{color:#d7f3ff}
+.crew-anatomy-measure[hidden],.crew-anatomy-entry[hidden]{display:none}
+.crew-anatomy-view .crew-anatomy-measure-primary{margin-top:32px}
+.crew-anatomy-reading strong{display:block;color:#f5fcff;font-size:clamp(68px,6.8vw,96px);font-weight:400;line-height:.95;letter-spacing:-.06em;white-space:nowrap}
+.crew-anatomy-reading strong small{margin-left:9px;color:#acd6eb;font-size:16px;font-weight:400;letter-spacing:0}
+.crew-anatomy-provenance{display:block;margin-top:14px;color:#b6cdd8;font-size:12px;line-height:1.4}
+.crew-anatomy-record{display:inline-flex;align-items:center;gap:15px;margin:29px 0 0;padding:10px 0;border:0;border-bottom:1px solid rgba(149,218,248,.7);background:none;color:#eefaff;font:500 13px Orbit Magnetik,sans-serif;letter-spacing:.01em}
+.crew-anatomy-record span,.crew-anatomy-entry-actions button span{color:#8bd9ff;font-size:16px}
+.crew-anatomy-guidance,.crew-anatomy-history-disclosure,.crew-anatomy-symptoms{margin-top:23px;color:#c5d9e4;font-size:13px;line-height:1.55}
+.crew-anatomy-guidance summary,.crew-anatomy-history-disclosure summary,.crew-anatomy-symptoms summary{width:max-content;max-width:100%;color:#b9d6e5;font-size:13px;cursor:pointer;list-style:none}
+.crew-anatomy-guidance summary::-webkit-details-marker,.crew-anatomy-history-disclosure summary::-webkit-details-marker,.crew-anatomy-symptoms summary::-webkit-details-marker{display:none}
+.crew-anatomy-guidance summary span,.crew-anatomy-history-disclosure summary span{margin-left:6px;color:#8bd9ff}
+.crew-anatomy-guidance p{margin:16px 0 0}.crew-anatomy-guidance p>span{display:block;margin-bottom:4px;color:#9cc9df;font-size:11px;font-weight:600}
+.crew-anatomy-guidance a{display:inline-block;margin-top:12px;color:#bce7f9;font-size:12px;text-underline-offset:4px}
+.crew-anatomy-entry{margin-top:26px;color:#c1d8e4;font-size:13px;font-weight:500}
+.crew-anatomy-entry label{display:block;min-width:0}.crew-anatomy-entry label>span{color:#a7c5d4;font-size:12px}
+.crew-anatomy-entry input,.crew-anatomy-entry select{display:block;width:100%;min-width:0;margin-top:9px;padding:7px 0;border:0;border-bottom:1px solid rgba(179,222,240,.65);border-radius:0;background:transparent;color:#f6fcff;font:400 30px/1.2 Orbit Magnetik,sans-serif;letter-spacing:-.03em}
+.crew-anatomy-entry input{appearance:textfield;-moz-appearance:textfield}.crew-anatomy-entry input::-webkit-inner-spin-button,.crew-anatomy-entry input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.crew-anatomy-entry-pair{display:grid;grid-template-columns:1fr auto 1fr;align-items:end;gap:10px}.crew-anatomy-entry-pair>span{padding-bottom:8px;color:#9cbccb}
+.crew-anatomy-entry-context{margin-top:20px}.crew-anatomy-entry select{padding:7px 0;font-size:15px;letter-spacing:0}.crew-anatomy-entry select option{background:#091a28;color:#fff}
+.crew-anatomy-time{margin-top:18px;font-size:12px}.crew-anatomy-time summary{cursor:pointer;color:#b9d6e5}.crew-anatomy-time label{margin-top:12px}.crew-anatomy-time input{font-size:15px}.crew-anatomy-time small{display:block;margin-top:7px;color:#9eb6c2}
+.crew-anatomy-form-error{margin:8px 0;color:#ffc0b5;font-size:12px;font-weight:400;line-height:1.4}
+.crew-anatomy-entry-actions{display:flex;flex-wrap:wrap;gap:24px;margin-top:18px}
+.crew-anatomy-entry-actions button{padding:8px 0;border:0;border-bottom:1px solid transparent;background:none;color:#bed0dc;font:500 13px Orbit Magnetik,sans-serif}
+.crew-anatomy-entry-actions button[type="submit"]{border-bottom-color:#a6def3;color:#f4fcff}.crew-anatomy-entry-actions button:hover{color:#8bd9ff}
+.crew-anatomy-measure:has(.crew-anatomy-entry:not([hidden]))>.crew-anatomy-reading,.crew-anatomy-measure:has(.crew-anatomy-entry:not([hidden]))>.crew-anatomy-record,.crew-anatomy-measure:has(.crew-anatomy-entry:not([hidden]))>.crew-anatomy-guidance{display:none}
+.crew-anatomy-entry input:focus-visible,.crew-anatomy-entry select:focus-visible,.crew-anatomy-guidance a:focus-visible,.crew-anatomy-guidance summary:focus-visible,.crew-anatomy-history-disclosure summary:focus-visible{outline:2px solid #95ddff;outline-offset:4px}
+.crew-orbit[data-anatomy="true"] .orbit-profile-actions{visibility:hidden;pointer-events:none}
+.crew-anatomy-connector{position:absolute;right:calc(6% + clamp(260px,26vw,370px) + 14px);height:1px;background:linear-gradient(90deg,rgba(152,221,250,.12),rgba(181,233,253,.65));pointer-events:none;opacity:.75}
+.crew-anatomy-connector:after{content:'';position:absolute;right:0;top:-2px;width:5px;height:5px;border-radius:50%;background:#c4edff;box-shadow:0 0 10px #83d9ff}
+.crew-anatomy[data-category="circulation"] .crew-anatomy-connector{top:var(--anatomy-chest-y,40%);left:calc(var(--anatomy-chest-x,50%) + 105px)}
+.crew-anatomy[data-category="recovery"] .crew-anatomy-connector{top:var(--anatomy-head-y,25%);left:calc(var(--anatomy-head-x,50%) + 105px)}
+.crew-anatomy[data-category="daily"] .crew-anatomy-connector{top:var(--anatomy-abdomen-y,53%);left:calc(var(--anatomy-abdomen-x,50%) + 105px)}
+.crew-orbit[data-anatomy="true"]:not([data-anatomy-ready="true"]) .crew-anatomy-connector{opacity:0}
+@media(max-width:767px){.crew-anatomy-connector{display:none}.crew-anatomy-view h3{margin-bottom:18px;font-size:30px}.crew-anatomy-metric-switch{gap:8px 18px}.crew-anatomy-metric-switch button{font-size:14px}.crew-anatomy-view .crew-anatomy-measure-primary{margin-top:24px}.crew-anatomy-reading strong{font-size:62px}.crew-anatomy-entry select{font-size:16px}}
+@media(prefers-reduced-motion:reduce){.crew-anatomy-metric-switch button{transition:none}}
+
+@media(max-width:360px){.crew-anatomy-hotspot--chest .crew-anatomy-hotspot-label{right:auto;left:calc(100% + 5px);flex-direction:row}}
+
+/* Section navigation remains available when the camera is close to the heart. */
+.crew-anatomy-sections{display:flex;align-items:center;gap:clamp(18px,2vw,30px);margin-bottom:34px}
+.crew-anatomy-sections button{padding:8px 0;border:0;border-bottom:1px solid transparent;background:none;color:#a9c3d0;font:500 14px Orbit Magnetik,sans-serif;white-space:nowrap}
+.crew-anatomy-sections button[aria-pressed="true"]{color:#fff;border-bottom-color:#b4e8fc}
+.crew-anatomy-sections button:hover,.crew-anatomy-sections button:focus-visible{color:#d5f4ff}
+.crew-anatomy-sections button:focus-visible{outline:2px solid #95ddff;outline-offset:4px}
+.crew-anatomy[data-heart-focused="true"] .crew-anatomy-hotspots{visibility:hidden;pointer-events:none}
+.crew-anatomy-connector{display:none}
+@media(max-width:767px){.crew-anatomy-sections{gap:22px;margin-bottom:20px}}
+
+.crew-anatomy-heart-detail{display:inline-flex;gap:12px;align-items:center;margin:0 0 24px;padding:6px 0;border:0;border-bottom:1px solid rgba(166,222,243,.65);background:none;color:#cfeaf5;font:500 13px Orbit Magnetik,sans-serif}.crew-anatomy-heart-detail i{color:#8dd7fa;font-style:normal}.crew-anatomy-heart-detail:hover{color:#fff}.crew-anatomy-heart-detail:focus-visible{outline:2px solid #95ddff;outline-offset:4px}
+@media(min-width:768px){.crew-anatomy-content{top:18%}}
+.crew-anatomy-sections{margin-bottom:24px}
+.crew-anatomy-view-header{display:flex;align-items:baseline;justify-content:space-between;gap:18px}
+.crew-anatomy-view-header h3{margin:0;font-size:clamp(27px,2.5vw,38px)}
+.crew-anatomy-heart-detail{flex:none;margin:0;padding:5px 0;font-size:13px}
+.crew-anatomy-metric-switch{margin-top:22px}
+.crew-anatomy-view .crew-anatomy-measure-primary{margin-top:23px}
+.crew-anatomy-reading strong{font-size:clamp(58px,6vw,82px)}
+.crew-anatomy-insight{max-width:300px;margin:18px 0 0;color:#c2d7e1;font-size:13px;line-height:1.5}
+.crew-anatomy-record{margin-top:17px}
+.crew-anatomy-guidance{margin-top:16px}
+.crew-anatomy-measure:has(.crew-anatomy-entry:not([hidden]))>.crew-anatomy-insight{display:none}
+@media(max-width:767px){.crew-anatomy-view-header h3{font-size:28px}.crew-anatomy-metric-switch{margin-top:18px}.crew-anatomy-view .crew-anatomy-measure-primary{margin-top:21px}.crew-anatomy-reading strong{font-size:62px}}
+/* Each section offers its related observations without repeating the selected value. */
+.crew-anatomy-metric-switch{display:grid;grid-template-columns:repeat(auto-fit,minmax(80px,1fr));gap:14px}
+.crew-anatomy-metric-switch button{min-width:0;display:block;padding:5px 0 8px}
+.crew-anatomy-metric-switch button>span{display:block;min-height:2.35em;font-size:13px;line-height:1.2}
+.crew-anatomy-metric-switch button strong{display:block;margin-top:6px;color:#f4fbff;font-size:20px;font-weight:400;line-height:1;letter-spacing:-.035em;white-space:nowrap}
+.crew-anatomy-metric-switch button strong small{margin-left:3px;color:#a9cfdf;font-size:10px;letter-spacing:0}
+.crew-anatomy-metric-switch button em{display:block;margin-top:5px;color:#a9c2ce;font-size:11px;font-style:normal}
+.crew-anatomy-metric-switch button[aria-pressed="true"] strong,.crew-anatomy-metric-switch button[aria-pressed="true"] em{visibility:hidden}
+@media(max-width:767px){.crew-anatomy-metric-switch{gap:10px}.crew-anatomy-metric-switch button>span{font-size:12px}}
+@media(max-width:400px){.crew-anatomy-metric-switch button strong{font-size:17px}.crew-anatomy-metric-switch button[data-anatomy-metric-select="pressure"] strong small{display:block;margin:3px 0 0}}

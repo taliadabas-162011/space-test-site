@@ -1,0 +1,31 @@
+/* The native select remains the submitted control; the visible list stays in-scene. */
+.crew-select,.crew-select *, .crew-select *::before,.crew-select *::after{box-sizing:border-box}
+.crew-select-label{display:block;min-width:0}
+.crew-select{position:relative;display:block;width:100%;min-width:0;margin-top:5px}
+.crew-orbit select.crew-select__native{position:absolute!important;width:1px!important;height:1px!important;min-width:0!important;margin:0!important;padding:0!important;border:0!important;opacity:0!important;pointer-events:none!important;clip-path:inset(50%)!important}
+.crew-orbit .crew-select__trigger{display:flex;align-items:center;justify-content:space-between;gap:14px;width:100%;min-height:38px;margin:0;padding:7px 0;border:0;border-bottom:1px solid rgba(179,222,240,.55);border-radius:0;background:transparent;color:#f1f9fc;font:400 14px/1.35 Orbit Magnetik,sans-serif;letter-spacing:0;text-align:left;text-transform:none;cursor:pointer}
+.crew-orbit .crew-select__trigger:disabled{opacity:.5;cursor:not-allowed}
+.crew-select__value{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.crew-select__arrow{flex:none;padding:0 2px;color:#a7d9ee;font:400 20px/1 sans-serif;transition:transform .2s ease}
+.crew-select.is-open{z-index:30}
+.crew-select.is-open .crew-select__arrow{transform:rotate(180deg)}
+.crew-select__menu{position:absolute;z-index:30;top:calc(100% + 5px);right:0;left:0;display:block;max-height:min(250px,40vh);overflow-y:auto;overscroll-behavior:contain;padding:4px 12px;background:linear-gradient(145deg,#122b3b,#071725);box-shadow:0 16px 28px rgba(0,4,10,.45);border-top:1px solid #8acbe7;color:#ebf8fd;animation:crew-select-open .2s ease-out both;scrollbar-width:thin;scrollbar-color:#719bad transparent}
+.crew-select__menu[hidden]{display:none}
+.crew-select.opens-up .crew-select__menu{top:auto;bottom:calc(100% + 5px)}
+.crew-select__option{display:flex;align-items:center;min-height:42px;padding:8px 3px;border-bottom:1px solid rgba(174,210,225,.14);font:400 14px/1.35 Orbit Magnetik,sans-serif;cursor:pointer}
+.crew-select__option:last-child{border-bottom:0}
+.crew-select__option.is-active,.crew-select__option:hover{color:#fff;background:rgba(151,216,246,.12)}
+.crew-select__option[aria-selected="true"]:after{content:'';width:6px;height:11px;margin:0 5px 4px auto;border-right:1.5px solid #a6e5ff;border-bottom:1.5px solid #a6e5ff;transform:rotate(45deg)}
+.crew-select__option[aria-disabled="true"]{opacity:.45;cursor:not-allowed}
+.crew-select__error{display:block;margin-top:7px;color:#ffc0b5;font-size:12px;line-height:1.4}
+.crew-select__error[hidden]{display:none}
+.crew-orbit .crew-select__trigger:focus-visible{outline:2px solid #95ddff;outline-offset:4px}
+.observation-symptom-meta .crew-select-label,.crew-anatomy-entry .crew-select,.crew-select *, .crew-select *::before,.crew-select *::after{box-sizing:border-box}
+.crew-select-label{color:#c1d8e4;font-size:13px;font-weight:600}
+.observation-symptom-meta .crew-select-label>span:not(.crew-select){color:#91adbb;font-size:11px;font-weight:400}
+.observation-context-pair .crew-select,.crew-select *, .crew-select *::before,.crew-select *::after{box-sizing:border-box}
+.crew-select-label{margin:0}
+.observation-context-pair .crew-select-label>span:not(.crew-select){font-size:12px;color:#a8c3d0}
+@keyframes crew-select-open{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:767px){.crew-orbit .crew-select__trigger,.crew-select__option{font-size:16px}.crew-select__option{min-height:44px}}
+@media(prefers-reduced-motion:reduce){.crew-select__menu{animation:none}.crew-select__arrow{transition:none}}

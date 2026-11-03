@@ -1,0 +1,45 @@
+/* The record stays in the crew scene; chronology and whitespace do the grouping. */
+.crew-orbit .orbit-timeline{position:absolute;z-index:20;top:11%;right:4%;bottom:5%;left:auto;width:min(39vw,540px);padding:24px 12px 40px 32px;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#6d95a7 transparent;color:#f4fbff;text-shadow:0 2px 18px #030b14;font-family:Orbit Magnetik,sans-serif}
+.crew-orbit .orbit-timeline[hidden]{display:none}
+.crew-orbit[data-panel="history"] .orbit-profile-readings,.crew-orbit[data-panel="history"] .orbit-form,.crew-orbit[data-panel="history"] .orbit-profile-actions,.crew-orbit[data-panel="history"] .crew-anatomy-content,.crew-orbit[data-panel="history"] .crew-anatomy-hotspots,.crew-orbit[data-panel="history"] .crew-anatomy-exit{visibility:hidden;pointer-events:none}
+.timeline-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:20px}
+.timeline-heading p{margin:0 0 15px;color:#a6cfdf;font-size:11px;letter-spacing:.12em}
+.timeline-heading h2{margin:0;font-size:clamp(31px,3vw,43px);font-weight:400;line-height:1.06;letter-spacing:-.045em}
+.timeline-heading h2:focus{outline:none}
+.timeline-heading div>span{display:block;margin-top:12px;color:#b4cbd6;font-size:13px}
+.timeline-heading button,.timeline-record,.timeline-urgent-action{border:0;border-bottom:1px solid rgba(166,222,243,.65);border-radius:0;background:none;color:#e7f7fc;font:500 13px Orbit Magnetik,sans-serif;cursor:pointer}
+.timeline-heading button{flex:none;padding:3px 0 7px;color:#bdd6e2}
+.timeline-heading button span{font-size:18px;margin-left:5px}
+.timeline-record{display:inline-flex;gap:14px;margin-top:30px;padding:9px 0}
+.timeline-record span{color:#8dd7fa}
+.timeline-list{margin:32px 0 0;padding:0;list-style:none}
+.timeline-entry{position:relative;padding:23px 0 27px;border-top:1px solid rgba(158,206,226,.3)}
+.timeline-entry>header{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 16px;margin-bottom:17px}
+.timeline-entry time{color:#d5ebf4;font-size:14px;font-weight:600}
+.timeline-saved,.timeline-context{color:#a6bfcb;font-size:12px;line-height:1.45}
+.timeline-report{margin:0 0 21px}
+.timeline-report h3{margin:0;color:#ecf8fc;font-size:17px;font-weight:500;line-height:1.2;letter-spacing:-.015em}
+.timeline-report[data-status="urgent"] h3{color:#ffc0b4}
+.timeline-report[data-status="concerning"] h3{color:#ffdda9}
+.timeline-report p{margin:8px 0 0;color:#c9dce5;font-size:13px;line-height:1.45}
+.timeline-report p.timeline-context{color:#a6bfcb;font-size:12px}
+.timeline-note{white-space:pre-wrap;overflow-wrap:anywhere}
+.timeline-urgent-action{margin-top:14px;padding:7px 0;border-color:#efaa9e;color:#ffd0c9}
+.timeline-readings{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 24px;margin:0}
+.timeline-readings>div{min-width:0}
+.timeline-readings dt{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 10px;color:#bdd4df;font-size:12px;font-weight:500}
+.timeline-repeat{padding:0;border:0;border-radius:0;background:none;color:#a9def5;font:500 12px Orbit Magnetik,sans-serif;cursor:pointer}
+.timeline-repeat:hover{text-decoration:underline;text-underline-offset:3px}
+.timeline-readings dd{margin:5px 0 0;color:#e8f8ff;font-size:13px}
+.timeline-readings dd strong{font-size:24px;font-weight:400;line-height:1;letter-spacing:-.035em}
+.timeline-readings dd span{color:#a8cfdf;font-size:12px}
+.timeline-readings dd.timeline-context{margin-top:6px;color:#a6bfcb;font-size:12px}
+.timeline-empty{margin:38px 0;color:#bfd3dc;font-size:15px;line-height:1.5}
+.timeline-heading button:focus-visible,.timeline-record:focus-visible,.timeline-urgent-action:focus-visible,.timeline-repeat:focus-visible{outline:2px solid #95ddff;outline-offset:4px}
+@media(max-width:767px){
+  .crew-orbit .orbit-timeline{top:26%;right:0;bottom:0;left:0;width:auto;padding:25px 20px 40px}
+  .timeline-heading h2{font-size:32px}
+  .timeline-list{margin-top:26px}
+  .timeline-entry{padding:20px 0 23px}
+}
+@media(max-width:360px){.timeline-readings{gap:16px}}
