@@ -22,7 +22,7 @@ function timestamp(value) {
   return Number.isFinite(time) ? time : null;
 }
 function displayTime(time) {
-  return new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(time));
+  return new Intl.DateTimeFormat('en-US', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(time));
 }
 function number(value) {
   if (value == null || (typeof value === 'string' && !value.trim())) return null;

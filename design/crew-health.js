@@ -86,7 +86,7 @@
   }
   function entries(field) { return entriesFor(selected.id, field); }
   function displayDate(value) {
-    return new Intl.DateTimeFormat(undefined, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }).format(new Date(value));
+    return new Intl.DateTimeFormat('en-US', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }).format(new Date(value));
   }
   function displayValue(field, value) {
     if (value == null || value === '') return '—';

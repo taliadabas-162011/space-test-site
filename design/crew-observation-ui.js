@@ -5,7 +5,7 @@ const escapeHtml = value => String(value).replace(/[&<>"']/g, char => ({
 const contextLabels = { rest: 'At rest', 'after-activity': 'After activity', fasting: 'Fasting', 'after-meal': 'After a meal', other: 'Other context' };
 function shortDate(time) {
   const date = new Date(time);
-  return time && Number.isFinite(date.getTime()) ? new Intl.DateTimeFormat(undefined, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }).format(date) : '';
+  return time && Number.isFinite(date.getTime()) ? new Intl.DateTimeFormat('en-US', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }).format(date) : '';
 }
 function recordedDetail(reading) {
   if (!reading?.recorded) return 'Sample';
@@ -166,7 +166,7 @@ export function renderObservationCheckin() {
       ${input('exercise', 'Exercise · 24h', 'min', 0, 1440, 1)}
     </div></fieldset>
     <div class="observation-reports"><label class="observation-select"><span>Mood</span><select name="mood"><option value="">Not recorded</option><option value="good">Good</option><option value="neutral">Neutral</option><option value="low">Low</option></select></label><label class="observation-select"><span>Sleep quality</span><select name="sleepQuality"><option value="">Not recorded</option><option value="restful">Restful</option><option value="mixed">Mixed</option><option value="poor">Poor</option></select></label></div></details>
-    <details class="observation-time" open><summary>Reading date and time</summary><label>Observed at <input type="datetime-local" name="measuredAt"></label><small>Set the date and time before saving the measurements.</small></details>
+    <details class="observation-time" open><summary>Reading date and time</summary><label>Observed at <input type="datetime-local" lang="en" name="measuredAt"></label><small>Set the date and time before saving the measurements.</small></details>
     <details class="observation-guide"><summary>How to take a measurement <span aria-hidden="true">↗</span></summary><div>
       <p><strong>Heart rate</strong> — Follow the device instructions, or count the wrist pulse for 60 seconds. Note whether the reading was taken at rest or after activity. <a href="https://www.heart.org/en/health-topics/high-blood-pressure/the-facts-about-high-blood-pressure/all-about-heart-rate-pulse" target="_blank" rel="noopener noreferrer">AHA guide ↗</a></p>
       <p><strong>Blood pressure</strong> — Use a correctly sized cuff after five minutes of quiet rest. Support the cuff at heart level; follow the mission procedure in microgravity. <a href="https://www.heart.org/en/health-topics/high-blood-pressure/understanding-blood-pressure-readings/monitoring-your-blood-pressure-at-home" target="_blank" rel="noopener noreferrer">AHA guide ↗</a></p>
