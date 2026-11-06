@@ -15,7 +15,8 @@
     pulse: { label: 'Heart rate', unit: 'bpm', min: 0, max: 300, step: 1 },
     pressure: { label: 'Blood pressure', unit: 'mmHg', pair: true },
     oxygen: { label: 'Oxygen saturation', unit: '%', min: 0, max: 100, step: 1 },
-    glucose: { label: 'Blood glucose', unit: 'mg/dL', min: 0, max: 9999, step: 1 },
+    glucose: { label: 'Blood glucose', unit: 'mg/dL', min: 0, max: 9999, step: 0.1 },
+    weight: { label: 'Body mass', unit: 'kg', min: 0, max: 400, step: 0.1 },
     sleep: { label: 'Sleep', unit: 'hours', min: 0, max: 24, step: 0.1 },
     water: { label: 'Water intake', unit: 'litres', min: 0, max: 15, step: 0.1 },
     temperature: { label: 'Temperature', unit: '°C', min: 20, max: 50, step: 0.1 },
@@ -157,7 +158,7 @@
     const reading = field => {
       const latest = entriesFor(person.id, field).at(-1);
       const contexts = field === 'glucose' ? glucoseContexts : readingContexts;
-      return { value: latest ? latest.value : person.samples[field] ?? null, recorded: Boolean(latest), time: latest?.time || null,
+      return { value: latest ? latest.value : person.samples[field] ?? null, recorded: Boolean(latest), time: latest?.time || null, source: latest?.source || '',
         context: contexts.includes(latest?.context) ? latest.context : '' };
     };
     const symptoms = symptomEntries(person.id).at(-1);
@@ -166,7 +167,7 @@
       const latest = Array.isArray(list) ? list.filter(item => selfReports[field].includes(item?.value) && Number.isFinite(Date.parse(item?.time))).sort((a, b) => Date.parse(a.time) - Date.parse(b.time)).at(-1) : null;
       return latest ? { value: latest.value, time: latest.time } : null;
     };
-    return { person, pulse: reading('pulse'), oxygen: reading('oxygen'), glucose: reading('glucose'), sleep: reading('sleep'), pressure: reading('pressure'),
+    return { person, pulse: reading('pulse'), oxygen: reading('oxygen'), glucose: reading('glucose'), weight: reading('weight'), sleep: reading('sleep'), pressure: reading('pressure'),
       water: reading('water'), temperature: reading('temperature'), exercise: reading('exercise'), symptoms: symptoms?.value || '',
       symptomTime: symptoms?.time || null, symptomNote: typeof symptoms?.note === 'string' ? symptoms.note : '',
       symptomTags: Array.isArray(symptoms?.tags) ? symptoms.tags.filter(tag => Object.hasOwn(symptomOptions, tag)) : [],
@@ -214,6 +215,7 @@
       onset = date.toISOString();
     }
     let count = 0;
+    let skippedDuplicates = 0;
     for (const [field, raw] of Object.entries(values)) {
       const metric = metrics[field];
       if (!metric || raw == null || (typeof raw === 'string' && !raw.trim())) continue;
@@ -225,10 +227,13 @@
         if (!Number.isFinite(value.systolic) || !Number.isFinite(value.diastolic) || value.systolic < 0 || value.systolic > 400 || value.diastolic < 0 || value.diastolic > 300 || value.systolic <= value.diastolic) throw new Error('Check the blood-pressure values.');
       } else {
         value = Number(raw);
-        if (!Number.isFinite(value) || value < metric.min || value > metric.max || (field === 'glucose' && !Number.isInteger(value))) throw new Error(`Check the ${metric.label.toLowerCase()} value.`);
+        if (!Number.isFinite(value) || value < metric.min || value > metric.max) throw new Error(`Check the ${metric.label.toLowerCase()} value.`);
       }
       next[personId][field] ||= [];
+      if (details.deviceSequence != null && next[personId][field].some(item => item.deviceSequence === details.deviceSequence)) { skippedDuplicates++; continue; }
       const entry = { value, time, recordedAt: recordedAt.toISOString() };
+      entry.source = typeof details.source === 'string' && details.source.trim() ? details.source.trim().slice(0, 80) : 'Manual entry';
+      if (details.deviceSequence != null) entry.deviceSequence = details.deviceSequence;
       if (vitalFields.has(field) && details.context) entry.context = details.context;
       if (field === 'glucose' && details.glucoseContext) entry.context = details.glucoseContext;
       next[personId][field].push(entry);
@@ -250,6 +255,7 @@
       next[personId][field].push({ value: details[field], time, recordedAt: recordedAt.toISOString() });
       count++;
     }
+    if (!count && skippedDuplicates) return;
     if (!count) throw new Error('Enter a reading or select a self-report.');
     localStorage.setItem(storageKey, JSON.stringify(next));
     records = next;

@@ -4,7 +4,8 @@ const COMPARISON_WINDOW = 30 * DEMO_INTERVAL;
 const METRICS = {
   pulse: { min: 0, max: 300 },
   oxygen: { min: 0, max: 100 },
-  glucose: { min: 0, max: 9999, integer: true },
+  glucose: { min: 0, max: 9999 },
+  weight: { min: 0, max: 400 },
   pressure: { pair: true },
   temperature: { min: 20, max: 50 },
   sleep: { min: 0, max: 24 },

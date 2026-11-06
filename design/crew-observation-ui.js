@@ -9,7 +9,7 @@ function shortDate(time) {
 }
 function recordedDetail(reading) {
   if (!reading?.recorded) return 'Sample';
-  return ['Recorded', shortDate(reading.time), contextLabels[reading.context]].filter(Boolean).join(' · ');
+  return ['Recorded', shortDate(reading.time), contextLabels[reading.context], reading.source].filter(Boolean).join(' · ');
 }
 
 function observationValue(reading) {
@@ -83,7 +83,7 @@ function profileReading(summary, key, title, unit, primary = false) {
 
 export function renderObservationProfile(summary, pulseHistory = []) {
   const fields = {
-    pulse: ['Heart rate', 'bpm'], oxygen: ['Oxygen', '%'], pressure: ['Blood pressure', 'mmHg'], glucose: ['Blood glucose', 'mg/dL'],
+    pulse: ['Heart rate', 'bpm'], oxygen: ['Oxygen', '%'], pressure: ['Blood pressure', 'mmHg'], glucose: ['Blood glucose', 'mg/dL'], weight: ['Body mass', 'kg'],
     sleep: ['Sleep', 'hrs'], temperature: ['Temperature', '°C'], water: ['Water intake', 'L'], exercise: ['Exercise', 'min'],
   };
   const ordered = Object.keys(fields).sort((a, b) => Number(Boolean(summary?.[b]?.recorded)) - Number(Boolean(summary?.[a]?.recorded)));
@@ -130,7 +130,7 @@ export function updateObservationCheckin(form, summary) {
     const value = key === 'pressure'
       ? `${observationValue({ value: reading.value?.systolic })}/${observationValue({ value: reading.value?.diastolic })}`
       : observationValue(reading);
-    const unit = { pulse: 'bpm', oxygen: '%', pressure: 'mmHg', temperature: '°C', glucose: 'mg/dL', sleep: 'hrs', water: 'L', exercise: 'min' }[key] || '';
+    const unit = { pulse: 'bpm', oxygen: '%', pressure: 'mmHg', temperature: '°C', glucose: 'mg/dL', weight: 'kg', sleep: 'hrs', water: 'L', exercise: 'min' }[key] || '';
     const context = contextLabels[reading.context];
     element.textContent = [`Last recorded ${value} ${unit}`, shortDate(reading.time), context].filter(Boolean).join(' · ');
     element.hidden = false;
@@ -154,7 +154,8 @@ export function renderObservationCheckin() {
       ${input('oxygen', 'Oxygen saturation', '%', 0, 100, 1)}
       <div class="observation-pressure"><span class="observation-field-name"><span class="observation-field-label">Blood pressure</span><em data-checkin-last="pressure" hidden></em></span><div class="observation-pressure-entry"><label><span class="observation-sr-only">Systolic blood pressure</span><input name="systolic" type="number" min="0" max="400" step="1" inputmode="numeric" placeholder="Sys"></label><span aria-hidden="true">/</span><label><span class="observation-sr-only">Diastolic blood pressure</span><input name="diastolic" type="number" min="0" max="300" step="1" inputmode="numeric" placeholder="Dia"></label><small>mmHg</small></div></div>
       ${input('temperature', 'Temperature', '°C', 20, 50, 0.1, 'decimal')}
-      ${input('glucose', 'Blood glucose', 'mg/dL', 0, 9999, 1)}
+      ${input('glucose', 'Blood glucose', 'mg/dL', 0, 9999, 0.1, 'decimal')}
+      ${input('weight', 'Body mass', 'kg', 0, 400, 0.1, 'decimal')}
     </div>
     <div class="observation-context-pair"><label class="observation-select observation-vital-context"><span>Vitals taken</span><select name="context"><option value="">Context not specified</option><option value="rest">At rest</option><option value="after-activity">After activity</option><option value="other">Other context</option></select></label>
       <label class="observation-select observation-glucose-context"><span>Glucose taken</span><select name="glucoseContext"><option value="">Context not specified</option><option value="fasting">Fasting</option><option value="after-meal">After a meal</option><option value="other">Other context</option></select></label></div>
@@ -174,5 +175,5 @@ export function renderObservationCheckin() {
       <p><strong>Blood glucose</strong> — Follow the meter instructions and record whether the reading was taken fasting or after a meal. <a href="https://medlineplus.gov/lab-tests/blood-glucose-test/" target="_blank" rel="noopener noreferrer">MedlinePlus ↗</a></p>
       <p>If a reading is unexpected, check the device and follow the mission medical protocol. Do not delay urgent care to enter data.</p>
     </div></details>
-    <div class="observation-footer"><p class="orbit-error" role="alert"></p><div class="orbit-form-actions observation-actions"><button type="button" data-cancel>Cancel</button><button type="submit">Save check-in <span aria-hidden="true">↗</span></button></div></div>`;
+    <div class="observation-footer"><p class="orbit-error" role="alert"></p><div class="orbit-form-actions observation-actions"><button type="button" data-cancel>Cancel</button><button type="submit">Save this reading <span aria-hidden="true">↗</span></button></div></div>`;
 }

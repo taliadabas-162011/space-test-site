@@ -1,10 +1,11 @@
 import { createCrewStage } from '/space-test-site/design/crew-motion-stage.js?v=astronaut-6';
-import { renderObservationCheckin, renderObservationIdentity, renderObservationOverview, renderObservationProfile, renderObservationMobile, updateObservationCheckin } from '/space-test-site/design/crew-observation-ui.js?v=astronaut-3';
+import { renderObservationCheckin, renderObservationIdentity, renderObservationOverview, renderObservationProfile, renderObservationMobile, updateObservationCheckin } from '/space-test-site/design/crew-observation-ui.js?v=astronaut-4';
 import { renderAnatomyUI, setAnatomyCategory, setAnatomyMetric } from '/space-test-site/design/crew-anatomy-ui.js?v=astronaut-3';
 import { renderEmergencyGuide } from '/space-test-site/design/crew-guidance.js?v=astronaut-3';
 import { initializeCustomSelects, syncCustomSelects, focusCustomSelect } from '/space-test-site/design/crew-select.js?v=astronaut-3';
-import { renderHealthTimeline } from '/space-test-site/design/crew-timeline-ui.js?v=astronaut-3';
-import { assessCrewHealth } from '/space-test-site/design/crew-assessment.js?v=astronaut-3';
+import { renderHealthTimeline } from '/space-test-site/design/crew-timeline-ui.js?v=astronaut-4';
+import { assessCrewHealth } from '/space-test-site/design/crew-assessment.js?v=astronaut-4';
+import { connectCrewSensor } from '/space-test-site/design/crew-device.js?v=astronaut-1';
 
 const { CrewDesign } = window;
 const people = CrewDesign.crew;
@@ -15,7 +16,7 @@ hub.setAttribute('aria-label', 'Crew health overview');
 hub.innerHTML = `<div class="orbit-background" aria-hidden="true"></div><canvas class="orbit-canvas" aria-hidden="true"></canvas>
   <header class="orbit-header"><span class="orbit-brand">CREW <i>/</i> HEALTH</span><div class="orbit-header-right"><span class="orbit-meta">Personal crew profile · entries stay on this device</span><button type="button" data-emergency>Emergency <span aria-hidden="true">↗</span></button></div></header>
   <div class="orbit-intro"><h1 tabindex="-1">Space health</h1><p>One crew member · one personal record</p></div>
-  <nav class="orbit-app-nav" aria-label="Health dashboard" hidden><button type="button" data-nav="profile">Profile</button><button type="button" data-nav="today">Readings today</button><button type="button" data-nav="history">History</button><button type="button" data-nav="device">Link device</button><button type="button" data-nav="research">Space effects</button><button type="button" data-nav="feedback">Feedback</button></nav>
+  <nav class="orbit-app-nav" aria-label="Health dashboard" hidden><button type="button" data-nav="profile">Profile</button><button type="button" data-nav="today">Readings</button><button type="button" data-nav="history">History</button><button type="button" data-nav="weights">Body mass</button><button type="button" data-nav="device">Link device</button><button type="button" data-nav="advice">NASA advice</button><button type="button" data-nav="research">Space effects</button><button type="button" data-nav="feedback">Feedback</button></nav>
   <div class="orbit-actors">${people.map((person, index) => `<section class="orbit-actor" data-actor="${index}"><button class="orbit-hit" type="button" data-select="${index}" aria-label="Open astronaut health profile"></button><div class="orbit-actor-label"><span>ASTRONAUT PROFILE</span><h2></h2><div class="orbit-actor-status"></div><button type="button" data-record="${index}">Readings today <span aria-hidden="true">↗</span></button></div><div class="orbit-actor-readings"></div></section>`).join('')}</div>
   <div class="orbit-mobile-summary"></div>
   <nav class="orbit-mobile-crew" aria-label="Choose a crew member">${people.map((person, index) => `<button type="button" data-select="${index}">${person.name.split(' ')[0]} <span aria-hidden="true">↗</span></button>`).join('')}</nav>
@@ -59,6 +60,8 @@ let gesture = null;
 let suppressFigureClick = false;
 let returnFocus = null;
 let emergencyStep = 'start';
+const deviceConnections = new Map();
+const deviceSaveTimes = new Map();
 const metricCategories = { pulse: 'circulation', pressure: 'circulation', oxygen: 'circulation', glucose: 'daily', sleep: 'recovery', exercise: 'recovery', temperature: 'daily', water: 'daily' };
 
 function symptomText(status, brief = false) {
@@ -155,7 +158,11 @@ function focusCheckinAction() {
 }
 renderForm();
 renderData();
-window.addEventListener('crewhealth:update', renderData);
+window.addEventListener('crewhealth:update', () => {
+  renderData();
+  if (hub.dataset.panel === 'advice') sectionContent.innerHTML = sectionMarkup('advice');
+  if (hub.dataset.panel === 'weights') sectionContent.innerHTML = sectionMarkup('weights');
+});
 
 function showPerson(index, openForm = false) {
   if (!CrewDesign.hasProfile()) { openOnboarding(false); return; }
@@ -261,19 +268,109 @@ const escapeHtml = value => String(value).replace(/[&<>"']/g, char => ({ '&': '&
 function todayRow(reading, label, unit, pressure = false) {
   const recordedToday = reading?.recorded && new Date(reading.time).toDateString() === new Date().toDateString();
   const value = pressure
-    ? `${reading?.value?.systolic ?? '—'}/${reading?.value?.diastolic ?? '—'}`
+    ? reading?.recorded ? `${reading.value?.systolic ?? '—'}/${reading.value?.diastolic ?? '—'}` : '—'
     : reading?.recorded ? reading.value : '—';
   const detail = recordedToday
-    ? `Recorded ${new Intl.DateTimeFormat(undefined, { hour: '2-digit', minute: '2-digit' }).format(new Date(reading.time))}${reading.context ? ` · ${reading.context === 'rest' ? 'at rest' : reading.context === 'after-activity' ? 'after activity' : reading.context}` : ''}`
+    ? `Recorded ${new Intl.DateTimeFormat(undefined, { hour: '2-digit', minute: '2-digit' }).format(new Date(reading.time))}${reading.context ? ` · ${reading.context === 'rest' ? 'at rest' : reading.context === 'after-activity' ? 'after activity' : reading.context}` : ''}${reading.source ? ` · ${reading.source}` : ''}`
     : reading?.recorded ? 'Last entry was on another day' : 'No reading recorded today';
   return `<div class="orbit-today-row"><span>${label}</span><strong>${escapeHtml(value)} <small>${unit}</small></strong><em>${escapeHtml(detail)}</em></div>`;
+}
+function deviceRows() {
+  const sensors = [
+    ['pulse', 'Heart rate', 'A compatible BLE heart-rate sensor can stream readings while connected.'],
+    ['pressure', 'Blood pressure', 'Pair a BLE blood-pressure cuff, then take a measurement on the cuff.'],
+    ['oxygen', 'Oxygen saturation', 'Pair a BLE pulse oximeter that exposes the Bluetooth SIG spot-check service.'],
+    ['glucose', 'Blood glucose', 'A compatible BLE meter can send its latest stored record on connection; many glucose devices do not stream continuously.'],
+  ];
+  return sensors.map(([field, label, note]) => {
+    const session = deviceConnections.get(field);
+    const status = session ? `Connected · ${session.device.name || 'sensor'}` : 'Not connected';
+    const action = session ? 'Disconnect' : 'Connect device';
+    return `<article class="orbit-device-card"><div><strong>${label}</strong><small>${note}</small><em data-device-status="${field}">${escapeHtml(status)}</em></div><button class="orbit-panel-action" type="button" data-device-connect="${field}" aria-pressed="${String(Boolean(session))}">${action}</button></article>`;
+  }).join('');
+}
+function weightMarkup(summary) {
+  const history = CrewDesign.history(summary.person.id, 'weight').slice(-12).reverse();
+  const rows = history.length ? history.map(entry => `<li><span>${escapeHtml(new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(entry.time)))}${entry.source ? ` · ${escapeHtml(entry.source)}` : ''}</span><strong>${escapeHtml(entry.value)} kg</strong></li>`).join('') : '<li class="orbit-empty-history">No body-mass readings recorded yet.</li>';
+  return `<p class="orbit-panel-kicker">ASTRONAUT MEASUREMENTS</p><h2 id="section-title">Body mass</h2><p class="orbit-section-lede">Record mass from the mission’s approved in-flight measuring device. In microgravity, an ordinary Earth scale does not measure body mass reliably.</p><form class="orbit-weight-form" data-weight-form><label for="body-mass-value">Measured body mass <small>kg</small></label><input id="body-mass-value" name="weight" type="number" min="0" max="400" step="0.1" inputmode="decimal" required placeholder="Enter measured mass"><label for="body-mass-time">Measurement time <small>Optional</small></label><input id="body-mass-time" name="measuredAt" type="datetime-local"><p class="orbit-profile-error" role="alert"></p><button class="orbit-panel-action" type="submit">Save this reading <span aria-hidden="true">↗</span></button></form><div class="orbit-weight-history"><h3>Mass history</h3><ol>${rows}</ol></div><p class="orbit-local-note">NASA describes using the Space Linear Acceleration Mass Measurement Device (SLAMMD) to measure body mass in flight.</p><a class="orbit-source-link" href="https://www.nasa.gov/wp-content/uploads/2024/10/2024-space-nutrition-2nd-edition-2024.pdf" target="_blank" rel="noopener noreferrer">NASA space nutrition research ↗</a>`;
+}
+function adviceMarkup(summary, histories) {
+  const assessment = assessCrewHealth(summary, histories);
+  const recorded = Object.entries(CrewDesign.metrics).filter(([field]) => summary[field]?.recorded).map(([field, metric]) => {
+    const reading = summary[field];
+    const value = field === 'pressure' ? `${reading.value.systolic}/${reading.value.diastolic}` : reading.value;
+    const when = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(reading.time));
+    return `<li><strong>${escapeHtml(metric.label)}:</strong> ${escapeHtml(value)} ${escapeHtml(metric.unit)} · ${escapeHtml(when)}${reading.source ? ` · ${escapeHtml(reading.source)}` : ''}</li>`;
+  }).join('');
+  const status = assessment.priority === 'urgent'
+    ? '<div class="orbit-advice-alert" data-priority="urgent"><strong>Urgent symptoms were recorded.</strong><p>Alert a crew member and follow the mission emergency procedure now.</p></div>'
+    : assessment.priority === 'attention'
+      ? '<div class="orbit-advice-alert" data-priority="attention"><strong>Symptoms were recorded.</strong><p>Review them with the flight medical team and follow mission procedures.</p></div>'
+      : `<div class="orbit-advice-alert"><strong>${escapeHtml(assessment.title)}</strong><p>${escapeHtml(assessment.explanation)} ${escapeHtml(assessment.nextAction)}</p></div>`;
+  return `<p class="orbit-panel-kicker">NASA-BASED HEALTH GUIDANCE</p><h2 id="section-title">Reading feedback & advice</h2><p class="orbit-section-lede">This page summarizes observations and spaceflight research. It does not diagnose health or label a reading “normal” using Earth-based cutoffs.</p>${status}<section class="orbit-research-card"><h3>Your latest saved observations</h3>${recorded ? `<ul class="orbit-advice-readings">${recorded}</ul>` : '<p>No readings have been saved yet. Record one to see it summarized here.</p>'}</section><section class="orbit-research-card"><h3>According to NASA research</h3><p>Microgravity shifts body fluids toward the head and the cardiovascular system adapts. Compare heart rate and blood pressure with this astronaut’s own baseline, record whether the measurement was taken at rest or after activity, and use mission medical limits.</p><p>NASA research describes hypoxia as a mission-environment risk. An oxygen-saturation number alone cannot identify the cause or replace the suit, cabin, and medical procedures.</p><p>NASA’s public sources do not provide one universal in-flight “healthy astronaut” limit for heart rate, blood pressure, oxygen saturation, glucose, or body mass for this general dashboard.</p><a class="orbit-source-link" href="https://www.nasa.gov/directorates/esdmd/hhp/cardiovascular-and-vision/" target="_blank" rel="noopener noreferrer">NASA cardiovascular monitoring ↗</a><a class="orbit-source-link" href="https://www.nasa.gov/reference/risk-of-hypoxia/" target="_blank" rel="noopener noreferrer">NASA hypoxia risk ↗</a><a class="orbit-source-link" href="https://www.nasa.gov/directorates/esdmd/hhp/treat/medical-examination-requirements-mer-for-former-astronauts/" target="_blank" rel="noopener noreferrer">NASA medical surveillance and glucose tests ↗</a></section><p class="orbit-local-note">Use this feedback to organize records and questions for the flight medical team. Mission-approved limits and procedures take priority.</p>`;
+}
+function deviceMessage(text, error = false) {
+  const element = sectionContent.querySelector('[data-device-message]');
+  if (!element) return;
+  element.textContent = text;
+  element.dataset.error = String(error);
+}
+function refreshDeviceRows() {
+  sectionContent.querySelectorAll('[data-device-connect]').forEach(button => {
+    const session = deviceConnections.get(button.dataset.deviceConnect);
+    button.textContent = session ? 'Disconnect' : 'Connect device';
+    button.setAttribute('aria-pressed', String(Boolean(session)));
+    const status = sectionContent.querySelector(`[data-device-status="${button.dataset.deviceConnect}"]`);
+    if (status) status.textContent = session ? `Connected · ${session.device.name || 'sensor'}` : 'Not connected';
+  });
+}
+async function toggleDevice(field, button) {
+  const existing = deviceConnections.get(field);
+  if (existing) { existing.disconnect(); deviceConnections.delete(field); refreshDeviceRows(); return; }
+  button.disabled = true;
+  deviceMessage('Waiting for device selection…');
+  try {
+    const session = await connectCrewSensor(field, {
+      onStatus: text => deviceMessage(text),
+      onDisconnect: name => {
+        deviceConnections.delete(field);
+        refreshDeviceRows();
+        deviceMessage(`${name} disconnected. Readings already saved remain in this browser.`);
+      },
+      onReading: reading => {
+        const now = Date.now();
+        const interval = field === 'pulse' ? 15000 : field === 'oxygen' ? 30000 : 0;
+        if (interval && now - (deviceSaveTimes.get(field) || 0) < interval) return;
+        try {
+          const details = { measuredAt: reading.time, source: `Bluetooth · ${reading.deviceName}` };
+          if (field === 'pulse' || field === 'pressure' || field === 'oxygen') details.context = 'other';
+          if (field === 'glucose') { details.glucoseContext = 'other'; details.deviceSequence = reading.sequence; }
+          CrewDesign.saveOverview(people[0].id, { [field]: reading.value }, '', details);
+          deviceSaveTimes.set(field, now);
+          deviceMessage(`${CrewDesign.metrics[field].label} saved automatically from ${reading.deviceName}.`);
+        } catch (error) {
+          deviceMessage(error.message || 'The device reading could not be saved on this device.', true);
+        }
+      },
+    });
+    deviceConnections.set(field, session);
+    refreshDeviceRows();
+  } catch (error) {
+    const cancelled = error?.name === 'NotFoundError';
+    deviceMessage(cancelled ? 'Device selection was cancelled.' : error.message || 'Could not connect to that sensor. Check that it supports the listed Bluetooth service.', !cancelled);
+  } finally {
+    button.disabled = false;
+    refreshDeviceRows();
+  }
 }
 function sectionMarkup(section) {
   const summary = CrewDesign.summary(people[0].id);
   const name = escapeHtml(summary.person.name);
-  if (section === 'today') return `<p class="orbit-panel-kicker">MISSION HEALTH / TODAY</p><h2 id="section-title">Readings today</h2><p class="orbit-section-lede">A daily snapshot for ${name}. Values are shown as recorded; this demo does not classify them as normal or abnormal.</p><div class="orbit-today-list">${todayRow(summary.pulse, 'Heart rate', 'bpm')}${todayRow(summary.oxygen, 'Oxygen saturation', '%')}${todayRow(summary.pressure, 'Blood pressure', 'mmHg', true)}${todayRow(summary.temperature, 'Temperature', '°C')}</div><button class="orbit-panel-action" type="button" data-today-record>Record today’s readings <span aria-hidden="true">↗</span></button><p class="orbit-local-note">Entries are stored in this browser only.</p>`;
-  if (section === 'device') return `<p class="orbit-panel-kicker">DEVICE LINK / CONCEPT</p><h2 id="section-title">Connect a wearable</h2><p class="orbit-section-lede">A future device link could send heart rate, oxygen saturation, activity, and other supported measurements into this profile.</p><div class="orbit-device-status"><span class="orbit-device-dot"></span><div><strong>No device connected</strong><small>Manual entry is available today</small></div></div><p>This prototype does not pair with Bluetooth devices or receive live sensor data. A real connection would need a supported device, permission, and a review step before a reading is saved.</p><button class="orbit-panel-action" type="button" data-device-plan>View connection concept <span aria-hidden="true">↗</span></button><div class="orbit-device-flow" data-device-flow hidden><ol><li>Choose a compatible wearable.</li><li>Approve a secure connection.</li><li>Review the sensor reading and its time.</li><li>Confirm before adding it to the record.</li></ol></div><a class="orbit-source-link" href="https://ntrs.nasa.gov/api/citations/20240000117/downloads/AI_and_Human_Spaceflight.pdf" target="_blank" rel="noopener noreferrer">NASA biosensors overview ↗</a>`;
-  if (section === 'research') return `<p class="orbit-panel-kicker">SPACEFLIGHT HEALTH / NASA RESEARCH</p><h2 id="section-title">What changes in space?</h2><p class="orbit-section-lede">Spaceflight can change physiology. Readings need personal baselines, activity context, mission phase, and medical-team interpretation.</p><article class="orbit-research-card"><h3>Heart and circulation</h3><p>In microgravity, body fluids shift toward the head and the cardiovascular system adapts. NASA studies changes in heart and blood-vessel function and the risk of dizziness or fainting after return to gravity.</p><p class="orbit-research-note">NASA’s public material does not give one universal astronaut “normal” heart-rate or SpO₂ range for this dashboard. This prototype records values and context without setting medical thresholds.</p><a class="orbit-source-link" href="https://www.nasa.gov/reference/risk-of-cardiovascular-adaptations/" target="_blank" rel="noopener noreferrer">NASA cardiovascular risk research ↗</a></article><article class="orbit-research-card"><h3>Oxygen and wearable measurements</h3><p>NASA identifies hypoxia as a spaceflight risk in some mission and spacesuit scenarios. Wearable biosensor research has measured blood oxygen and ECG, but a sensor number alone is not a diagnosis.</p><a class="orbit-source-link" href="https://www.nasa.gov/hrp/risks/" target="_blank" rel="noopener noreferrer">NASA human-spaceflight risks ↗</a><a class="orbit-source-link" href="https://ntrs.nasa.gov/api/citations/20240000117/downloads/AI_and_Human_Spaceflight.pdf" target="_blank" rel="noopener noreferrer">NASA biosensors overview ↗</a></article><article class="orbit-research-card"><h3>Radiation</h3><p>Space radiation is not visible or felt. NASA monitors the radiation environment and uses dedicated instruments and dosimeters; exposure is not inferred from heart rate or oxygen saturation. Risks depend on mission and dose and can include long-term cancer and other tissue effects.</p><a class="orbit-source-link" href="https://www.nasa.gov/hrp/hazard-space-radiation/" target="_blank" rel="noopener noreferrer">NASA space-radiation research ↗</a></article><article class="orbit-research-card"><h3>Bone and muscle</h3><p>NASA reports an average 1%–1.5% loss of bone density per month in weight-bearing bones during four-to-six-month missions. Rates vary; exercise and bone scans are part of countermeasure and monitoring work.</p><a class="orbit-source-link" href="https://www.nasa.gov/reference/risk-of-spaceflight-induced-bone-changes/" target="_blank" rel="noopener noreferrer">NASA bone-health research ↗</a></article><p class="orbit-local-note">Educational summary only. It does not provide an astronaut’s live telemetry or replace flight medical procedures.</p>`;
+  if (section === 'today') return `<p class="orbit-panel-kicker">MISSION HEALTH / TODAY</p><h2 id="section-title">Readings today</h2><p class="orbit-section-lede">A daily snapshot for ${name}. Values are recorded as measured; this demo does not label them normal or abnormal.</p><div class="orbit-today-list">${todayRow(summary.pulse, 'Heart rate', 'bpm')}${todayRow(summary.oxygen, 'Oxygen saturation', '%')}${todayRow(summary.pressure, 'Blood pressure', 'mmHg', true)}${todayRow(summary.glucose, 'Blood glucose', 'mg/dL')}${todayRow(summary.weight, 'Body mass', 'kg')}${todayRow(summary.temperature, 'Temperature', '°C')}</div><button class="orbit-panel-action" type="button" data-today-record>Record a reading <span aria-hidden="true">↗</span></button><p class="orbit-local-note">Entries are stored in this browser only.</p>`;
+  if (section === 'weights') return weightMarkup(summary);
+  if (section === 'advice') return adviceMarkup(summary, anatomyHistory(summary.person.id));
+  if (section === 'device') return `<p class="orbit-panel-kicker">LIVE SENSOR LINK</p><h2 id="section-title">Link a device</h2><p class="orbit-section-lede">Pair a compatible Bluetooth LE health sensor. After connection, supported readings are saved automatically to ${name}’s local history while this page stays open.</p><div class="orbit-device-list">${deviceRows()}</div><p class="orbit-device-message" data-device-message role="status">Each device must provide the standard Bluetooth service shown here. Pairing requires your browser’s permission.</p><p class="orbit-section-lede">Bluetooth pairing requires HTTPS and a supported browser such as recent Chrome or Edge. This page cannot collect while closed, and readings remain in this browser.</p><a class="orbit-source-link" href="https://www.nasa.gov/missions/station/iss-research/wearable-tech-for-space-station-research/" target="_blank" rel="noopener noreferrer">NASA wearable monitoring research ↗</a><a class="orbit-source-link" href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Bluetooth_API" target="_blank" rel="noopener noreferrer">Browser Bluetooth support ↗</a>`;
+  if (section === 'research') return `<p class="orbit-panel-kicker">SPACEFLIGHT HEALTH / NASA RESEARCH</p><h2 id="section-title">What changes in space?</h2><p class="orbit-section-lede">According to NASA research, readings depend on the individual astronaut, mission phase, environment, and flight medical procedure.</p><article class="orbit-research-card"><h3>Heart and circulation</h3><p>NASA describes body fluids shifting toward the head in microgravity and cardiovascular adaptation. Some astronauts experience dizziness or fainting after return to gravity; NASA uses clinical monitoring and mission-specific procedures.</p><p class="orbit-research-note">NASA’s public research does not give one universal in-flight “healthy astronaut” range for heart rate, blood pressure, or oxygen saturation for this dashboard. Use the astronaut’s baseline and mission-approved limits.</p><a class="orbit-source-link" href="https://www.nasa.gov/directorates/esdmd/hhp/cardiovascular-and-vision/" target="_blank" rel="noopener noreferrer">NASA cardiovascular monitoring ↗</a></article><article class="orbit-research-card"><h3>Oxygen and wearable measurements</h3><p>NASA studies hypoxia risk in mission and spacesuit scenarios. NASA and partner research has used wearable sensors to monitor heart activity, breathing, sleep, and oxygen-related measurements; each device and mission protocol determines what is measured.</p><a class="orbit-source-link" href="https://www.nasa.gov/reference/risk-of-hypoxia/" target="_blank" rel="noopener noreferrer">NASA hypoxia research ↗</a><a class="orbit-source-link" href="https://www.nasa.gov/missions/station/iss-research/wearable-tech-for-space-station-research/" target="_blank" rel="noopener noreferrer">NASA wearable research ↗</a></article><article class="orbit-research-card"><h3>Glucose</h3><p>NASA’s astronaut medical surveillance includes laboratory fasting blood glucose and HbA1c testing. That public schedule is not an in-flight glucose target; interpret a sensor reading with its units, timing, individual medical plan, and flight medical team.</p><a class="orbit-source-link" href="https://www.nasa.gov/directorates/esdmd/hhp/treat/medical-examination-requirements-mer-for-former-astronauts/" target="_blank" rel="noopener noreferrer">NASA medical surveillance ↗</a></article><article class="orbit-research-card"><h3>Body mass</h3><p>NASA explains that mass is measured in flight using equipment such as SLAMMD, because a conventional scale relies on gravity. Compare body-mass records taken with the approved mission device.</p><a class="orbit-source-link" href="https://www.nasa.gov/wp-content/uploads/2024/10/2024-space-nutrition-2nd-edition-2024.pdf" target="_blank" rel="noopener noreferrer">NASA space nutrition research ↗</a></article><article class="orbit-research-card"><h3>Radiation</h3><p>NASA tracks space radiation with dedicated monitoring and dosimetry. A heart-rate or oxygen sensor cannot tell radiation dose; NASA describes long-term health risks that depend on exposure and mission context.</p><a class="orbit-source-link" href="https://www.nasa.gov/hrp/hazard-space-radiation/" target="_blank" rel="noopener noreferrer">NASA space-radiation research ↗</a></article><article class="orbit-research-card"><h3>Bone and muscle</h3><p>NASA reports average bone-density loss of about 1%–1.5% per month in weight-bearing bones during four-to-six-month missions. Rates vary; NASA uses exercise countermeasures and bone scans to monitor changes.</p><a class="orbit-source-link" href="https://www.nasa.gov/reference/risk-of-spaceflight-induced-bone-changes/" target="_blank" rel="noopener noreferrer">NASA bone-health research ↗</a></article><p class="orbit-local-note">This is an educational summary of public NASA research. Follow the flight medical procedure for personal interpretation and care.</p>`;
   if (section === 'feedback') return `<p class="orbit-panel-kicker">PRODUCT FEEDBACK</p><h2 id="section-title">Share feedback</h2><p class="orbit-section-lede">Tell us what is clear, confusing, or missing from this prototype.</p><form class="orbit-feedback-form" data-feedback-form><label for="feedback-rating">How useful is this dashboard?</label><select id="feedback-rating" name="rating"><option value="">Choose a rating</option><option value="5">5 · Very useful</option><option value="4">4 · Useful</option><option value="3">3 · Not sure</option><option value="2">2 · Needs work</option><option value="1">1 · Not useful</option></select><label for="feedback-message">Your feedback</label><textarea id="feedback-message" name="message" rows="5" maxlength="800" required placeholder="Write a few notes"></textarea><p class="orbit-feedback-confirmation" role="status"></p><button class="orbit-panel-action" type="submit">Save feedback <span aria-hidden="true">↗</span></button></form><p class="orbit-local-note">Feedback is saved in this browser and is not sent to anyone.</p>`;
   return '';
 }
@@ -357,6 +454,8 @@ hub.addEventListener('click', event => {
   }
   if (event.target.closest('[data-section-close]')) { closeContextPanel(); return; }
   if (event.target.closest('[data-today-record]')) { closeContextPanel(false); showPerson(0, true); return; }
+  const deviceButton = event.target.closest('[data-device-connect]');
+  if (deviceButton) { toggleDevice(deviceButton.dataset.deviceConnect, deviceButton); return; }
   if (event.target.closest('[data-device-plan]')) {
     const flow = sectionContent.querySelector('[data-device-flow]');
     if (flow) { flow.hidden = !flow.hidden; event.target.closest('[data-device-plan]').setAttribute('aria-expanded', String(!flow.hidden)); }
@@ -380,6 +479,8 @@ hub.addEventListener('click', event => {
     return;
   }
   const repeatMeasure = event.target.closest('[data-timeline-measure]');
+  const repeatWeight = event.target.closest('[data-timeline-weight]');
+  if (repeatWeight) { closeContextPanel(false); showSection('weights', repeatWeight); return; }
   if (repeatMeasure && metricCategories[repeatMeasure.dataset.timelineMeasure]) {
     const field = repeatMeasure.dataset.timelineMeasure;
     closeContextPanel(false);
@@ -524,6 +625,21 @@ hub.addEventListener('submit', event => {
     } catch (_) { confirmation.textContent = 'Feedback could not be saved on this device.'; }
     return;
   }
+  const weightForm = event.target.closest('[data-weight-form]');
+  if (weightForm) {
+    event.preventDefault();
+    if (!weightForm.reportValidity()) return;
+    try {
+      CrewDesign.saveOverview(people[0].id, { weight: weightForm.elements.weight.value }, '', {
+        measuredAt: weightForm.elements.measuredAt.value,
+        source: 'Manual entry',
+      });
+    } catch (error) {
+      const message = sectionContent.querySelector('[data-weight-form] .orbit-profile-error');
+      if (message) message.textContent = error.message || 'Could not save this mass reading.';
+    }
+    return;
+  }
   const entry = event.target.closest('[data-anatomy-form]');
   if (entry && selected !== null) {
     event.preventDefault();
@@ -542,7 +658,7 @@ hub.addEventListener('submit', event => {
   event.preventDefault();
   if (!form.reportValidity()) return;
   try {
-    const values = Object.fromEntries(['pulse', 'oxygen', 'glucose', 'sleep', 'water', 'temperature', 'exercise'].map(field => [field, form.elements[field].value]));
+    const values = Object.fromEntries(['pulse', 'oxygen', 'glucose', 'weight', 'sleep', 'water', 'temperature', 'exercise'].map(field => [field, form.elements[field].value]));
     values.pressure = { systolic: form.elements.systolic.value, diastolic: form.elements.diastolic.value };
     CrewDesign.saveOverview(people[selected].id, values, form.elements.symptoms.value, {
       context: form.elements.context.value,

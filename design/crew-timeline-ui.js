@@ -3,6 +3,7 @@ const MEASURES = {
   pressure: ['Blood pressure', 'mmHg'],
   oxygen: ['Oxygen saturation', '%'],
   glucose: ['Blood glucose', 'mg/dL'],
+  weight: ['Body mass', 'kg'],
   temperature: ['Temperature', '°C'],
   sleep: ['Sleep', 'hrs'],
   water: ['Water intake', 'L'],
@@ -56,7 +57,8 @@ export function renderHealthTimeline(summary, histories = {}, symptomHistory = [
       const value = measureValue(key, entry?.value);
       if (value == null) continue;
       const context = Object.hasOwn(CONTEXT, entry.context) ? CONTEXT[entry.context] : (WITH_CONTEXT.has(key) ? 'Context not recorded' : '');
-      add(entry, { type: 'reading', key, label, value, unit, context });
+      const source = typeof entry.source === 'string' && entry.source.trim() ? entry.source.trim() : '';
+      add(entry, { type: 'reading', key, label, value, unit, context: [context, source].filter(Boolean).join(' · ') });
     }
   }
   for (const report of Array.isArray(symptomHistory) ? symptomHistory : []) {
@@ -70,7 +72,7 @@ export function renderHealthTimeline(summary, histories = {}, symptomHistory = [
       const context = [report.onset == null ? '' : `Began ${displayTime(report.onset)}`, report.progression].filter(Boolean).join(' · ');
       return `<div class="timeline-report" data-status="${report.status}"><h3>${STATUS[report.status]}</h3>${report.tags.length ? `<p>${report.tags.map(escapeHtml).join(' · ')}</p>` : ''}${context ? `<p class="timeline-context">${escapeHtml(context)}</p>` : ''}${report.note ? `<p class="timeline-note">${escapeHtml(report.note)}</p>` : ''}${report.status === 'urgent' ? '<button type="button" class="timeline-urgent-action" data-emergency>Emergency guidance <span aria-hidden="true">↗</span></button>' : ''}</div>`;
     }).join('');
-    const readings = group.readings.length ? `<dl class="timeline-readings">${group.readings.map(reading => `<div><dt><span>${reading.label}</span><button type="button" class="timeline-repeat" data-timeline-measure="${reading.key}" aria-label="Record a new ${reading.label}">Record <span aria-hidden="true">↗</span></button></dt><dd><strong>${escapeHtml(reading.value)}</strong> <span>${reading.unit}</span></dd>${reading.context ? `<dd class="timeline-context">${escapeHtml(reading.context)}</dd>` : ''}</div>`).join('')}</dl>` : '';
+    const readings = group.readings.length ? `<dl class="timeline-readings">${group.readings.map(reading => `<div><dt><span>${reading.label}</span>${reading.key === 'weight' ? '<button type="button" class="timeline-repeat" data-timeline-weight aria-label="Record body mass">Record ↗</button>' : `<button type="button" class="timeline-repeat" data-timeline-measure="${reading.key}" aria-label="Record a new ${reading.label}">Record <span aria-hidden="true">↗</span></button>`}</dt><dd><strong>${escapeHtml(reading.value)}</strong> <span>${reading.unit}</span></dd>${reading.context ? `<dd class="timeline-context">${escapeHtml(reading.context)}</dd>` : ''}</div>`).join('')}</dl>` : '';
     const saved = group.saved != null && Math.abs(group.saved - group.observed) >= 60000 ? `<span class="timeline-saved">Saved ${escapeHtml(displayTime(group.saved))}</span>` : '';
     return `<li class="timeline-entry"><header><time datetime="${escapeHtml(new Date(group.observed).toISOString())}">${escapeHtml(displayTime(group.observed))}</time>${saved}</header>${reports}${readings}</li>`;
   }).join('');
