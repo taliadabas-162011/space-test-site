@@ -118,3 +118,8 @@
 .orbit-section-panel{backdrop-filter:none;background:rgba(4,15,27,.98);box-shadow:0 12px 36px rgba(0,0,0,.28)}
 .crew-orbit .orbit-timeline{backdrop-filter:none;background:rgba(4,15,27,.98);box-shadow:0 12px 36px rgba(0,0,0,.28)}
 @media(max-width:767px){.orbit-app-nav{backdrop-filter:none;background:rgba(4,14,26,.97)}}
+
+/* Compact desktop navigation; keep the touch bar full-width on phones. */
+.crew-orbit .orbit-app-nav{display:inline-flex!important;left:50%!important;right:auto!important;width:fit-content!important;max-width:calc(100% - 32px)!important;gap:1px!important;padding:3px!important;transform:translateX(-50%)!important}
+.crew-orbit .orbit-app-nav button{flex:0 0 auto!important;min-width:0!important;padding:8px 9px!important;font-size:10px!important}
+@media(max-width:767px){.crew-orbit .orbit-app-nav{left:8px!important;right:8px!important;width:auto!important;max-width:none!important;transform:none!important;gap:2px!important;padding:4px!important}.crew-orbit .orbit-app-nav button{flex:1 1 0!important;min-width:0!important;padding:11px 4px!important;font-size:10px!important}}
