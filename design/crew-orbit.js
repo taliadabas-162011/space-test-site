@@ -16,12 +16,12 @@ hub.setAttribute('aria-label', 'Crew health overview');
 hub.innerHTML = `<div class="orbit-background" aria-hidden="true"></div><canvas class="orbit-canvas" aria-hidden="true"></canvas>
   <header class="orbit-header"><span class="orbit-brand">CREW <i>/</i> HEALTH</span><div class="orbit-header-right"><span class="orbit-meta">Personal crew profile · entries stay on this device</span><button type="button" data-emergency>Emergency <span aria-hidden="true">↗</span></button></div></header>
   <div class="orbit-intro"><h1 tabindex="-1">Space health</h1><p>One crew member · one personal record</p></div>
-  <nav class="orbit-app-nav" aria-label="Health dashboard" hidden><button type="button" data-nav="profile">Overview</button><button type="button" data-nav="device">Link device</button><button type="button" data-nav="today">Readings</button><button type="button" data-nav="history">History</button><button type="button" data-nav="guidance">NASA feedback &amp; advice</button></nav>
+  <nav class="orbit-app-nav" aria-label="Health dashboard" hidden><button type="button" data-nav="profile">Profile</button><button type="button" data-nav="device">Link device</button><button type="button" data-nav="today">Readings</button><button type="button" data-nav="history">Calendar &amp; history</button><button type="button" data-nav="guidance">Help &amp; NASA advice</button></nav>
   <div class="orbit-actors">${people.map((person, index) => `<section class="orbit-actor" data-actor="${index}"><button class="orbit-hit" type="button" data-select="${index}" aria-label="Open astronaut health profile"></button><div class="orbit-actor-label"><span>ASTRONAUT PROFILE</span><h2></h2><div class="orbit-actor-status"></div><button type="button" data-record="${index}">Readings today <span aria-hidden="true">↗</span></button></div><div class="orbit-actor-readings"></div></section>`).join('')}</div>
   <div class="orbit-mobile-summary"></div>
   <nav class="orbit-mobile-crew" aria-label="Choose a crew member">${people.map((person, index) => `<button type="button" data-select="${index}">${person.name.split(' ')[0]} <span aria-hidden="true">↗</span></button>`).join('')}</nav>
   <div class="orbit-profile" hidden><button class="orbit-back" type="button" data-all>← Overview</button><div class="orbit-profile-identity"><div class="orbit-profile-name"></div><div class="orbit-profile-actions"><button type="button" data-edit-profile>Edit profile <span aria-hidden="true">↗</span></button><button type="button" data-open-form><span>Record readings today</span><i aria-hidden="true">↗</i></button><button type="button" data-open-history><span>View history</span><i aria-hidden="true">↗</i></button><button type="button" data-anatomy disabled>Preparing anatomy…</button><p class="orbit-anatomy-error" role="alert" hidden></p></div></div><button class="orbit-figure-hit" type="button" data-figure-anatomy aria-label="Explore this astronaut’s anatomy"></button><div class="orbit-scanline" aria-hidden="true"></div><div class="orbit-profile-readings" role="region" aria-label="Health readings" tabindex="0"></div><form class="orbit-form" hidden></form><div class="orbit-anatomy-root" hidden></div><p class="orbit-gesture">Drag to explore the scene</p><nav class="orbit-switch" aria-label="Astronaut"><span class="orbit-position"></span></nav></div>
-  <section class="orbit-onboarding" hidden aria-labelledby="profile-setup-title"><div class="orbit-panel-kicker">ASTRONAUT PROFILE</div><h2 id="profile-setup-title">Create your profile</h2><p>Set up the crew member shown in this scene. Your profile and readings stay in this browser.</p><form data-profile-form><label for="profile-name">Name</label><input id="profile-name" name="name" maxlength="48" autocomplete="name" required placeholder="Enter your name"><label for="profile-anatomy">Anatomy model <span>Optional</span></label><select id="profile-anatomy" name="model"><option value="male">Masculine anatomy</option><option value="female">Feminine anatomy</option></select><p class="orbit-profile-error" role="alert"></p><button type="submit">Save profile <span aria-hidden="true">↗</span></button></form><small>This prototype does not create an online account or sync data.</small></div>
+  <section class="orbit-onboarding" hidden aria-labelledby="profile-setup-title"><div class="orbit-panel-kicker">ASTRONAUT PROFILE</div><h2 id="profile-setup-title">Create your profile</h2><p>Set up the crew member shown in this scene. Your profile and readings stay in this browser.</p><form data-profile-form><label for="profile-name">Name</label><input id="profile-name" name="name" maxlength="48" autocomplete="name" required placeholder="Enter your name"><label for="profile-age">Age <span>Optional</span></label><input id="profile-age" name="age" type="number" min="0" max="120" step="1" inputmode="numeric" placeholder="Age in years"><label for="profile-mass">Body mass <span>kg · optional</span></label><input id="profile-mass" name="bodyMass" type="number" min="0.1" max="400" step="0.1" inputmode="decimal" placeholder="Mass in kilograms"><label for="profile-anatomy">Anatomy model <span>Optional</span></label><select id="profile-anatomy" name="model"><option value="male">Masculine anatomy</option><option value="female">Feminine anatomy</option></select><p class="orbit-profile-error" role="alert"></p><button type="submit">Save profile <span aria-hidden="true">↗</span></button></form><small>This prototype does not create an online account or sync data.</small></div>
   <section class="orbit-section-panel" hidden role="region" aria-label="Dashboard section"><button class="orbit-section-close" type="button" data-section-close>Close <span aria-hidden="true">×</span></button><div class="orbit-section-content"></div></section>
   <div class="orbit-emergency" role="region" aria-label="Emergency guidance" hidden></div>
   <div class="orbit-timeline" role="region" aria-label="Observation history" hidden></div>
@@ -60,6 +60,7 @@ let gesture = null;
 let suppressFigureClick = false;
 let returnFocus = null;
 let emergencyStep = 'start';
+let selectedReadingDate = new Date().toISOString().slice(0, 10);
 const deviceConnections = new Map();
 const deviceSaveTimes = new Map();
 const metricCategories = { pulse: 'circulation', pressure: 'circulation', oxygen: 'circulation', glucose: 'daily', sleep: 'recovery', exercise: 'recovery', temperature: 'daily', water: 'daily' };
@@ -137,7 +138,9 @@ function renderData() {
     form.querySelector(`select[name="${field}"] option[value=""]`).textContent = summary[field] ? 'Keep previous report' : 'Not recorded';
   }
   figureButton.setAttribute('aria-label', `Explore ${summary.person.name}'s anatomy`);
-  hub.querySelector('.orbit-profile-name').innerHTML = `${renderObservationIdentity(summary, pulseHistory, assessment)}<button type="button" class="orbit-edit-profile" data-edit-profile>Edit profile ↗</button>`;
+  const profileInfo = CrewDesign.getProfile() || {};
+  const profileDetails = [profileInfo.age !== '' && profileInfo.age != null ? `Age ${escapeHtml(profileInfo.age)}` : '', profileInfo.bodyMass !== '' && profileInfo.bodyMass != null ? `Body mass ${escapeHtml(profileInfo.bodyMass)} kg` : ''].filter(Boolean).join(' · ');
+  hub.querySelector('.orbit-profile-name').innerHTML = `${renderObservationIdentity(summary, pulseHistory, assessment)}${profileDetails ? `<p class="orbit-profile-meta">${profileDetails}</p>` : ''}<button type="button" class="orbit-edit-profile" data-edit-profile>Edit profile ↗</button>`;
   hub.querySelector('.orbit-profile-readings').innerHTML = renderObservationProfile(summary, pulseHistory);
   if (anatomyMode) renderAnatomy(summary, histories);
   hub.querySelector('.orbit-position').textContent = '01 / 01';
@@ -268,7 +271,7 @@ function showHistory(source) {
   setContextPanel('history', source);
   stage?.setRecordView?.(true);
   const personId = people[selected].id;
-  timeline.innerHTML = renderHealthTimeline(CrewDesign.summary(personId), anatomyHistory(personId), CrewDesign.symptomHistory(personId), CrewDesign.symptomOptions);
+  timeline.innerHTML = `<label class="orbit-date-picker">Browse a date<input type="date" data-history-date value="${new Date().toISOString().slice(0, 10)}" max="${new Date().toISOString().slice(0, 10)}"></label>${renderHealthTimeline(CrewDesign.summary(personId), anatomyHistory(personId), CrewDesign.symptomHistory(personId), CrewDesign.symptomOptions)}`;
   timeline.hidden = false;
   timeline.scrollTop = 0;
   timeline.querySelector('#timeline-title')?.focus({ preventScroll: true });
@@ -283,6 +286,14 @@ function todayRow(reading, label, unit, pressure = false) {
     ? `Recorded ${new Intl.DateTimeFormat(undefined, { hour: '2-digit', minute: '2-digit' }).format(new Date(reading.time))}${reading.context ? ` · ${reading.context === 'rest' ? 'at rest' : reading.context === 'after-activity' ? 'after activity' : reading.context}` : ''}${reading.source ? ` · ${reading.source}` : ''}`
     : reading?.recorded ? 'Last entry was on another day' : 'No reading recorded today';
   return `<div class="orbit-today-row"><span>${label}</span><strong>${escapeHtml(value)} <small>${unit}</small></strong><em>${escapeHtml(detail)}</em></div>`;
+}
+function readingForDate(personId, field) {
+  const rows = CrewDesign.history(personId, field).filter(entry => {
+    const date = new Date(entry.time);
+    return Number.isFinite(date.getTime()) && `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}` === selectedReadingDate;
+  });
+  const entry = rows.at(-1);
+  return entry ? { recorded: true, value: entry.value, time: entry.time, context: entry.context, source: entry.source } : null;
 }
 function deviceRows() {
   const sensors = [
@@ -375,7 +386,7 @@ async function toggleDevice(field, button) {
 function sectionMarkup(section) {
   const summary = CrewDesign.summary(people[0].id);
   const name = escapeHtml(summary.person.name);
-  if (section === 'today') return `<p class="orbit-panel-kicker">MISSION HEALTH / TODAY</p><h2 id="section-title">Readings today</h2><p class="orbit-section-lede">A daily snapshot for ${name}. Values are recorded as measured; this demo does not label them normal or abnormal.</p><div class="orbit-today-list">${todayRow(summary.pulse, 'Heart rate', 'bpm')}${todayRow(summary.oxygen, 'Oxygen saturation', '%')}${todayRow(summary.pressure, 'Blood pressure', 'mmHg', true)}${todayRow(summary.glucose, 'Blood glucose', 'mg/dL')}${todayRow(summary.weight, 'Body mass', 'kg')}${todayRow(summary.temperature, 'Temperature', '°C')}</div><button class="orbit-panel-action" type="button" data-today-record>Enter readings <span aria-hidden="true">↗</span></button><p class="orbit-local-note">Entries from a linked sensor appear here and in History automatically.</p>`;
+  if (section === 'today') return `<p class="orbit-panel-kicker">MISSION HEALTH / READINGS</p><h2 id="section-title">Readings</h2><p class="orbit-section-lede">Select the observation date first, then review each measurement. Saved values appear in Calendar &amp; history.</p><label class="orbit-date-picker">Reading date<input type="date" data-reading-date value="${selectedReadingDate}" max="${new Date().toISOString().slice(0, 10)}"></label><div class="orbit-today-list">${todayRow(readingForDate(summary.person.id, 'pulse'), 'Heart rate', 'bpm')}${todayRow(readingForDate(summary.person.id, 'oxygen'), 'Oxygen saturation', '%')}${todayRow(readingForDate(summary.person.id, 'pressure'), 'Blood pressure', 'mmHg', true)}${todayRow(readingForDate(summary.person.id, 'glucose'), 'Blood glucose', 'mg/dL')}${todayRow(readingForDate(summary.person.id, 'weight'), 'Body mass', 'kg')}${todayRow(readingForDate(summary.person.id, 'temperature'), 'Temperature', '°C')}</div><button class="orbit-panel-action" type="button" data-today-record>Enter readings for selected date <span aria-hidden="true">↗</span></button><p class="orbit-local-note">Entries from a linked sensor appear here and in Calendar &amp; history automatically.</p>`;
   if (section === 'device') return `<p class="orbit-panel-kicker">SENSOR CONNECTION</p><h2 id="section-title">Link a device</h2><p class="orbit-section-lede">Connect a compatible sensor first. New readings are saved to this astronaut’s history while this page stays open.</p><div class="orbit-device-list">${deviceRows()}</div><p class="orbit-device-message" data-device-message role="status">Choose Connect device to open your browser’s sensor picker.</p><details class="orbit-device-help" open><summary>Device compatibility</summary><p><strong>Heart rate:</strong> Some BLE heart-rate straps support direct streaming.</p><p><strong>Blood pressure and oxygen:</strong> Some cuffs and pulse oximeters work if they expose the standard Bluetooth service. You must take a reading on the device.</p><p><strong>Diabetes sensors:</strong> Most CGMs send readings to the manufacturer’s phone app or cloud, and use private protocols. Direct connection here needs the maker’s approved API and a secure server; this static site cannot connect to most CGMs. A compatible Bluetooth glucose meter may share a stored reading.</p><p>Pairing requires a supported browser, HTTPS, and your permission. Readings are saved on this device only; this page cannot collect in the background.</p></details><a class="orbit-source-link" href="https://www.nasa.gov/missions/station/iss-research/wearable-tech-for-space-station-research/" target="_blank" rel="noopener noreferrer">NASA wearable monitoring research ↗</a>`;
   if (section === 'research') return `<p class="orbit-panel-kicker">SPACEFLIGHT HEALTH / NASA RESEARCH</p><h2 id="section-title">What changes in space?</h2><p class="orbit-section-lede">According to NASA research, readings depend on the individual astronaut, mission phase, environment, and flight medical procedure.</p><article class="orbit-research-card"><h3>Heart and circulation</h3><p>NASA describes body fluids shifting toward the head in microgravity and cardiovascular adaptation. Some astronauts experience dizziness or fainting after return to gravity; NASA uses clinical monitoring and mission-specific procedures.</p><p class="orbit-research-note">NASA’s public research does not give one universal in-flight “healthy astronaut” range for heart rate, blood pressure, or oxygen saturation for this dashboard. Use the astronaut’s baseline and mission-approved limits.</p><a class="orbit-source-link" href="https://www.nasa.gov/directorates/esdmd/hhp/cardiovascular-and-vision/" target="_blank" rel="noopener noreferrer">NASA cardiovascular monitoring ↗</a></article><article class="orbit-research-card"><h3>Oxygen and wearable measurements</h3><p>NASA studies hypoxia risk in mission and spacesuit scenarios. NASA and partner research has used wearable sensors to monitor heart activity, breathing, sleep, and oxygen-related measurements; each device and mission protocol determines what is measured.</p><a class="orbit-source-link" href="https://www.nasa.gov/reference/risk-of-hypoxia/" target="_blank" rel="noopener noreferrer">NASA hypoxia research ↗</a><a class="orbit-source-link" href="https://www.nasa.gov/missions/station/iss-research/wearable-tech-for-space-station-research/" target="_blank" rel="noopener noreferrer">NASA wearable research ↗</a></article><article class="orbit-research-card"><h3>Glucose</h3><p>NASA’s astronaut medical surveillance includes laboratory fasting blood glucose and HbA1c testing. That public schedule is not an in-flight glucose target; interpret a sensor reading with its units, timing, individual medical plan, and flight medical team.</p><a class="orbit-source-link" href="https://www.nasa.gov/directorates/esdmd/hhp/treat/medical-examination-requirements-mer-for-former-astronauts/" target="_blank" rel="noopener noreferrer">NASA medical surveillance ↗</a></article><article class="orbit-research-card"><h3>Body mass</h3><p>NASA explains that mass is measured in flight using equipment such as SLAMMD, because a conventional scale relies on gravity. Compare body-mass records taken with the approved mission device.</p><a class="orbit-source-link" href="https://www.nasa.gov/wp-content/uploads/2024/10/2024-space-nutrition-2nd-edition-2024.pdf" target="_blank" rel="noopener noreferrer">NASA space nutrition research ↗</a></article><article class="orbit-research-card"><h3>Radiation</h3><p>NASA tracks space radiation with dedicated monitoring and dosimetry. A heart-rate or oxygen sensor cannot tell radiation dose; NASA describes long-term health risks that depend on exposure and mission context.</p><a class="orbit-source-link" href="https://www.nasa.gov/hrp/hazard-space-radiation/" target="_blank" rel="noopener noreferrer">NASA space-radiation research ↗</a></article><article class="orbit-research-card"><h3>Bone and muscle</h3><p>NASA reports average bone-density loss of about 1%–1.5% per month in weight-bearing bones during four-to-six-month missions. Rates vary; NASA uses exercise countermeasures and bone scans to monitor changes.</p><a class="orbit-source-link" href="https://www.nasa.gov/reference/risk-of-spaceflight-induced-bone-changes/" target="_blank" rel="noopener noreferrer">NASA bone-health research ↗</a></article><p class="orbit-local-note">This is an educational summary of public NASA research. Follow the flight medical procedure for personal interpretation and care.</p>`;
   if (section === 'guidance') return adviceMarkup(summary, anatomyHistory(summary.person.id));
@@ -393,6 +404,8 @@ function showSection(section, source) {
 function openOnboarding(edit = false) {
   const existing = CrewDesign.getProfile();
   profileForm.elements.name.value = existing?.name || '';
+  profileForm.elements.age.value = existing?.age ?? '';
+  profileForm.elements.bodyMass.value = existing?.bodyMass ?? '';
   profileForm.elements.model.value = existing?.model || 'male';
   profileForm.querySelector('.orbit-profile-error').textContent = '';
   hub.querySelector('#profile-setup-title').textContent = edit ? 'Edit your profile' : 'Create your profile';
@@ -404,7 +417,10 @@ profileForm.addEventListener('submit', event => {
   event.preventDefault();
   if (!profileForm.reportValidity()) return;
   try {
-    CrewDesign.saveProfile(profileForm.elements.name.value, profileForm.elements.model.value);
+    const prior = CrewDesign.getProfile();
+    CrewDesign.saveProfile(profileForm.elements.name.value, profileForm.elements.model.value, profileForm.elements.age.value, profileForm.elements.bodyMass.value);
+    const mass = profileForm.elements.bodyMass.value;
+    if (mass && Number(mass) > 0 && String(prior?.bodyMass ?? '') !== String(mass)) CrewDesign.saveOverview(people[0].id, { weight: mass }, '', { source: 'Profile body mass' });
     onboarding.hidden = true;
     appNav.hidden = false;
     renderData();
@@ -462,7 +478,16 @@ hub.addEventListener('click', event => {
     return;
   }
   if (event.target.closest('[data-section-close]')) { closeContextPanel(); return; }
-  if (event.target.closest('[data-today-record]')) { closeContextPanel(false); showPerson(0, true); return; }
+  if (event.target.closest('[data-today-record]')) {
+    selectedReadingDate = sectionContent.querySelector('[data-reading-date]')?.value || selectedReadingDate;
+    closeContextPanel(false);
+    showPerson(0, true);
+    const now = new Date();
+    const time = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    form.elements.measuredAt.value = `${selectedReadingDate}T${time}`;
+    form.querySelector('.observation-time').open = true;
+    return;
+  }
   const deviceButton = event.target.closest('[data-device-connect]');
   if (deviceButton) { toggleDevice(deviceButton.dataset.deviceConnect, deviceButton); return; }
   if (event.target.closest('[data-device-plan]')) {
@@ -618,6 +643,27 @@ form.addEventListener('change', event => {
   details.hidden = !['concerning', 'urgent'].includes(status.value);
   form.querySelector('.observation-urgent').hidden = status.value !== 'urgent';
   syncCustomSelects(form);
+});
+hub.addEventListener('change', event => {
+  if (event.target.matches('[data-reading-date]')) {
+    selectedReadingDate = event.target.value || selectedReadingDate;
+    const personId = people[0].id;
+    const list = sectionContent.querySelector('.orbit-today-list');
+    if (list) list.innerHTML = `${todayRow(readingForDate(personId, 'pulse'), 'Heart rate', 'bpm')}${todayRow(readingForDate(personId, 'oxygen'), 'Oxygen saturation', '%')}${todayRow(readingForDate(personId, 'pressure'), 'Blood pressure', 'mmHg', true)}${todayRow(readingForDate(personId, 'glucose'), 'Blood glucose', 'mg/dL')}${todayRow(readingForDate(personId, 'weight'), 'Body mass', 'kg')}${todayRow(readingForDate(personId, 'temperature'), 'Temperature', '°C')}`;
+  }
+  if (event.target.matches('[data-history-date]')) {
+    const day = event.target.value;
+    const entries = timeline.querySelectorAll('.timeline-entry');
+    let visible = 0;
+    entries.forEach(entry => {
+      const timestamp = entry.querySelector('time')?.dateTime;
+      const matches = !day || (timestamp && new Date(timestamp).toISOString().slice(0, 10) === day);
+      entry.hidden = !matches;
+      if (matches) visible++;
+    });
+    timeline.querySelector('.timeline-date-empty')?.remove();
+    if (!visible) timeline.querySelector('.timeline-list')?.insertAdjacentHTML('afterend', '<p class="timeline-date-empty">No readings are saved for this date.</p>');
+  }
 });
 hub.addEventListener('submit', event => {
   const feedback = event.target.closest('[data-feedback-form]');

@@ -6,7 +6,7 @@
     try {
       const value = JSON.parse(localStorage.getItem(profileStorageKey) || 'null');
       if (!value || typeof value.name !== 'string' || !value.name.trim()) return null;
-      return { name: value.name.trim().slice(0, 48), model: value.model === 'female' ? 'female' : 'male' };
+      return { name: value.name.trim().slice(0, 48), model: value.model === 'female' ? 'female' : 'male', age: Number.isFinite(Number(value.age)) && Number(value.age) >= 0 && Number(value.age) <= 120 ? Number(value.age) : '', bodyMass: Number.isFinite(Number(value.bodyMass)) && Number(value.bodyMass) > 0 && Number(value.bodyMass) <= 400 ? Number(value.bodyMass) : '' };
     } catch (_) { return null; }
   }
   let savedProfile = readProfile();
@@ -133,11 +133,15 @@
     }
   }
   function registerStories(value) { stories = value; refreshStories(); }
-  function saveProfile(name, model = 'male') {
+  function saveProfile(name, model = 'male', age = '', bodyMass = '') {
     const cleanName = typeof name === 'string' ? name.trim().replace(/\s+/g, ' ').slice(0, 48) : '';
     if (!cleanName) throw new Error('Enter a name for the crew profile.');
     const safeModel = model === 'female' ? 'female' : 'male';
-    const nextProfile = { name: cleanName, model: safeModel, createdAt: savedProfile?.createdAt || new Date().toISOString() };
+    const parsedAge = age === '' ? '' : Number(age);
+    const parsedMass = bodyMass === '' ? '' : Number(bodyMass);
+    if (parsedAge !== '' && (!Number.isInteger(parsedAge) || parsedAge < 0 || parsedAge > 120)) throw new Error('Enter a valid age.');
+    if (parsedMass !== '' && (!Number.isFinite(parsedMass) || parsedMass <= 0 || parsedMass > 400)) throw new Error('Enter a valid body mass.');
+    const nextProfile = { name: cleanName, model: safeModel, age: parsedAge, bodyMass: parsedMass, createdAt: savedProfile?.createdAt || new Date().toISOString() };
     localStorage.setItem(profileStorageKey, JSON.stringify(nextProfile));
     savedProfile = nextProfile;
     crew[0].name = cleanName;

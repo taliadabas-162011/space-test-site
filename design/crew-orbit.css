@@ -99,3 +99,17 @@
 .crew-orbit[data-panel] .orbit-canvas{opacity:.48;transition:opacity .25s ease}
 .orbit-app-nav button{min-width:84px}
 @media(max-width:767px){.orbit-app-nav{gap:3px}.orbit-app-nav button{min-width:auto;padding:11px 13px;font-size:11px}.orbit-section-panel{overscroll-behavior:contain}.orbit-device-help{padding:12px;border-radius:10px;background:rgba(100,150,180,.06)}.orbit-device-help summary{color:#dbeaf2;font-size:12px;cursor:pointer}.orbit-device-help p{margin:9px 0;font-size:11px}}
+
+/* Clear, full-width dashboard workflow and date controls. */
+.orbit-app-nav{left:16px;right:16px;bottom:14px;width:auto;max-width:none;justify-content:center;transform:none;border-radius:14px}
+.orbit-section-panel{left:50%;right:auto;width:min(760px,calc(100% - 48px));transform:translateX(-50%)}
+.orbit-date-picker{display:grid;gap:7px;margin:10px 0 20px;color:#c5dbe7;font-size:12px;font-weight:600}
+.orbit-date-picker input{width:min(100%,340px);height:44px;padding:8px 12px;border:1px solid rgba(130,180,205,.45);border-radius:9px;background:rgba(2,10,18,.82);color:#f6fbff;color-scheme:dark;font:500 14px Orbit Magnetik,sans-serif}
+.orbit-profile-meta{margin:7px 0 0;color:#c2d8e4;font-size:12px}
+.timeline-date-empty{padding:15px;border:1px solid rgba(145,194,219,.2);border-radius:10px;color:#c1d4df;font-size:12px}
+@media(max-width:767px){.orbit-app-nav{left:8px;right:8px;bottom:8px;justify-content:space-between;gap:2px;padding:4px}.orbit-app-nav button{flex:1;min-width:0;padding:12px 5px;font-size:10px}.orbit-section-panel{left:10px;right:10px;top:72px;bottom:70px;width:auto;transform:none;padding:17px}.orbit-date-picker{margin:8px 0 14px}.orbit-date-picker input{width:100%}}
+
+.orbit-onboarding{max-height:min(78dvh,760px);overflow-y:auto;overscroll-behavior:contain}
+.crew-orbit .orbit-timeline{top:100px;right:auto;bottom:78px;left:50%;width:min(760px,calc(100% - 48px));padding:24px 28px 40px;transform:translateX(-50%);border:1px solid rgba(127,191,222,.3);border-radius:18px;background:rgba(4,15,27,.94);backdrop-filter:blur(18px)}
+.crew-orbit[data-panel='history'] .orbit-canvas{opacity:.35}
+@media(max-width:767px){.orbit-onboarding{left:12px;right:12px;bottom:68px;max-height:78dvh}.crew-orbit .orbit-timeline{top:72px;right:10px;bottom:68px;left:10px;width:auto;padding:18px 16px 30px;transform:none}.timeline-readings{grid-template-columns:1fr}}
