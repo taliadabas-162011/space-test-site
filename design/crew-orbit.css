@@ -126,3 +126,10 @@
 
 .orbit-reading-methods{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0}.orbit-reading-methods .orbit-panel-action{margin:0}.orbit-reading-methods .orbit-secondary-action{background:rgba(4,15,27,.45);border-color:rgba(130,180,205,.4)}.orbit-advice-readings li{line-height:1.55}.orbit-advice-readings li span{color:#a8c3d1;font-size:11px}
 @media(max-width:767px){.orbit-reading-methods{display:grid;grid-template-columns:1fr}.orbit-reading-methods .orbit-panel-action{width:100%;justify-content:center}}
+
+/* Treat each dashboard destination as a clear, nearly full-screen workspace. */
+.orbit-section-panel{z-index:50;top:88px;bottom:82px;width:min(1080px,calc(100% - 48px));padding:30px 34px;background:rgba(4,15,27,.99);border-color:rgba(127,191,222,.42);box-shadow:0 16px 48px rgba(0,0,0,.42);backdrop-filter:none}
+.crew-orbit[data-panel] .orbit-canvas{opacity:0;visibility:hidden}
+.orbit-device-card{min-height:100px}
+.orbit-device-card .orbit-panel-action{min-width:132px;min-height:42px}
+@media(max-width:767px){.orbit-section-panel{top:70px;bottom:74px;left:8px;right:8px;width:auto;padding:20px 16px}.orbit-device-card{min-height:0}.orbit-device-card .orbit-panel-action{min-width:145px}}

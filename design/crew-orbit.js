@@ -60,6 +60,7 @@ let gesture = null;
 let suppressFigureClick = false;
 let returnFocus = null;
 let emergencyStep = 'start';
+let pendingDashboardSection = null;
 let selectedReadingDate = new Date().toISOString().slice(0, 10);
 const deviceConnections = new Map();
 const deviceSaveTimes = new Map();
@@ -245,6 +246,7 @@ function closeContextPanel(restoreFocus = true) {
   actors.inert = !stage || selected !== null;
   mobileControls.forEach(item => { item.inert = !stage || selected !== null; });
   if (selected !== null) syncProfileScroll();
+  if (selected !== null) stage?.resume();
   if (restoreFocus) (previousFocus?.isConnected ? previousFocus : hub.querySelector('[data-emergency]'))?.focus({ preventScroll: true });
   returnFocus = null;
 }
@@ -261,6 +263,7 @@ function setContextPanel(panel, source) {
   profile.inert = true;
   actors.inert = true;
   mobileControls.forEach(item => { item.inert = true; });
+  stage?.pause();
 }
 function showEmergency(source) {
   const previousHistory = hub.dataset.panel === 'history' ? source : null;
@@ -434,10 +437,11 @@ function showSection(section, source) {
   sectionPanel.setAttribute('aria-label', section === 'research' ? 'NASA spaceflight health research' : section === 'device' ? 'Link a health device' : section);
   sectionPanel.hidden = false;
   sectionPanel.scrollTop = 0;
+  sectionPanel.scrollTop = 0;
   sectionContent.querySelector('#section-title')?.focus({ preventScroll: true });
 }
 function navigateDashboard(section, source) {
-  if (!CrewDesign.hasProfile()) { openOnboarding(false); return; }
+  if (!CrewDesign.hasProfile()) { pendingDashboardSection = section; openOnboarding(false); return; }
   if (section === 'profile') {
     appNav.querySelectorAll('[data-nav]').forEach(button => button.removeAttribute('aria-current'));
     if (hub.dataset.panel) closeContextPanel(false);
@@ -486,6 +490,9 @@ profileForm.addEventListener('submit', event => {
     appNav.hidden = false;
     renderData();
     if (selected === null) showPerson(0);
+    const pending = pendingDashboardSection;
+    pendingDashboardSection = null;
+    if (pending) navigateDashboard(pending, appNav.querySelector(`[data-nav="${pending}"]`));
   } catch (error) {
     profileForm.querySelector('.orbit-profile-error').textContent = error.message || 'Could not save this profile on the device.';
   }
