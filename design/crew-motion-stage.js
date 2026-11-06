@@ -32,9 +32,9 @@ const angleDifference = (a, b) => ((b - a + Math.PI * 3) % TAU) - Math.PI;
 
 /** Shared astronaut stage using Scars' captured camera tracks and switch weights. */
 export async function createCrewStage(canvas, onFrame = () => {}) {
-  const renderer = new WebGLRenderer({ canvas, alpha: true, antialias: true, powerPreference: 'high-performance' });
+  const renderer = new WebGLRenderer({ canvas, alpha: true, antialias: false, powerPreference: 'low-power' });
   renderer.localClippingEnabled = true;
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.15));
   renderer.setClearColor(0x000000, 0);
   const scene = new Scene();
   const camera = new PerspectiveCamera(34, 1, 0.05, 100);
@@ -55,6 +55,8 @@ export async function createCrewStage(canvas, onFrame = () => {}) {
   let cameraRig;
   let environment;
   let frameId = 0;
+  let lastRenderAt = 0;
+  const frameInterval = 1000 / 30;
   let width = 0;
   let height = 0;
   let projectionOffset = NaN;
@@ -364,6 +366,11 @@ export async function createCrewStage(canvas, onFrame = () => {}) {
 
   function render(now) {
     if (disposed) return;
+    if (now - lastRenderAt < frameInterval) {
+      frameId = requestAnimationFrame(render);
+      return;
+    }
+    lastRenderAt = now;
     const dt = frameTime ? clamp((now - frameTime) / 1000, 0, 0.05) : 0;
     frameTime = now;
     const isReduced = reducedMotion.matches;

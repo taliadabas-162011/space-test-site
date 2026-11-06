@@ -1,4 +1,4 @@
-import { createCrewStage } from '/space-test-site/design/crew-motion-stage.js?v=astronaut-6';
+import { createCrewStage } from '/space-test-site/design/crew-motion-stage.js?v=astronaut-7';
 import { renderObservationCheckin, renderObservationIdentity, renderObservationOverview, renderObservationProfile, renderObservationMobile, updateObservationCheckin } from '/space-test-site/design/crew-observation-ui.js?v=astronaut-4';
 import { renderAnatomyUI, setAnatomyCategory, setAnatomyMetric } from '/space-test-site/design/crew-anatomy-ui.js?v=astronaut-3';
 import { renderEmergencyGuide } from '/space-test-site/design/crew-guidance.js?v=astronaut-3';
@@ -238,7 +238,7 @@ function closeContextPanel(restoreFocus = true) {
   profile.inert = false;
   actors.inert = !stage || selected !== null;
   mobileControls.forEach(item => { item.inert = !stage || selected !== null; });
-  if (selected !== null) stage?.resume();
+  if (selected !== null) syncProfileScroll();
   if (restoreFocus) (previousFocus?.isConnected ? previousFocus : hub.querySelector('[data-emergency]'))?.focus({ preventScroll: true });
   returnFocus = null;
 }
@@ -255,7 +255,6 @@ function setContextPanel(panel, source) {
   profile.inert = true;
   actors.inert = true;
   mobileControls.forEach(item => { item.inert = true; });
-  stage?.pause();
 }
 function showEmergency(source) {
   const previousHistory = hub.dataset.panel === 'history' ? source : null;
@@ -468,7 +467,7 @@ hub.addEventListener('wheel', event => {
 hub.addEventListener('click', event => {
   const nav = event.target.closest('[data-nav]');
   if (nav) {
-    const section = nav.dataset.nav;
+    let section = nav.dataset.nav;
     if (!CrewDesign.hasProfile()) { openOnboarding(false); return; }
     if (section === 'profile') { if (hub.dataset.panel) closeContextPanel(false); showOverview(); return; }
     if (section === 'history') { if (selected === null) showPerson(0); showHistory(nav); return; }
