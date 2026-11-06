@@ -1,10 +1,10 @@
-import { createCrewStage } from '/space-test/design/crew-motion-stage.js?v=astronaut-6';
-import { renderObservationCheckin, renderObservationIdentity, renderObservationOverview, renderObservationProfile, renderObservationMobile, updateObservationCheckin } from '/space-test/design/crew-observation-ui.js?v=astronaut-3';
-import { renderAnatomyUI, setAnatomyCategory, setAnatomyMetric } from '/space-test/design/crew-anatomy-ui.js?v=astronaut-3';
-import { renderEmergencyGuide } from '/space-test/design/crew-guidance.js?v=astronaut-3';
-import { initializeCustomSelects, syncCustomSelects, focusCustomSelect } from '/space-test/design/crew-select.js?v=astronaut-3';
-import { renderHealthTimeline } from '/space-test/design/crew-timeline-ui.js?v=astronaut-3';
-import { assessCrewHealth } from '/space-test/design/crew-assessment.js?v=astronaut-3';
+import { createCrewStage } from '/space-test-site/design/crew-motion-stage.js?v=astronaut-6';
+import { renderObservationCheckin, renderObservationIdentity, renderObservationOverview, renderObservationProfile, renderObservationMobile, updateObservationCheckin } from '/space-test-site/design/crew-observation-ui.js?v=astronaut-3';
+import { renderAnatomyUI, setAnatomyCategory, setAnatomyMetric } from '/space-test-site/design/crew-anatomy-ui.js?v=astronaut-3';
+import { renderEmergencyGuide } from '/space-test-site/design/crew-guidance.js?v=astronaut-3';
+import { initializeCustomSelects, syncCustomSelects, focusCustomSelect } from '/space-test-site/design/crew-select.js?v=astronaut-3';
+import { renderHealthTimeline } from '/space-test-site/design/crew-timeline-ui.js?v=astronaut-3';
+import { assessCrewHealth } from '/space-test-site/design/crew-assessment.js?v=astronaut-3';
 
 const { CrewDesign } = window;
 const people = CrewDesign.crew;

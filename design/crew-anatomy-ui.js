@@ -167,7 +167,7 @@ export function renderAnatomyUI(summary, active = 'circulation', histories = {},
   const navigation = Object.entries(CATEGORIES).map(([key, category]) =>
     `<button type="button" id="crew-anatomy-control-${key}" aria-controls="crew-anatomy-panel-${key}" aria-pressed="${key === active}" data-anatomy-category="${key}">${category.nav}</button>`
   ).join('');
-  const heartHotspot = `<button type="button" class="crew-anatomy-hotspot crew-anatomy-hotspot--chest" aria-label="Explore the heart" aria-controls="crew-anatomy-panel-circulation" aria-pressed="${active === 'circulation'}" data-anatomy-category="circulation"><span class="crew-anatomy-hotspot-ring" aria-hidden="true"><img src="/space-test/images/hotspot_vfx.png" alt=""></span><span class="crew-anatomy-hotspot-label"><span>Explore heart</span><i aria-hidden="true">↗</i></span></button>`;
+  const heartHotspot = `<button type="button" class="crew-anatomy-hotspot crew-anatomy-hotspot--chest" aria-label="Explore the heart" aria-controls="crew-anatomy-panel-circulation" aria-pressed="${active === 'circulation'}" data-anatomy-category="circulation"><span class="crew-anatomy-hotspot-ring" aria-hidden="true"><img src="/space-test-site/images/hotspot_vfx.png" alt=""></span><span class="crew-anatomy-hotspot-label"><span>Explore heart</span><i aria-hidden="true">↗</i></span></button>`;
   const panels = Object.entries(CATEGORIES).map(([key, category]) => {
     const selectedMetric = key === active ? activeMetric : category.metrics[0];
     const selectors = category.metrics.map(field => {

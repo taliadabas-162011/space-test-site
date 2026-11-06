@@ -1,5 +1,5 @@
-@font-face{font-family:Orbit Magnetik;src:url('/space-test/design/assets/environment/fonts/Magnetik-Regular.woff2') format('woff2');font-weight:400;font-display:swap}
-@font-face{font-family:Orbit Magnetik;src:url('/space-test/design/assets/environment/fonts/Magnetik-SemiBold.woff2') format('woff2');font-weight:600;font-display:swap}
+@font-face{font-family:Orbit Magnetik;src:url('/space-test-site/design/assets/environment/fonts/Magnetik-Regular.woff2') format('woff2');font-weight:400;font-display:swap}
+@font-face{font-family:Orbit Magnetik;src:url('/space-test-site/design/assets/environment/fonts/Magnetik-SemiBold.woff2') format('woff2');font-weight:600;font-display:swap}
 .crew-orbit,.crew-orbit *{box-sizing:border-box}
 .crew-orbit{position:fixed;inset:0;z-index:100;overflow:hidden;color:#f2f8fc;background:#030913;font-family:Orbit Magnetik,sans-serif;-webkit-font-smoothing:antialiased;opacity:1;transition:opacity .7s ease}
 .crew-orbit[hidden]{display:none}

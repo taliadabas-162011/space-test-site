@@ -11,9 +11,9 @@
 // rendering, and dispose() when the stage is destroyed. A far plane of >= 160
 // is needed. The separate satellite load can be disabled for slow devices.
 import { Mesh, Group, BufferGeometry, BufferAttribute, ShaderMaterial, TextureLoader, Texture, PointLight }
-  from '/space-test/design/vendor/three/three.module.min.js';
+  from '/space-test-site/design/vendor/three/three.module.min.js';
 
-const ASSET_ROOT = '/space-test/design/assets/environment';
+const ASSET_ROOT = '/space-test-site/design/assets/environment';
 const REPEAT = 1000;
 const MIRRORED_REPEAT = 1002;
 const NEAREST = 1003;
@@ -193,7 +193,7 @@ function disposeMeshTree(root) {
 
 async function loadSatellite(loader) {
   if (!loader) return null;
-  const reference = await loader.loadAsync('/space-test/design/astronaut-preview/assets/nasa-iss.glb');
+  const reference = await loader.loadAsync('/space-test-site/design/astronaut-preview/assets/nasa-iss.glb');
   const satellite = reference.scene;
   satellite.position.set(0, 1.5, .4);
   satellite.scale.setScalar(.19);

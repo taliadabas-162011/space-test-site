@@ -2,7 +2,7 @@
 // The source animation stores WORLD-space joint poses (not local bone rotations).
 // This module applies world-space deltas from the source bind pose and converts
 // them back to each target bone's current parent space. Callers own timing.
-const TRACK_URL = '/space-test/design/scars-motion-tracks.json';
+const TRACK_URL = '/space-test-site/design/scars-motion-tracks.json';
 let tracksPromise;
 
 export function loadScarsMotion() {

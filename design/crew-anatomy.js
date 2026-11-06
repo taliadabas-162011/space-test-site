@@ -1,9 +1,9 @@
 import { Scene, Vector3, TextureLoader, MeshPhysicalMaterial, Vector2, RepeatWrapping, Plane }
-  from '/space-test/design/vendor/three/three.module.min.js';
+  from '/space-test-site/design/vendor/three/three.module.min.js';
 
 // The body and organs are the original Vibrant Wellness assets. Their mesh
 // coordinates share one authored space, so they must be normalized together.
-const BODY = { female: '/space-test/design/assets/anatomy/skinF.glb', male: '/space-test/design/assets/anatomy/skinMB2.glb' };
+const BODY = { female: '/space-test-site/design/assets/anatomy/skinF.glb', male: '/space-test-site/design/assets/anatomy/skinMB2.glb' };
 const BODY_HEIGHT = 1.9;
 
 function bodyBounds(scene) {
@@ -27,8 +27,8 @@ function bodyBounds(scene) {
 export async function createCrewAnatomy({ loader, parent, model }) {
   if (!loader?.loadAsync || !parent?.add || !BODY[model]) throw new TypeError('A loader, parent, and female or male model are required.');
   const [body, heart, brain, normalMap] = await Promise.all([
-    loader.loadAsync(BODY[model]), loader.loadAsync('/space-test/design/assets/anatomy/heart.glb'),
-    loader.loadAsync('/space-test/design/assets/anatomy/brain.glb'), new TextureLoader().loadAsync('/space-test/design/assets/anatomy/Plastic015A_1K-JPG_NormalGL.jpg'),
+    loader.loadAsync(BODY[model]), loader.loadAsync('/space-test-site/design/assets/anatomy/heart.glb'),
+    loader.loadAsync('/space-test-site/design/assets/anatomy/brain.glb'), new TextureLoader().loadAsync('/space-test-site/design/assets/anatomy/Plastic015A_1K-JPG_NormalGL.jpg'),
   ]);
   normalMap.wrapS = normalMap.wrapT = RepeatWrapping;
   normalMap.repeat.set(2, 2);
