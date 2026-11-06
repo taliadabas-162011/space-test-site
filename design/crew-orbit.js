@@ -1,23 +1,27 @@
-import { createCrewStage } from '/space-test-site/design/crew-motion-stage.js?v=astronaut-5';
-import { renderObservationCheckin, renderObservationIdentity, renderObservationOverview, renderObservationProfile, renderObservationMobile, updateObservationCheckin } from '/space-test-site/design/crew-observation-ui.js?v=astronaut-3';
-import { renderAnatomyUI, setAnatomyCategory, setAnatomyMetric } from '/space-test-site/design/crew-anatomy-ui.js?v=astronaut-3';
-import { renderEmergencyGuide } from '/space-test-site/design/crew-guidance.js?v=astronaut-3';
-import { initializeCustomSelects, syncCustomSelects, focusCustomSelect } from '/space-test-site/design/crew-select.js?v=astronaut-3';
-import { renderHealthTimeline } from '/space-test-site/design/crew-timeline-ui.js?v=astronaut-3';
-import { assessCrewHealth } from '/space-test-site/design/crew-assessment.js?v=astronaut-3';
+import { createCrewStage } from '/space-test/design/crew-motion-stage.js?v=astronaut-6';
+import { renderObservationCheckin, renderObservationIdentity, renderObservationOverview, renderObservationProfile, renderObservationMobile, updateObservationCheckin } from '/space-test/design/crew-observation-ui.js?v=astronaut-3';
+import { renderAnatomyUI, setAnatomyCategory, setAnatomyMetric } from '/space-test/design/crew-anatomy-ui.js?v=astronaut-3';
+import { renderEmergencyGuide } from '/space-test/design/crew-guidance.js?v=astronaut-3';
+import { initializeCustomSelects, syncCustomSelects, focusCustomSelect } from '/space-test/design/crew-select.js?v=astronaut-3';
+import { renderHealthTimeline } from '/space-test/design/crew-timeline-ui.js?v=astronaut-3';
+import { assessCrewHealth } from '/space-test/design/crew-assessment.js?v=astronaut-3';
 
 const { CrewDesign } = window;
 const people = CrewDesign.crew;
 const hub = document.createElement('main');
 hub.className = 'crew-orbit';
+hub.dataset.single = 'true';
 hub.setAttribute('aria-label', 'Crew health overview');
 hub.innerHTML = `<div class="orbit-background" aria-hidden="true"></div><canvas class="orbit-canvas" aria-hidden="true"></canvas>
-  <header class="orbit-header"><span class="orbit-brand">CREW <i>/</i> HEALTH</span><div class="orbit-header-right"><span class="orbit-meta">Illustrative crew · no live telemetry</span><button type="button" data-emergency>Emergency <span aria-hidden="true">↗</span></button></div></header>
-  <div class="orbit-intro"><h1 tabindex="-1">Meet the crew</h1><p>Select a crew member to explore their health.</p></div>
-  <div class="orbit-actors">${people.map((person, index) => `<section class="orbit-actor" data-actor="${index}"><button class="orbit-hit" type="button" data-select="${index}" aria-label="Open ${person.name}'s health overview"></button><div class="orbit-actor-label"><span>CREW / 0${index + 1}</span><h2>${person.name}</h2><div class="orbit-actor-status"></div><button type="button" data-record="${index}">Record readings <span aria-hidden="true">↗</span></button></div><div class="orbit-actor-readings"></div></section>`).join('')}</div>
+  <header class="orbit-header"><span class="orbit-brand">CREW <i>/</i> HEALTH</span><div class="orbit-header-right"><span class="orbit-meta">Personal crew profile · entries stay on this device</span><button type="button" data-emergency>Emergency <span aria-hidden="true">↗</span></button></div></header>
+  <div class="orbit-intro"><h1 tabindex="-1">Space health</h1><p>One crew member · one personal record</p></div>
+  <nav class="orbit-app-nav" aria-label="Health dashboard" hidden><button type="button" data-nav="profile">Profile</button><button type="button" data-nav="today">Readings today</button><button type="button" data-nav="history">History</button><button type="button" data-nav="device">Link device</button><button type="button" data-nav="research">Space effects</button><button type="button" data-nav="feedback">Feedback</button></nav>
+  <div class="orbit-actors">${people.map((person, index) => `<section class="orbit-actor" data-actor="${index}"><button class="orbit-hit" type="button" data-select="${index}" aria-label="Open astronaut health profile"></button><div class="orbit-actor-label"><span>ASTRONAUT PROFILE</span><h2></h2><div class="orbit-actor-status"></div><button type="button" data-record="${index}">Readings today <span aria-hidden="true">↗</span></button></div><div class="orbit-actor-readings"></div></section>`).join('')}</div>
   <div class="orbit-mobile-summary"></div>
   <nav class="orbit-mobile-crew" aria-label="Choose a crew member">${people.map((person, index) => `<button type="button" data-select="${index}">${person.name.split(' ')[0]} <span aria-hidden="true">↗</span></button>`).join('')}</nav>
-  <div class="orbit-profile" hidden><button class="orbit-back" type="button" data-all>← All crew</button><div class="orbit-profile-identity"><div class="orbit-profile-name"></div><div class="orbit-profile-actions"><button type="button" data-open-form><span>Health check</span><i aria-hidden="true">↗</i></button><button type="button" data-open-history><span>Health record</span><i aria-hidden="true">↗</i></button><button type="button" data-anatomy disabled>Preparing anatomy…</button><p class="orbit-anatomy-error" role="alert" hidden></p></div></div><button class="orbit-figure-hit" type="button" data-figure-anatomy aria-label="Explore this crew member’s anatomy"></button><div class="orbit-scanline" aria-hidden="true"></div><div class="orbit-profile-readings" role="region" aria-label="Health readings" tabindex="0"></div><form class="orbit-form" hidden></form><div class="orbit-anatomy-root" hidden></div><p class="orbit-gesture">Drag to switch crew · Scroll to explore</p><nav class="orbit-switch" aria-label="Switch crew member"><button type="button" data-previous aria-label="Previous crew member">←</button><span class="orbit-position"></span><button type="button" data-next aria-label="Next crew member">→</button></nav></div>
+  <div class="orbit-profile" hidden><button class="orbit-back" type="button" data-all>← Overview</button><div class="orbit-profile-identity"><div class="orbit-profile-name"></div><div class="orbit-profile-actions"><button type="button" data-edit-profile>Edit profile <span aria-hidden="true">↗</span></button><button type="button" data-open-form><span>Record readings today</span><i aria-hidden="true">↗</i></button><button type="button" data-open-history><span>View history</span><i aria-hidden="true">↗</i></button><button type="button" data-anatomy disabled>Preparing anatomy…</button><p class="orbit-anatomy-error" role="alert" hidden></p></div></div><button class="orbit-figure-hit" type="button" data-figure-anatomy aria-label="Explore this astronaut’s anatomy"></button><div class="orbit-scanline" aria-hidden="true"></div><div class="orbit-profile-readings" role="region" aria-label="Health readings" tabindex="0"></div><form class="orbit-form" hidden></form><div class="orbit-anatomy-root" hidden></div><p class="orbit-gesture">Drag to explore the scene</p><nav class="orbit-switch" aria-label="Astronaut"><span class="orbit-position"></span></nav></div>
+  <section class="orbit-onboarding" hidden aria-labelledby="profile-setup-title"><div class="orbit-panel-kicker">ASTRONAUT PROFILE</div><h2 id="profile-setup-title">Create your profile</h2><p>Set up the crew member shown in this scene. Your profile and readings stay in this browser.</p><form data-profile-form><label for="profile-name">Name</label><input id="profile-name" name="name" maxlength="48" autocomplete="name" required placeholder="Enter your name"><label for="profile-anatomy">Anatomy model <span>Optional</span></label><select id="profile-anatomy" name="model"><option value="male">Masculine anatomy</option><option value="female">Feminine anatomy</option></select><p class="orbit-profile-error" role="alert"></p><button type="submit">Save profile <span aria-hidden="true">↗</span></button></form><small>This prototype does not create an online account or sync data.</small></div>
+  <section class="orbit-section-panel" hidden role="region" aria-label="Dashboard section"><button class="orbit-section-close" type="button" data-section-close>Close <span aria-hidden="true">×</span></button><div class="orbit-section-content"></div></section>
   <div class="orbit-emergency" role="region" aria-label="Emergency guidance" hidden></div>
   <div class="orbit-timeline" role="region" aria-label="Observation history" hidden></div>
   <p class="orbit-loading" role="status">Preparing the crew scene…</p><p class="orbit-failure" role="alert" hidden>Unable to load the 3D crew scene. Please reload to try again.</p>`;
@@ -32,6 +36,11 @@ const figureButton = hub.querySelector('[data-figure-anatomy]');
 const anatomyRoot = hub.querySelector('.orbit-anatomy-root');
 const actors = hub.querySelector('.orbit-actors');
 const mobileControls = [hub.querySelector('.orbit-mobile-summary'), hub.querySelector('.orbit-mobile-crew')];
+const onboarding = hub.querySelector('.orbit-onboarding');
+const profileForm = hub.querySelector('[data-profile-form]');
+const sectionPanel = hub.querySelector('.orbit-section-panel');
+const sectionContent = hub.querySelector('.orbit-section-content');
+const appNav = hub.querySelector('.orbit-app-nav');
 actors.inert = true;
 mobileControls.forEach(item => { item.inert = true; });
 let stage;
@@ -91,6 +100,10 @@ function renderData() {
   people.forEach((person, index) => {
     const summary = CrewDesign.summary(person.id);
     const actor = hub.querySelector(`[data-actor="${index}"]`);
+    actor.querySelector('.orbit-actor-label h2').textContent = summary.person.name;
+    actor.querySelector('.orbit-hit').setAttribute('aria-label', `Open ${summary.person.name}'s profile`);
+    const recordButton = actor.querySelector('[data-record]');
+    recordButton.textContent = CrewDesign.hasProfile() ? 'Readings today ↗' : 'Create profile ↗';
     const status = actor.querySelector('.orbit-actor-status');
     status.dataset.status = summary.symptoms;
     status.hidden = !summary.symptoms;
@@ -107,8 +120,8 @@ function renderData() {
     }
     actor.querySelector('.orbit-actor-readings').innerHTML = renderObservationOverview(summary);
   });
-  const mobile = CrewDesign.summary(people[1].id);
-  hub.querySelector('.orbit-mobile-summary').innerHTML = renderObservationMobile(mobile, 1);
+  const mobile = CrewDesign.summary(people[0].id);
+  hub.querySelector('.orbit-mobile-summary').innerHTML = renderObservationMobile(mobile, 0);
   if (selected === null) return;
   const summary = CrewDesign.summary(people[selected].id);
   const pulseHistory = CrewDesign.history(summary.person.id, 'pulse');
@@ -121,10 +134,10 @@ function renderData() {
     form.querySelector(`select[name="${field}"] option[value=""]`).textContent = summary[field] ? 'Keep previous report' : 'Not recorded';
   }
   figureButton.setAttribute('aria-label', `Explore ${summary.person.name}'s anatomy`);
-  hub.querySelector('.orbit-profile-name').innerHTML = renderObservationIdentity(summary, pulseHistory, assessment);
+  hub.querySelector('.orbit-profile-name').innerHTML = `${renderObservationIdentity(summary, pulseHistory, assessment)}<button type="button" class="orbit-edit-profile" data-edit-profile>Edit profile ↗</button>`;
   hub.querySelector('.orbit-profile-readings').innerHTML = renderObservationProfile(summary, pulseHistory);
   if (anatomyMode) renderAnatomy(summary, histories);
-  hub.querySelector('.orbit-position').textContent = `0${selected + 1} / 0${people.length}`;
+  hub.querySelector('.orbit-position').textContent = '01 / 01';
 }
 function renderForm() {
   form.innerHTML = renderObservationCheckin();
@@ -145,6 +158,7 @@ renderData();
 window.addEventListener('crewhealth:update', renderData);
 
 function showPerson(index, openForm = false) {
+  if (!CrewDesign.hasProfile()) { openOnboarding(false); return; }
   if (!stage || index < 0 || index >= people.length) return;
   if (selected !== index) exitAnatomy();
   selected = index;
@@ -208,6 +222,7 @@ function closeContextPanel(restoreFocus = true) {
   historyReturn = null;
   emergency.hidden = true;
   timeline.hidden = true;
+  sectionPanel.hidden = true;
   delete hub.dataset.panel;
   profile.inert = false;
   actors.inert = !stage || selected !== null;
@@ -242,11 +257,63 @@ function showHistory(source) {
   timeline.scrollTop = 0;
   timeline.querySelector('#timeline-title')?.focus({ preventScroll: true });
 }
+const escapeHtml = value => String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
+function todayRow(reading, label, unit, pressure = false) {
+  const recordedToday = reading?.recorded && new Date(reading.time).toDateString() === new Date().toDateString();
+  const value = pressure
+    ? `${reading?.value?.systolic ?? '—'}/${reading?.value?.diastolic ?? '—'}`
+    : reading?.recorded ? reading.value : '—';
+  const detail = recordedToday
+    ? `Recorded ${new Intl.DateTimeFormat(undefined, { hour: '2-digit', minute: '2-digit' }).format(new Date(reading.time))}${reading.context ? ` · ${reading.context === 'rest' ? 'at rest' : reading.context === 'after-activity' ? 'after activity' : reading.context}` : ''}`
+    : reading?.recorded ? 'Last entry was on another day' : 'No reading recorded today';
+  return `<div class="orbit-today-row"><span>${label}</span><strong>${escapeHtml(value)} <small>${unit}</small></strong><em>${escapeHtml(detail)}</em></div>`;
+}
+function sectionMarkup(section) {
+  const summary = CrewDesign.summary(people[0].id);
+  const name = escapeHtml(summary.person.name);
+  if (section === 'today') return `<p class="orbit-panel-kicker">MISSION HEALTH / TODAY</p><h2 id="section-title">Readings today</h2><p class="orbit-section-lede">A daily snapshot for ${name}. Values are shown as recorded; this demo does not classify them as normal or abnormal.</p><div class="orbit-today-list">${todayRow(summary.pulse, 'Heart rate', 'bpm')}${todayRow(summary.oxygen, 'Oxygen saturation', '%')}${todayRow(summary.pressure, 'Blood pressure', 'mmHg', true)}${todayRow(summary.temperature, 'Temperature', '°C')}</div><button class="orbit-panel-action" type="button" data-today-record>Record today’s readings <span aria-hidden="true">↗</span></button><p class="orbit-local-note">Entries are stored in this browser only.</p>`;
+  if (section === 'device') return `<p class="orbit-panel-kicker">DEVICE LINK / CONCEPT</p><h2 id="section-title">Connect a wearable</h2><p class="orbit-section-lede">A future device link could send heart rate, oxygen saturation, activity, and other supported measurements into this profile.</p><div class="orbit-device-status"><span class="orbit-device-dot"></span><div><strong>No device connected</strong><small>Manual entry is available today</small></div></div><p>This prototype does not pair with Bluetooth devices or receive live sensor data. A real connection would need a supported device, permission, and a review step before a reading is saved.</p><button class="orbit-panel-action" type="button" data-device-plan>View connection concept <span aria-hidden="true">↗</span></button><div class="orbit-device-flow" data-device-flow hidden><ol><li>Choose a compatible wearable.</li><li>Approve a secure connection.</li><li>Review the sensor reading and its time.</li><li>Confirm before adding it to the record.</li></ol></div><a class="orbit-source-link" href="https://ntrs.nasa.gov/api/citations/20240000117/downloads/AI_and_Human_Spaceflight.pdf" target="_blank" rel="noopener noreferrer">NASA biosensors overview ↗</a>`;
+  if (section === 'research') return `<p class="orbit-panel-kicker">SPACEFLIGHT HEALTH / NASA RESEARCH</p><h2 id="section-title">What changes in space?</h2><p class="orbit-section-lede">Spaceflight can change physiology. Readings need personal baselines, activity context, mission phase, and medical-team interpretation.</p><article class="orbit-research-card"><h3>Heart and circulation</h3><p>In microgravity, body fluids shift toward the head and the cardiovascular system adapts. NASA studies changes in heart and blood-vessel function and the risk of dizziness or fainting after return to gravity.</p><p class="orbit-research-note">NASA’s public material does not give one universal astronaut “normal” heart-rate or SpO₂ range for this dashboard. This prototype records values and context without setting medical thresholds.</p><a class="orbit-source-link" href="https://www.nasa.gov/reference/risk-of-cardiovascular-adaptations/" target="_blank" rel="noopener noreferrer">NASA cardiovascular risk research ↗</a></article><article class="orbit-research-card"><h3>Oxygen and wearable measurements</h3><p>NASA identifies hypoxia as a spaceflight risk in some mission and spacesuit scenarios. Wearable biosensor research has measured blood oxygen and ECG, but a sensor number alone is not a diagnosis.</p><a class="orbit-source-link" href="https://www.nasa.gov/hrp/risks/" target="_blank" rel="noopener noreferrer">NASA human-spaceflight risks ↗</a><a class="orbit-source-link" href="https://ntrs.nasa.gov/api/citations/20240000117/downloads/AI_and_Human_Spaceflight.pdf" target="_blank" rel="noopener noreferrer">NASA biosensors overview ↗</a></article><article class="orbit-research-card"><h3>Radiation</h3><p>Space radiation is not visible or felt. NASA monitors the radiation environment and uses dedicated instruments and dosimeters; exposure is not inferred from heart rate or oxygen saturation. Risks depend on mission and dose and can include long-term cancer and other tissue effects.</p><a class="orbit-source-link" href="https://www.nasa.gov/hrp/hazard-space-radiation/" target="_blank" rel="noopener noreferrer">NASA space-radiation research ↗</a></article><article class="orbit-research-card"><h3>Bone and muscle</h3><p>NASA reports an average 1%–1.5% loss of bone density per month in weight-bearing bones during four-to-six-month missions. Rates vary; exercise and bone scans are part of countermeasure and monitoring work.</p><a class="orbit-source-link" href="https://www.nasa.gov/reference/risk-of-spaceflight-induced-bone-changes/" target="_blank" rel="noopener noreferrer">NASA bone-health research ↗</a></article><p class="orbit-local-note">Educational summary only. It does not provide an astronaut’s live telemetry or replace flight medical procedures.</p>`;
+  if (section === 'feedback') return `<p class="orbit-panel-kicker">PRODUCT FEEDBACK</p><h2 id="section-title">Share feedback</h2><p class="orbit-section-lede">Tell us what is clear, confusing, or missing from this prototype.</p><form class="orbit-feedback-form" data-feedback-form><label for="feedback-rating">How useful is this dashboard?</label><select id="feedback-rating" name="rating"><option value="">Choose a rating</option><option value="5">5 · Very useful</option><option value="4">4 · Useful</option><option value="3">3 · Not sure</option><option value="2">2 · Needs work</option><option value="1">1 · Not useful</option></select><label for="feedback-message">Your feedback</label><textarea id="feedback-message" name="message" rows="5" maxlength="800" required placeholder="Write a few notes"></textarea><p class="orbit-feedback-confirmation" role="status"></p><button class="orbit-panel-action" type="submit">Save feedback <span aria-hidden="true">↗</span></button></form><p class="orbit-local-note">Feedback is saved in this browser and is not sent to anyone.</p>`;
+  return '';
+}
+function showSection(section, source) {
+  if (!CrewDesign.hasProfile()) { openOnboarding(false); return; }
+  setContextPanel(section, source);
+  sectionContent.innerHTML = sectionMarkup(section);
+  sectionPanel.setAttribute('aria-label', section === 'research' ? 'NASA spaceflight health research' : section);
+  sectionPanel.hidden = false;
+  sectionPanel.scrollTop = 0;
+  sectionContent.querySelector('#section-title')?.focus({ preventScroll: true });
+}
+function openOnboarding(edit = false) {
+  const existing = CrewDesign.getProfile();
+  profileForm.elements.name.value = existing?.name || '';
+  profileForm.elements.model.value = existing?.model || 'male';
+  profileForm.querySelector('.orbit-profile-error').textContent = '';
+  hub.querySelector('#profile-setup-title').textContent = edit ? 'Edit your profile' : 'Create your profile';
+  profileForm.querySelector('button[type="submit"]').innerHTML = edit ? 'Save changes <span aria-hidden="true">↗</span>' : 'Save profile <span aria-hidden="true">↗</span>';
+  onboarding.hidden = false;
+  profileForm.elements.name.focus({ preventScroll: true });
+}
+profileForm.addEventListener('submit', event => {
+  event.preventDefault();
+  if (!profileForm.reportValidity()) return;
+  try {
+    CrewDesign.saveProfile(profileForm.elements.name.value, profileForm.elements.model.value);
+    onboarding.hidden = true;
+    appNav.hidden = false;
+    renderData();
+    if (selected === null) showPerson(0);
+  } catch (error) {
+    profileForm.querySelector('.orbit-profile-error').textContent = error.message || 'Could not save this profile on the device.';
+  }
+});
 profile.addEventListener('scroll', syncProfileScroll, { passive: true });
 window.addEventListener('resize', syncProfileScroll, { passive: true });
 hub.addEventListener('pointerdown', event => {
   const control = event.target.closest('button,input,select,form');
-  if (hub.dataset.panel || selected === null || recording || anatomyMode || event.button !== 0 || !stage?.beginDrag || (control && control !== figureButton)) return;
+  if (people.length < 2 || hub.dataset.panel || selected === null || recording || anatomyMode || event.button !== 0 || !stage?.beginDrag || (control && control !== figureButton)) return;
   gesture = { pointerId: event.pointerId, x: event.clientX, y: event.clientY, dragging: false };
   stage.beginDrag();
 });
@@ -279,6 +346,23 @@ hub.addEventListener('wheel', event => {
   event.preventDefault();
 }, { passive: false });
 hub.addEventListener('click', event => {
+  const nav = event.target.closest('[data-nav]');
+  if (nav) {
+    const section = nav.dataset.nav;
+    if (!CrewDesign.hasProfile()) { openOnboarding(false); return; }
+    if (section === 'profile') { if (hub.dataset.panel) closeContextPanel(false); showPerson(0); return; }
+    if (section === 'history') { if (hub.dataset.panel) closeContextPanel(false); if (selected === null) showPerson(0); showHistory(nav); return; }
+    showSection(section, nav);
+    return;
+  }
+  if (event.target.closest('[data-section-close]')) { closeContextPanel(); return; }
+  if (event.target.closest('[data-today-record]')) { closeContextPanel(false); showPerson(0, true); return; }
+  if (event.target.closest('[data-device-plan]')) {
+    const flow = sectionContent.querySelector('[data-device-flow]');
+    if (flow) { flow.hidden = !flow.hidden; event.target.closest('[data-device-plan]').setAttribute('aria-expanded', String(!flow.hidden)); }
+    return;
+  }
+  if (event.target.closest('[data-edit-profile]')) { openOnboarding(true); return; }
   const crewEmergency = event.target.closest('[data-crew-emergency]');
   if (crewEmergency) {
     showPerson(Number(crewEmergency.dataset.crewEmergency));
@@ -320,7 +404,11 @@ hub.addEventListener('click', event => {
     return;
   }
   if (select) showPerson(Number(select.dataset.select));
-  if (record) showPerson(Number(record.dataset.record), true);
+  if (record) {
+    if (!CrewDesign.hasProfile()) openOnboarding(false);
+    else if (record.closest('.orbit-mobile-summary')) showSection('today', record);
+    else showPerson(Number(record.dataset.record), true);
+  }
   if (event.target.closest('[data-all]')) showOverview();
   if (event.target.closest('[data-previous]')) showPerson((selected + people.length - 1) % people.length);
   if (event.target.closest('[data-next]')) showPerson((selected + 1) % people.length);
@@ -422,6 +510,20 @@ form.addEventListener('change', event => {
   syncCustomSelects(form);
 });
 hub.addEventListener('submit', event => {
+  const feedback = event.target.closest('[data-feedback-form]');
+  if (feedback) {
+    event.preventDefault();
+    if (!feedback.reportValidity()) return;
+    const confirmation = feedback.querySelector('.orbit-feedback-confirmation');
+    try {
+      const saved = JSON.parse(localStorage.getItem('crew-health-feedback-v1') || '[]');
+      saved.push({ rating: feedback.elements.rating.value, message: feedback.elements.message.value.trim(), time: new Date().toISOString() });
+      localStorage.setItem('crew-health-feedback-v1', JSON.stringify(saved.slice(-20)));
+      confirmation.textContent = 'Thank you. Your feedback was saved in this browser; it was not sent.';
+      feedback.reset();
+    } catch (_) { confirmation.textContent = 'Feedback could not be saved on this device.'; }
+    return;
+  }
   const entry = event.target.closest('[data-anatomy-form]');
   if (entry && selected !== null) {
     event.preventDefault();
@@ -591,7 +693,15 @@ async function begin() {
     hub.querySelector('.orbit-failure').hidden = false;
     console.error('Crew stage failed:', error);
   }
-  actors.inert = false;
-  mobileControls.forEach(item => { item.inert = false; });
+  appNav.hidden = !CrewDesign.hasProfile();
+  if (CrewDesign.hasProfile()) {
+    actors.inert = true;
+    mobileControls.forEach(item => { item.inert = true; });
+    showPerson(0);
+  } else {
+    onboarding.hidden = false;
+    actors.inert = true;
+    mobileControls.forEach(item => { item.inert = true; });
+  }
 }
 begin();

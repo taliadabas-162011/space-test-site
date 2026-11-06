@@ -2,7 +2,7 @@
 // Coordinates in this file are adapted for a Three.js scene; the original
 // paths remain available through sampleSource(). See camera-mechanics.md.
 
-const CAMERA_DATA_URL = '/space-test-site/design/assets/camera-paths.raw?v=astronaut-5';
+const CAMERA_DATA_URL = '/space-test/design/assets/camera-paths.raw?v=astronaut-5';
 const TAU = Math.PI * 2;
 const COUNT = 3;
 export const SELECTION_FRAME = 200;

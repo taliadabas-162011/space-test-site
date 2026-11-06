@@ -1,11 +1,16 @@
 /* Data and interactions layered onto the captured Vibrant experience. */
 (() => {
   const storageKey = 'crew-health-observations-v1';
-  const crew = [
-    { id: 'alex', name: 'Alex Morgan', model: 'male', samples: { pulse: 68, pressure: { systolic: 116, diastolic: 74 }, oxygen: 98, sleep: 7.5, water: 2.1, temperature: 36.7, exercise: 55 } },
-    { id: 'maya', name: 'Maya Chen', model: 'female', samples: { pulse: 64, pressure: { systolic: 112, diastolic: 72 }, oxygen: 99, sleep: 8.1, water: 2.3, temperature: 36.6, exercise: 60 } },
-    { id: 'sam', name: 'Sam Rivera', model: 'male', samples: { pulse: 72, pressure: { systolic: 118, diastolic: 76 }, oxygen: 98, sleep: 6.8, water: 1.9, temperature: 36.8, exercise: 45 } },
-  ];
+  const profileStorageKey = 'crew-health-profile-v1';
+  function readProfile() {
+    try {
+      const value = JSON.parse(localStorage.getItem(profileStorageKey) || 'null');
+      if (!value || typeof value.name !== 'string' || !value.name.trim()) return null;
+      return { name: value.name.trim().slice(0, 48), model: value.model === 'female' ? 'female' : 'male' };
+    } catch (_) { return null; }
+  }
+  let savedProfile = readProfile();
+  const crew = [{ id: 'alex', name: savedProfile?.name || 'Crew member', model: savedProfile?.model || 'male', samples: {} }];
   const metrics = {
     pulse: { label: 'Heart rate', unit: 'bpm', min: 0, max: 300, step: 1 },
     pressure: { label: 'Blood pressure', unit: 'mmHg', pair: true },
@@ -83,6 +88,7 @@
     return new Intl.DateTimeFormat(undefined, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }).format(new Date(value));
   }
   function displayValue(field, value) {
+    if (value == null || value === '') return '—';
     return field === 'pressure' ? `${Number(value.systolic)}/${Number(value.diastolic)}` : String(Number(value));
   }
   function latestMarkup(field, position, count) {
@@ -90,7 +96,7 @@
     const list = entries(field);
     const last = list.at(-1);
     const value = last ? last.value : selected.samples[field];
-    const source = last ? `RECORDED ${displayDate(last.time)}` : 'ILLUSTRATIVE SAMPLE';
+    const source = last ? `RECORDED ${displayDate(last.time)}` : value == null ? 'NO READING RECORDED' : 'ILLUSTRATIVE SAMPLE';
     const shape = `${position === 0 ? ' rounded-t-2sm' : ''}${position === count - 1 ? ' rounded-b-2sm' : ''}`;
     const input = metric.pair
       ? '<label>Systolic <small>mmHg</small><input name="systolic" type="number" min="0" max="400" step="1" inputmode="numeric" required></label><label>Diastolic <small>mmHg</small><input name="diastolic" type="number" min="0" max="300" step="1" inputmode="numeric" required></label>'
@@ -126,6 +132,18 @@
     }
   }
   function registerStories(value) { stories = value; refreshStories(); }
+  function saveProfile(name, model = 'male') {
+    const cleanName = typeof name === 'string' ? name.trim().replace(/\s+/g, ' ').slice(0, 48) : '';
+    if (!cleanName) throw new Error('Enter a name for the crew profile.');
+    const safeModel = model === 'female' ? 'female' : 'male';
+    const nextProfile = { name: cleanName, model: safeModel, createdAt: savedProfile?.createdAt || new Date().toISOString() };
+    localStorage.setItem(profileStorageKey, JSON.stringify(nextProfile));
+    savedProfile = nextProfile;
+    crew[0].name = cleanName;
+    crew[0].model = safeModel;
+    window.dispatchEvent(new CustomEvent('crewprofile:update', { detail: { profile: { ...nextProfile } } }));
+    return { ...nextProfile };
+  }
   function hotspotLabel(name) { return hotspotNames[name] || name.replace(/_/g, ' '); }
   function symptomEntries(personId) {
     const list = records[personId]?.symptoms;
@@ -314,5 +332,6 @@
     refreshStories();
     window.dispatchEvent(new CustomEvent('crewhealth:update'));
   });
-  window.CrewDesign = { storyData, registerStories, hotspotLabel, crew, metrics, symptomOptions, summary, history, symptomHistory, selectCrew, saveOverview };
+  window.CrewDesign = { storyData, registerStories, hotspotLabel, crew, metrics, symptomOptions, summary, history, symptomHistory, selectCrew, saveOverview,
+    hasProfile: () => Boolean(savedProfile), getProfile: () => savedProfile ? { ...savedProfile } : null, saveProfile };
 })();

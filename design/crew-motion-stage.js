@@ -1,19 +1,19 @@
-import { Scene, WebGLRenderer, PerspectiveCamera, Vector3, PointLight, Plane } from '/space-test-site/design/vendor/three/three.module.min.js';
-import { GLTFLoader } from '/space-test-site/design/vendor/three/examples/jsm/loaders/GLTFLoader.js';
-import { DRACOLoader } from '/space-test-site/design/vendor/three/examples/jsm/loaders/DRACOLoader.js';
+import { Scene, WebGLRenderer, PerspectiveCamera, Vector3, PointLight, Plane } from '/space-test/design/vendor/three/three.module.min.js';
+import { GLTFLoader } from '/space-test/design/vendor/three/examples/jsm/loaders/GLTFLoader.js';
+import { DRACOLoader } from '/space-test/design/vendor/three/examples/jsm/loaders/DRACOLoader.js';
 import {
   loadScarsCameraPaths, createScarsCameraRig, advanceSelectionAngle,
   maintainBlendedDistance, SELECTION_FRAME, INTRO_DURATION_SECONDS,
-} from '/space-test-site/design/scars-camera-paths.js?v=astronaut-5';
-import { loadScarsMotion, createScarsPerformer } from '/space-test-site/design/scars-motion.js';
-import { createAstronautMotionRefinement } from '/space-test-site/design/astronaut-motion-refinement.js';
-import { createCrewEnvironment } from '/space-test-site/design/crew-environment.js?v=astronaut-4';
+} from '/space-test/design/scars-camera-paths.js?v=astronaut-6';
+import { loadScarsMotion, createScarsPerformer } from '/space-test/design/scars-motion.js';
+import { createAstronautMotionRefinement } from '/space-test/design/astronaut-motion-refinement.js';
+import { createCrewEnvironment } from '/space-test/design/crew-environment.js?v=astronaut-5';
 
-const MODEL_URL = '/space-test-site/design/astronaut-preview/assets/grab3d.glb';
+const MODEL_URL = '/space-test/design/astronaut-preview/assets/grab3d.glb';
 const MODEL_HEIGHT = 1.9;
-const LINE_POSITIONS = [-1.65, 0, 1.65];
-const LINE_YAW = [-0.13, 0.02, 0.13];
-const MODEL_TINTS = [0xcbdff2, 0xffffff, 0xc1cedc];
+const LINE_POSITIONS = [0];
+const LINE_YAW = [0];
+const MODEL_TINTS = [0xffffff];
 // The first inward section of each reference track; later frames follow weapons.
 const DETAIL_FRAMES = [60, 70, 80];
 const TAU = Math.PI * 2;
@@ -40,7 +40,7 @@ export async function createCrewStage(canvas, onFrame = () => {}) {
   const camera = new PerspectiveCamera(34, 1, 0.05, 100);
   const loader = new GLTFLoader();
   const draco = new DRACOLoader();
-  draco.setDecoderPath('/space-test-site/design/assets/draco/');
+  draco.setDecoderPath('/space-test/design/assets/draco/');
   loader.setDRACOLoader(draco);
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
   const pointer = { x: 0, y: 0, smoothX: 0, smoothY: 0 };
@@ -118,10 +118,10 @@ export async function createCrewStage(canvas, onFrame = () => {}) {
     cameraRig = createScarsCameraRig(paths, { lookHeight: 1.05, zoomOut: [2.1, 1.5, 2.1] });
     // Keep the overview and the reference camera tracks in one world: the
     // crew do not slide to new locations when the camera begins its orbit.
-    cameraRig.anchors.forEach((anchor, i) => anchor.splice(0, 3, LINE_POSITIONS[i], 0, 0));
+    cameraRig.anchors[0].splice(0, 3, 0, 0, 0);
     const bytes = await response.arrayBuffer();
     for (let i = 0; i < LINE_POSITIONS.length; i++) {
-      const gltf = await loader.parseAsync(bytes.slice(0), '/space-test-site/design/astronaut-preview/assets/');
+      const gltf = await loader.parseAsync(bytes.slice(0), '/space-test/design/astronaut-preview/assets/');
       const root = gltf.scene;
       const bounds = measure(root);
       const size = bounds.getSize(new Vector3());
@@ -200,7 +200,7 @@ export async function createCrewStage(canvas, onFrame = () => {}) {
 
   function focus(index) {
     if (disposed) return;
-    if (!Number.isInteger(index) || index < 0 || index >= models.length) throw new RangeError('Crew index must be 0, 1, or 2.');
+    if (!Number.isInteger(index) || index < 0 || index >= models.length) throw new RangeError('Crew index must be 0.');
     const fromOverview = selected === null;
     const changed = selected !== index;
     selected = index;
@@ -293,7 +293,7 @@ export async function createCrewStage(canvas, onFrame = () => {}) {
     const index = selected;
     const model = models[index];
     if (!model.anatomy) {
-      const { createCrewAnatomy } = await import('/space-test-site/design/crew-anatomy.js?v=source-focus-4');
+      const { createCrewAnatomy } = await import('/space-test/design/crew-anatomy.js?v=source-focus-4');
       const anatomy = await createCrewAnatomy({ loader, parent: model.pivot, model: bodyModel });
       if (disposed || revision !== anatomyRevision || selected !== index) { anatomy.dispose(); return false; }
       model.anatomy = anatomy;
