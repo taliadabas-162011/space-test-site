@@ -113,3 +113,8 @@
 .crew-orbit .orbit-timeline{top:100px;right:auto;bottom:78px;left:50%;width:min(760px,calc(100% - 48px));padding:24px 28px 40px;transform:translateX(-50%);border:1px solid rgba(127,191,222,.3);border-radius:18px;background:rgba(4,15,27,.94);backdrop-filter:blur(18px)}
 .crew-orbit[data-panel='history'] .orbit-canvas{opacity:.35}
 @media(max-width:767px){.orbit-onboarding{left:12px;right:12px;bottom:68px;max-height:78dvh}.crew-orbit .orbit-timeline{top:72px;right:10px;bottom:68px;left:10px;width:auto;padding:18px 16px 30px;transform:none}.timeline-readings{grid-template-columns:1fr}}
+
+/* Keep overlays light so the 3D scene and dashboard do not compete for GPU time. */
+.orbit-section-panel{backdrop-filter:none;background:rgba(4,15,27,.98);box-shadow:0 12px 36px rgba(0,0,0,.28)}
+.crew-orbit .orbit-timeline{backdrop-filter:none;background:rgba(4,15,27,.98);box-shadow:0 12px 36px rgba(0,0,0,.28)}
+@media(max-width:767px){.orbit-app-nav{backdrop-filter:none;background:rgba(4,14,26,.97)}}

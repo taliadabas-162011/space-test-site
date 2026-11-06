@@ -238,7 +238,7 @@ function closeContextPanel(restoreFocus = true) {
   profile.inert = false;
   actors.inert = !stage || selected !== null;
   mobileControls.forEach(item => { item.inert = !stage || selected !== null; });
-  if (selected !== null) syncProfileScroll();
+  if (selected !== null) stage?.resume();
   if (restoreFocus) (previousFocus?.isConnected ? previousFocus : hub.querySelector('[data-emergency]'))?.focus({ preventScroll: true });
   returnFocus = null;
 }
@@ -255,6 +255,7 @@ function setContextPanel(panel, source) {
   profile.inert = true;
   actors.inert = true;
   mobileControls.forEach(item => { item.inert = true; });
+  stage?.pause();
 }
 function showEmergency(source) {
   const previousHistory = hub.dataset.panel === 'history' ? source : null;
