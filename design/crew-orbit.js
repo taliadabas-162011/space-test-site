@@ -394,12 +394,43 @@ function sectionMarkup(section) {
 function showSection(section, source) {
   if (!CrewDesign.hasProfile()) { openOnboarding(false); return; }
   setContextPanel(section, source);
-  sectionContent.innerHTML = sectionMarkup(section);
+  try {
+    sectionContent.innerHTML = sectionMarkup(section);
+  } catch (error) {
+    console.error(`Could not open dashboard section: ${section}`, error);
+    sectionContent.innerHTML = `<h2 id="section-title">This section could not open</h2><p class="orbit-section-lede">Please try again. Your saved profile and readings are still here.</p><button type="button" class="orbit-panel-action" data-section-retry="${escapeHtml(section)}">Try again</button>`;
+  }
   sectionPanel.setAttribute('aria-label', section === 'research' ? 'NASA spaceflight health research' : section === 'device' ? 'Link a health device' : section);
   sectionPanel.hidden = false;
   sectionPanel.scrollTop = 0;
   sectionContent.querySelector('#section-title')?.focus({ preventScroll: true });
 }
+function navigateDashboard(section, source) {
+  if (!CrewDesign.hasProfile()) { openOnboarding(false); return; }
+  if (section === 'profile') {
+    appNav.querySelectorAll('[data-nav]').forEach(button => button.removeAttribute('aria-current'));
+    if (hub.dataset.panel) closeContextPanel(false);
+    showOverview();
+    return;
+  }
+  if (section === 'history') {
+    appNav.querySelectorAll('[data-nav]').forEach(button => button.toggleAttribute('aria-current', button === source));
+    if (selected === null) showPerson(0);
+    showHistory(source);
+    return;
+  }
+  if (section === 'weights') section = 'today';
+  if (section === 'advice' || section === 'research' || section === 'feedback') section = 'guidance';
+  appNav.querySelectorAll('[data-nav]').forEach(button => button.toggleAttribute('aria-current', button === source));
+  showSection(section, source);
+}
+appNav.addEventListener('click', event => {
+  const button = event.target.closest('[data-nav]');
+  if (!button) return;
+  event.preventDefault();
+  event.stopPropagation();
+  navigateDashboard(button.dataset.nav, button);
+});
 function openOnboarding(edit = false) {
   const existing = CrewDesign.getProfile();
   profileForm.elements.name.value = existing?.name || '';
@@ -465,18 +496,10 @@ hub.addEventListener('wheel', event => {
   event.preventDefault();
 }, { passive: false });
 hub.addEventListener('click', event => {
-  const nav = event.target.closest('[data-nav]');
-  if (nav) {
-    let section = nav.dataset.nav;
-    if (!CrewDesign.hasProfile()) { openOnboarding(false); return; }
-    if (section === 'profile') { if (hub.dataset.panel) closeContextPanel(false); showOverview(); return; }
-    if (section === 'history') { if (selected === null) showPerson(0); showHistory(nav); return; }
-    if (section === 'weights') section = 'today';
-    if (section === 'advice' || section === 'research' || section === 'feedback') section = 'guidance';
-    showSection(section, nav);
-    return;
-  }
+  if (event.target.closest('[data-nav]')) return;
   if (event.target.closest('[data-section-close]')) { closeContextPanel(); return; }
+  const retry = event.target.closest('[data-section-retry]');
+  if (retry) { showSection(retry.dataset.sectionRetry, retry); return; }
   if (event.target.closest('[data-today-record]')) {
     selectedReadingDate = sectionContent.querySelector('[data-reading-date]')?.value || selectedReadingDate;
     closeContextPanel(false);
