@@ -21,7 +21,7 @@ hub.innerHTML = `<div class="orbit-background" aria-hidden="true"></div><canvas 
   <div class="orbit-mobile-summary"></div>
   <nav class="orbit-mobile-crew" aria-label="Choose a crew member">${people.map((person, index) => `<button type="button" data-select="${index}">${person.name.split(' ')[0]} <span aria-hidden="true">↗</span></button>`).join('')}</nav>
   <div class="orbit-profile" hidden><button class="orbit-back" type="button" data-all>← Overview</button><div class="orbit-profile-identity"><div class="orbit-profile-name"></div><div class="orbit-profile-actions"><button type="button" data-edit-profile>Edit profile <span aria-hidden="true">↗</span></button><button type="button" data-open-form><span>Record readings today</span><i aria-hidden="true">↗</i></button><button type="button" data-open-history><span>View history</span><i aria-hidden="true">↗</i></button><button type="button" data-anatomy disabled>Preparing anatomy…</button><p class="orbit-anatomy-error" role="alert" hidden></p></div></div><button class="orbit-figure-hit" type="button" data-figure-anatomy aria-label="Explore this astronaut’s anatomy"></button><div class="orbit-scanline" aria-hidden="true"></div><div class="orbit-profile-readings" role="region" aria-label="Health readings" tabindex="0"></div><form class="orbit-form" hidden></form><div class="orbit-anatomy-root" hidden></div><p class="orbit-gesture">Drag to explore the scene</p><nav class="orbit-switch" aria-label="Astronaut"><span class="orbit-position"></span></nav></div>
-  <section class="orbit-onboarding" hidden aria-labelledby="profile-setup-title"><div class="orbit-panel-kicker">STEP 1 · ASTRONAUT PROFILE</div><h2 id="profile-setup-title">Create your profile</h2><p>Start with your personal crew profile. Your profile and readings stay in this browser.</p><form data-profile-form><label for="profile-name">Full name <span>Required</span></label><input id="profile-name" name="name" maxlength="48" autocomplete="name" required placeholder="Enter your full name"><label for="profile-age">Age <span>Optional</span></label><select id="profile-age" name="age" aria-label="Age in years"><option value="">Select age</option>${Array.from({length: 121}, (_, age) => `<option value="${age}">${age} years</option>`).join('')}</select><label for="profile-mass">Body mass <span>kg · optional</span></label><input id="profile-mass" name="bodyMass" type="number" min="0.1" max="400" step="0.1" inputmode="decimal" placeholder="Enter body mass in kilograms"><label for="profile-anatomy">Anatomy model <span>Optional</span></label><select id="profile-anatomy" name="model"><option value="male">Masculine anatomy</option><option value="female">Feminine anatomy</option></select><p class="orbit-profile-error" role="alert"></p><button type="submit">Save profile <span aria-hidden="true">↗</span></button></form><small>This prototype does not create an online account or sync data.</small></div>
+  <section class="orbit-onboarding" hidden aria-labelledby="profile-setup-title"><div class="orbit-panel-kicker">STEP 1 · ASTRONAUT PROFILE</div><h2 id="profile-setup-title">Create your profile</h2><p>Start with your personal crew profile. Your profile and readings stay in this browser.</p><form data-profile-form><label for="profile-name">Full name <span>Required</span></label><input id="profile-name" name="name" maxlength="48" autocomplete="name" required placeholder="Enter your full name"><label for="profile-age">Age <span>Optional</span></label><select id="profile-age" name="age" aria-label="Age in years"><option value="">Select age</option>${Array.from({length: 121}, (_, age) => `<option value="${age}">${age} years</option>`).join('')}</select><label for="profile-mass">Body mass <span>kg · optional</span></label><input id="profile-mass" name="bodyMass" type="number" min="0.1" max="400" step="0.1" inputmode="decimal" placeholder="Enter body mass in kilograms"><label for="profile-anatomy">Anatomy model <span>Optional</span></label><select id="profile-anatomy" name="model"><option value="male">Masculine anatomy</option><option value="female">Feminine anatomy</option></select><p class="orbit-profile-error" role="alert"></p><button type="submit">Save profile <span aria-hidden="true">↗</span></button></form><small>This prototype does not create an online account or sync data.</small></div></section>
   <section class="orbit-section-panel" hidden role="region" aria-label="Dashboard section"><button class="orbit-section-close" type="button" data-section-close>Close <span aria-hidden="true">×</span></button><div class="orbit-section-content"></div></section>
   <div class="orbit-emergency" role="region" aria-label="Emergency guidance" hidden></div>
   <div class="orbit-timeline" role="region" aria-label="Observation history" hidden></div>
@@ -304,7 +304,8 @@ function historyCalendarMarkup(personId) {
     if (Number.isFinite(date.getTime()) && date.getFullYear() >= 2027 && date.getFullYear() <= 2030) recordedDays.add(`${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`);
   }
   for (const field of ['mood', 'sleepQuality']) {
-    for (const item of CrewDesign.selfReportHistory(personId, field)) {
+    const reportHistory = typeof CrewDesign.selfReportHistory === 'function' ? CrewDesign.selfReportHistory(personId, field) : [];
+    for (const item of reportHistory) {
       const date = new Date(item.time);
       if (Number.isFinite(date.getTime()) && date.getFullYear() >= 2027 && date.getFullYear() <= 2030) recordedDays.add(`${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`);
     }
@@ -355,7 +356,8 @@ function readingForDate(personId, field) {
   return entry ? { recorded: true, value: entry.value, time: entry.time, context: entry.context, source: entry.source } : null;
 }
 function selfReportForDate(personId, field) {
-  const entry = CrewDesign.selfReportHistory(personId, field).filter(item => {
+  const reportHistory = typeof CrewDesign.selfReportHistory === 'function' ? CrewDesign.selfReportHistory(personId, field) : [];
+  const entry = reportHistory.filter(item => {
     const date = new Date(item.time);
     return Number.isFinite(date.getTime()) && `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}` === selectedReadingDate;
   }).at(-1);
@@ -511,7 +513,19 @@ appNav.addEventListener('click', event => {
   if (!button) return;
   event.preventDefault();
   event.stopPropagation();
-  navigateDashboard(button.dataset.nav, button);
+  try {
+    navigateDashboard(button.dataset.nav, button);
+  } catch (error) {
+    console.error(`Could not open dashboard section: ${button.dataset.nav}`, error);
+    returnFocus = button;
+    hub.dataset.panel = 'dashboard-error';
+    profile.inert = true;
+    actors.inert = true;
+    mobileControls.forEach(item => { item.inert = true; });
+    sectionPanel.hidden = false;
+    sectionPanel.setAttribute('aria-label', 'Dashboard section error');
+    sectionContent.innerHTML = `<h2 id="section-title">This section did not open</h2><p class="orbit-section-lede">Your profile and saved readings are still here. Try opening this section again.</p><button class="orbit-panel-action" type="button" data-nav-retry="${escapeHtml(button.dataset.nav)}">Try again</button>`;
+  }
 });
 function openOnboarding(edit = false) {
   const existing = CrewDesign.getProfile();
@@ -583,6 +597,11 @@ hub.addEventListener('wheel', event => {
 }, { passive: false });
 hub.addEventListener('click', event => {
   if (event.target.closest('[data-nav]')) return;
+  const navigationRetry = event.target.closest('[data-nav-retry]');
+  if (navigationRetry) {
+    navigateDashboard(navigationRetry.dataset.navRetry, appNav.querySelector(`[data-nav="${navigationRetry.dataset.navRetry}"]`));
+    return;
+  }
   const calendarShift = event.target.closest('[data-calendar-shift]');
   if (calendarShift) {
     historyCalendarMonth = new Date(historyCalendarMonth.getFullYear(), historyCalendarMonth.getMonth() + Number(calendarShift.dataset.calendarShift), 1);
