@@ -2,7 +2,7 @@ import { createCrewStage } from '/space-test-site/design/crew-motion-stage.js?v=
 import { renderObservationCheckin, renderObservationIdentity, renderObservationOverview, renderObservationProfile, renderObservationMobile, updateObservationCheckin } from '/space-test-site/design/crew-observation-ui.js?v=astronaut-4';
 import { renderAnatomyUI, setAnatomyCategory, setAnatomyMetric } from '/space-test-site/design/crew-anatomy-ui.js?v=astronaut-3';
 import { renderEmergencyGuide } from '/space-test-site/design/crew-guidance.js?v=astronaut-3';
-import { initializeCustomSelects, syncCustomSelects, focusCustomSelect } from '/space-test-site/design/crew-select.js?v=astronaut-3';
+import { initializeCustomSelects, syncCustomSelects, focusCustomSelect } from '/space-test-site/design/crew-select.js?v=astronaut-4';
 import { renderHealthTimeline } from '/space-test-site/design/crew-timeline-ui.js?v=astronaut-4';
 import { assessCrewHealth } from '/space-test-site/design/crew-assessment.js?v=astronaut-4';
 import { connectCrewSensor } from '/space-test-site/design/crew-device.js?v=astronaut-1';
@@ -20,8 +20,8 @@ hub.innerHTML = `<div class="orbit-background" aria-hidden="true"></div><canvas 
   <div class="orbit-actors">${people.map((person, index) => `<section class="orbit-actor" data-actor="${index}"><button class="orbit-hit" type="button" data-select="${index}" aria-label="Open astronaut health profile"></button><div class="orbit-actor-label"><span>ASTRONAUT PROFILE</span><h2></h2><div class="orbit-actor-status"></div><button type="button" data-record="${index}">Readings today <span aria-hidden="true">↗</span></button></div><div class="orbit-actor-readings"></div></section>`).join('')}</div>
   <div class="orbit-mobile-summary"></div>
   <nav class="orbit-mobile-crew" aria-label="Choose a crew member">${people.map((person, index) => `<button type="button" data-select="${index}">${person.name.split(' ')[0]} <span aria-hidden="true">↗</span></button>`).join('')}</nav>
-  <div class="orbit-profile" hidden><button class="orbit-back" type="button" data-all>← Overview</button><div class="orbit-profile-identity"><div class="orbit-profile-name"></div><div class="orbit-profile-actions"><button type="button" data-edit-profile>Edit profile <span aria-hidden="true">↗</span></button><button type="button" data-open-form><span>Record readings today</span><i aria-hidden="true">↗</i></button><button type="button" data-open-history><span>View history</span><i aria-hidden="true">↗</i></button><button type="button" data-anatomy disabled>Preparing anatomy…</button><p class="orbit-anatomy-error" role="alert" hidden></p></div></div><button class="orbit-figure-hit" type="button" data-figure-anatomy aria-label="Explore this astronaut’s anatomy"></button><div class="orbit-scanline" aria-hidden="true"></div><div class="orbit-profile-readings" role="region" aria-label="Health readings" tabindex="0"></div><form class="orbit-form" hidden></form><div class="orbit-anatomy-root" hidden></div><p class="orbit-gesture">Drag to explore the scene</p><nav class="orbit-switch" aria-label="Astronaut"><span class="orbit-position"></span></nav></div>
-  <section class="orbit-onboarding" hidden aria-labelledby="profile-setup-title"><div class="orbit-panel-kicker">STEP 1 · ASTRONAUT PROFILE</div><h2 id="profile-setup-title">Create your profile</h2><p>Start with your personal crew profile. Your profile and readings stay in this browser.</p><form data-profile-form><label for="profile-name">Full name <span>Required</span></label><input id="profile-name" name="name" maxlength="48" autocomplete="name" required placeholder="Enter your full name"><label for="profile-age">Age <span>Optional</span></label><select id="profile-age" name="age" aria-label="Age in years"><option value="">Select age</option>${Array.from({length: 121}, (_, age) => `<option value="${age}">${age} years</option>`).join('')}</select><label for="profile-mass">Body mass <span>kg · optional</span></label><input id="profile-mass" name="bodyMass" type="number" min="0.1" max="400" step="0.1" inputmode="decimal" placeholder="Enter body mass in kilograms"><label for="profile-anatomy">Anatomy model <span>Optional</span></label><select id="profile-anatomy" name="model"><option value="male">Masculine anatomy</option><option value="female">Feminine anatomy</option></select><p class="orbit-profile-error" role="alert"></p><button type="submit">Save profile <span aria-hidden="true">↗</span></button></form><small>This prototype does not create an online account or sync data.</small></div></section>
+  <div class="orbit-profile" hidden><button class="orbit-back" type="button" data-all>← Overview</button><button class="orbit-profile-edit" type="button" data-edit-profile>Edit profile <span aria-hidden="true">↗</span></button><div class="orbit-profile-identity"><div class="orbit-profile-name"></div></div><p class="orbit-anatomy-error" role="alert" hidden></p><button class="orbit-figure-hit" type="button" data-figure-anatomy aria-label="Explore this astronaut’s anatomy" disabled></button><div class="orbit-scanline" aria-hidden="true"></div><div class="orbit-profile-readings" role="region" aria-label="Health readings" tabindex="0"></div><form class="orbit-form" hidden></form><div class="orbit-anatomy-root" hidden></div><p class="orbit-gesture">Drag to explore the scene</p><nav class="orbit-switch" aria-label="Astronaut"><span class="orbit-position"></span></nav></div>
+  <section class="orbit-onboarding" hidden aria-labelledby="profile-setup-title"><div class="orbit-panel-kicker">STEP 1 · ASTRONAUT PROFILE</div><h2 id="profile-setup-title">Create your profile</h2><p>Start with your personal crew profile. Your profile and readings stay in this browser.</p><form data-profile-form><label for="profile-name">Full name <span>Required</span></label><input id="profile-name" name="name" maxlength="48" autocomplete="name" required placeholder="Enter your full name"><label for="profile-age">Age <span>Optional</span></label><select id="profile-age" name="age" aria-label="Age in years"><option value="">Select age</option>${Array.from({length: 121}, (_, age) => `<option value="${age}">${age} years</option>`).join('')}</select><label for="profile-mass">Body mass <span>kg · optional</span></label><input id="profile-mass" name="bodyMass" type="number" min="0.1" max="400" step="0.1" inputmode="decimal" placeholder="Enter body mass in kilograms"><label for="profile-anatomy">Anatomy model <span>Optional</span></label><select id="profile-anatomy" name="model"><option value="male">Masculine anatomy</option><option value="female">Feminine anatomy</option></select><p class="orbit-profile-error" role="alert"></p><div class="orbit-profile-form-actions"><button type="submit">Save profile <span aria-hidden="true">↗</span></button><button type="button" data-cancel-profile hidden>Cancel</button></div></form><small>This prototype does not create an online account or sync data.</small></div></section>
   <section class="orbit-section-panel" hidden role="region" aria-label="Dashboard section"><button class="orbit-section-close" type="button" data-section-close>Close <span aria-hidden="true">×</span></button><div class="orbit-section-content"></div></section>
   <div class="orbit-emergency" role="region" aria-label="Emergency guidance" hidden></div>
   <div class="orbit-timeline" role="region" aria-label="Observation history" hidden></div>
@@ -32,7 +32,6 @@ const profile = hub.querySelector('.orbit-profile');
 const form = hub.querySelector('.orbit-form');
 const emergency = hub.querySelector('.orbit-emergency');
 const timeline = hub.querySelector('.orbit-timeline');
-const anatomyButton = hub.querySelector('[data-anatomy]');
 const figureButton = hub.querySelector('[data-figure-anatomy]');
 const anatomyRoot = hub.querySelector('.orbit-anatomy-root');
 const actors = hub.querySelector('.orbit-actors');
@@ -42,6 +41,12 @@ const profileForm = hub.querySelector('[data-profile-form]');
 const sectionPanel = hub.querySelector('.orbit-section-panel');
 const sectionContent = hub.querySelector('.orbit-section-content');
 const appNav = hub.querySelector('.orbit-app-nav');
+function setActiveDashboard(section) {
+  appNav.querySelectorAll('[data-nav]').forEach(button => {
+    if (button.dataset.nav === section) button.setAttribute('aria-current', 'page');
+    else button.removeAttribute('aria-current');
+  });
+}
 actors.inert = true;
 mobileControls.forEach(item => { item.inert = true; });
 let stage;
@@ -61,9 +66,10 @@ let suppressFigureClick = false;
 let returnFocus = null;
 let emergencyStep = 'start';
 let pendingDashboardSection = null;
-let selectedReadingDate = new Date().toISOString().slice(0, 10);
-let selectedHistoryDate = '2027-01-01';
-let historyCalendarMonth = new Date(2027, 0, 1);
+const today = new Date();
+let selectedReadingDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+let selectedHistoryDate = selectedReadingDate;
+let historyCalendarMonth = new Date(today.getFullYear(), today.getMonth(), 1);
 const deviceConnections = new Map();
 const deviceSaveTimes = new Map();
 const metricCategories = { pulse: 'circulation', pressure: 'circulation', oxygen: 'circulation', glucose: 'daily', sleep: 'recovery', exercise: 'recovery', temperature: 'daily', water: 'daily' };
@@ -143,7 +149,7 @@ function renderData() {
   figureButton.setAttribute('aria-label', `Explore ${summary.person.name}'s anatomy`);
   const profileInfo = CrewDesign.getProfile() || {};
   const profileDetails = [profileInfo.age !== '' && profileInfo.age != null ? `Age ${escapeHtml(profileInfo.age)}` : '', profileInfo.bodyMass !== '' && profileInfo.bodyMass != null ? `Body mass ${escapeHtml(profileInfo.bodyMass)} kg` : ''].filter(Boolean).join(' · ');
-  hub.querySelector('.orbit-profile-name').innerHTML = `${renderObservationIdentity(summary, pulseHistory, assessment)}${profileDetails ? `<p class="orbit-profile-meta">${profileDetails}</p>` : ''}<button type="button" class="orbit-edit-profile" data-edit-profile>Edit profile ↗</button>`;
+  hub.querySelector('.orbit-profile-name').innerHTML = `${renderObservationIdentity(summary, pulseHistory, assessment)}${profileDetails ? `<p class="orbit-profile-meta">${profileDetails}</p>` : ''}`;
   hub.querySelector('.orbit-profile-readings').innerHTML = renderObservationProfile(summary, pulseHistory);
   if (anatomyMode) renderAnatomy(summary, histories);
   hub.querySelector('.orbit-position').textContent = '01 / 01';
@@ -160,13 +166,17 @@ function resetForm() {
   form.querySelector('.observation-symptom-note').hidden = true;
 }
 function focusCheckinAction() {
-  hub.querySelector('.orbit-profile-actions [data-open-form]')?.focus({ preventScroll: true });
+  appNav.querySelector('[data-nav="today"]')?.focus({ preventScroll: true });
 }
 renderForm();
+initializeCustomSelects(profileForm);
 renderData();
 window.addEventListener('crewhealth:update', () => {
   renderData();
-  if (hub.dataset.panel === 'guidance' && !sectionContent.querySelector('[data-feedback-form] textarea:focus')) sectionContent.innerHTML = sectionMarkup('guidance');
+  if (hub.dataset.panel === 'guidance' && !sectionContent.querySelector('[data-feedback-form] textarea:focus')) {
+    sectionContent.innerHTML = sectionMarkup('guidance');
+    initializeCustomSelects(sectionContent);
+  }
   if (hub.dataset.panel === 'history') {
     const day = timeline.querySelector('[data-history-date]')?.value || '';
     showHistory(returnFocus);
@@ -194,7 +204,6 @@ function showPerson(index, openForm = false) {
   profile.hidden = false;
   form.hidden = !recording;
   hub.querySelector('.orbit-profile-readings').hidden = recording;
-  hub.querySelector('[data-open-form]').hidden = recording;
   resetForm();
   stage.focus(index);
   renderData();
@@ -228,11 +237,12 @@ function syncProfileScroll() {
 }
 function closeContextPanel(restoreFocus = true) {
   const previousFocus = returnFocus;
-  if (hub.dataset.panel === 'history' || (hub.dataset.panel === 'emergency' && historyReturn)) stage?.setRecordView?.(false);
+  if ((hub.dataset.panel && hub.dataset.panel !== 'emergency') || historyReturn) stage?.setRecordView?.(false);
   if (hub.dataset.panel === 'emergency' && historyReturn && restoreFocus) {
     emergency.hidden = true;
     hub.dataset.panel = 'history';
     timeline.hidden = false;
+    stage?.resume();
     stage?.setRecordView?.(true);
     const target = historyReturn;
     historyReturn = null;
@@ -244,6 +254,7 @@ function closeContextPanel(restoreFocus = true) {
   timeline.hidden = true;
   sectionPanel.hidden = true;
   delete hub.dataset.panel;
+  setActiveDashboard('profile');
   profile.inert = false;
   actors.inert = !stage || selected !== null;
   mobileControls.forEach(item => { item.inert = !stage || selected !== null; });
@@ -254,7 +265,7 @@ function closeContextPanel(restoreFocus = true) {
 }
 function setContextPanel(panel, source) {
   if (hub.dataset.panel) {
-    if (hub.dataset.panel === 'history' || hub.dataset.panel === 'emergency') stage?.setRecordView?.(false);
+    stage?.setRecordView?.(false);
     emergency.hidden = true;
     timeline.hidden = true;
     sectionPanel.hidden = true;
@@ -265,7 +276,8 @@ function setContextPanel(panel, source) {
   profile.inert = true;
   actors.inert = true;
   mobileControls.forEach(item => { item.inert = true; });
-  stage?.pause();
+  if (panel === 'emergency') stage?.pause();
+  else { stage?.resume(); stage?.setRecordView?.(true); }
 }
 function showEmergency(source) {
   const previousHistory = hub.dataset.panel === 'history' ? source : null;
@@ -281,7 +293,8 @@ function showHistory(source) {
   setContextPanel('history', source);
   stage?.setRecordView?.(true);
   const personId = people[selected].id;
-  timeline.innerHTML = `${historyCalendarMarkup(personId)}<label class="orbit-date-picker">Selected date<input type="date" lang="en" data-history-date min="2027-01-01" max="2030-12-31" value="${selectedHistoryDate}"></label>${renderHealthTimeline(CrewDesign.summary(personId), anatomyHistory(personId), CrewDesign.symptomHistory(personId), CrewDesign.symptomOptions)}`;
+  const calendar = `${historyCalendarMarkup(personId)}<details class="orbit-calendar-jump"><summary>Jump to a date</summary><label class="orbit-date-picker">Choose date<input type="date" lang="en" data-history-date value="${selectedHistoryDate}"></label></details>`;
+  timeline.innerHTML = renderHealthTimeline(CrewDesign.summary(personId), anatomyHistory(personId), CrewDesign.symptomHistory(personId), CrewDesign.symptomOptions).replace('</header>', `</header>${calendar}`);
   timeline.hidden = false;
   timeline.scrollTop = 0;
   filterHistoryByDate(selectedHistoryDate);
@@ -296,26 +309,29 @@ function historyCalendarMarkup(personId) {
   for (const field of Object.keys(CrewDesign.metrics)) {
     for (const item of CrewDesign.history(personId, field)) {
       const date = new Date(item.time);
-      if (Number.isFinite(date.getTime()) && date.getFullYear() >= 2027 && date.getFullYear() <= 2030) recordedDays.add(`${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`);
+      if (Number.isFinite(date.getTime())) recordedDays.add(`${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`);
     }
   }
   for (const item of CrewDesign.symptomHistory(personId)) {
     const date = new Date(item.time);
-    if (Number.isFinite(date.getTime()) && date.getFullYear() >= 2027 && date.getFullYear() <= 2030) recordedDays.add(`${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`);
+    if (Number.isFinite(date.getTime())) recordedDays.add(`${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`);
   }
   for (const field of ['mood', 'sleepQuality']) {
     const reportHistory = typeof CrewDesign.selfReportHistory === 'function' ? CrewDesign.selfReportHistory(personId, field) : [];
     for (const item of reportHistory) {
       const date = new Date(item.time);
-      if (Number.isFinite(date.getTime()) && date.getFullYear() >= 2027 && date.getFullYear() <= 2030) recordedDays.add(`${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`);
+      if (Number.isFinite(date.getTime())) recordedDays.add(`${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`);
     }
   }
   const cells = Array(firstWeekday).fill('<span aria-hidden="true"></span>');
   for (let day = 1; day <= days; day++) {
     const key = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-    cells.push(`<button type="button" data-calendar-day="${key}" aria-label="${new Intl.DateTimeFormat('en-US', { dateStyle: 'full' }).format(new Date(year, month, day))}" aria-pressed="${String(key === selectedHistoryDate)}"${recordedDays.has(key) ? ' data-has-records="true"' : ''}>${day}</button>`);
+    const hasRecords = recordedDays.has(key);
+    const now = new Date();
+    const isToday = year === now.getFullYear() && month === now.getMonth() && day === now.getDate();
+    cells.push(`<button type="button" data-calendar-day="${key}" aria-label="${new Intl.DateTimeFormat('en-US', { dateStyle: 'full' }).format(new Date(year, month, day))}${hasRecords ? ', saved observations' : ''}" aria-pressed="${String(key === selectedHistoryDate)}"${isToday ? ' aria-current="date"' : ''}${hasRecords ? ' data-has-records="true"' : ''}>${day}</button>`);
   }
-  return `<section class="orbit-history-calendar" aria-label="Calendar from 2027 through 2030"><div class="orbit-history-calendar-head"><button type="button" data-calendar-shift="-1" aria-label="Previous month"${year === 2027 && month === 0 ? ' disabled' : ''}>←</button><h2>${new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(historyCalendarMonth)}</h2><button type="button" data-calendar-shift="1" aria-label="Next month"${year === 2030 && month === 11 ? ' disabled' : ''}>→</button></div><div class="orbit-history-calendar-grid" aria-hidden="true"><span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span></div><div class="orbit-history-calendar-grid">${cells.join('')}</div><p>Dots mark dates with saved observations. Select a day to view its record.</p></section>`;
+  return `<section class="orbit-history-calendar" aria-label="Observation calendar"><div class="orbit-calendar-topline"><span>MISSION LOG / CALENDAR</span><button type="button" data-calendar-today>Today ↗</button></div><div class="orbit-history-calendar-head"><h2 aria-live="polite">${new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(historyCalendarMonth)}</h2><div><button type="button" data-calendar-shift="-1" aria-label="Previous month">←</button><button type="button" data-calendar-shift="1" aria-label="Next month">→</button></div></div><div class="orbit-history-calendar-grid orbit-calendar-weekdays" aria-hidden="true"><span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span></div><div class="orbit-history-calendar-grid orbit-calendar-days">${cells.join('')}</div><p><span class="orbit-calendar-dot" aria-hidden="true"></span> A dot marks a day with saved observations.</p></section>`;
 }
 function createHistoryCalendarNode(personId) {
   const wrapper = document.createElement('div');
@@ -476,9 +492,11 @@ function sectionMarkup(section) {
 }
 function showSection(section, source) {
   if (!CrewDesign.hasProfile()) { openOnboarding(false); return; }
+  if (selected === null) showPerson(0);
   setContextPanel(section, source);
   try {
     sectionContent.innerHTML = sectionMarkup(section);
+    initializeCustomSelects(sectionContent);
   } catch (error) {
     console.error(`Could not open dashboard section: ${section}`, error);
     sectionContent.innerHTML = `<h2 id="section-title">This section could not open</h2><p class="orbit-section-lede">Please try again. Your saved profile and readings are still here.</p><button type="button" class="orbit-panel-action" data-section-retry="${escapeHtml(section)}">Try again</button>`;
@@ -486,26 +504,27 @@ function showSection(section, source) {
   sectionPanel.setAttribute('aria-label', section === 'research' ? 'NASA spaceflight health research' : section === 'device' ? 'Link a health device' : section);
   sectionPanel.hidden = false;
   sectionPanel.scrollTop = 0;
-  sectionPanel.scrollTop = 0;
+  sectionContent.querySelector('#section-title')?.setAttribute('tabindex', '-1');
   sectionContent.querySelector('#section-title')?.focus({ preventScroll: true });
 }
 function navigateDashboard(section, source) {
   if (!CrewDesign.hasProfile()) { pendingDashboardSection = section; openOnboarding(false); return; }
+  onboarding.hidden = true;
   if (section === 'profile') {
-    appNav.querySelectorAll('[data-nav]').forEach(button => button.removeAttribute('aria-current'));
+    setActiveDashboard('profile');
     if (hub.dataset.panel) closeContextPanel(false);
-    showOverview();
+    showPerson(0);
     return;
   }
   if (section === 'history') {
-    appNav.querySelectorAll('[data-nav]').forEach(button => button.toggleAttribute('aria-current', button === source));
+    setActiveDashboard('history');
     if (selected === null) showPerson(0);
     showHistory(source);
     return;
   }
   if (section === 'weights') section = 'today';
   if (section === 'advice' || section === 'research' || section === 'feedback') section = 'guidance';
-  appNav.querySelectorAll('[data-nav]').forEach(button => button.toggleAttribute('aria-current', button === source));
+  setActiveDashboard(section);
   showSection(section, source);
 }
 appNav.addEventListener('click', event => {
@@ -533,12 +552,18 @@ function openOnboarding(edit = false) {
   profileForm.elements.age.value = existing?.age ?? '';
   profileForm.elements.bodyMass.value = existing?.bodyMass ?? '';
   profileForm.elements.model.value = existing?.model || 'male';
+  syncCustomSelects(profileForm);
   profileForm.querySelector('.orbit-profile-error').textContent = '';
   hub.querySelector('#profile-setup-title').textContent = edit ? 'Edit your profile' : 'Create your profile';
   profileForm.querySelector('button[type="submit"]').innerHTML = edit ? 'Save changes <span aria-hidden="true">↗</span>' : 'Save profile <span aria-hidden="true">↗</span>';
+  profileForm.querySelector('[data-cancel-profile]').hidden = !existing;
   onboarding.hidden = false;
   profileForm.elements.name.focus({ preventScroll: true });
 }
+profileForm.querySelector('[data-cancel-profile]').addEventListener('click', () => {
+  onboarding.hidden = true;
+  hub.querySelector('[data-edit-profile]')?.focus({ preventScroll: true });
+});
 profileForm.addEventListener('submit', event => {
   event.preventDefault();
   if (!profileForm.reportValidity()) return;
@@ -609,6 +634,18 @@ hub.addEventListener('click', event => {
     const datePicker = timeline.querySelector('[data-history-date]');
     if (datePicker) datePicker.value = selectedHistoryDate;
     timeline.querySelector('.orbit-history-calendar')?.replaceWith(createHistoryCalendarNode(people[selected ?? 0].id));
+    timeline.querySelector(`[data-calendar-shift="${calendarShift.dataset.calendarShift}"]`)?.focus({ preventScroll: true });
+    filterHistoryByDate(selectedHistoryDate);
+    return;
+  }
+  const calendarToday = event.target.closest('[data-calendar-today]');
+  if (calendarToday) {
+    const now = new Date();
+    selectedHistoryDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    historyCalendarMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    timeline.querySelector('[data-history-date]').value = selectedHistoryDate;
+    timeline.querySelector('.orbit-history-calendar')?.replaceWith(createHistoryCalendarNode(people[selected ?? 0].id));
+    timeline.querySelector('[data-calendar-today]')?.focus({ preventScroll: true });
     filterHistoryByDate(selectedHistoryDate);
     return;
   }
@@ -617,6 +654,7 @@ hub.addEventListener('click', event => {
     selectedHistoryDate = calendarDay.dataset.calendarDay;
     timeline.querySelector('[data-history-date]').value = selectedHistoryDate;
     timeline.querySelector('.orbit-history-calendar')?.replaceWith(createHistoryCalendarNode(people[selected ?? 0].id));
+    timeline.querySelector(`[data-calendar-day="${selectedHistoryDate}"]`)?.focus({ preventScroll: true });
     filterHistoryByDate(selectedHistoryDate);
     return;
   }
@@ -655,7 +693,7 @@ hub.addEventListener('click', event => {
   if (historyTrigger) { showHistory(historyTrigger); return; }
   if (event.target.closest('[data-timeline-record]')) {
     closeContextPanel(false);
-    hub.querySelector('.orbit-profile-actions [data-open-form]')?.click();
+    showPerson(selected, true);
     return;
   }
   const repeatMeasure = event.target.closest('[data-timeline-measure]');
@@ -693,31 +731,17 @@ hub.addEventListener('click', event => {
   if (event.target.closest('[data-all]')) showOverview();
   if (event.target.closest('[data-previous]')) showPerson((selected + people.length - 1) % people.length);
   if (event.target.closest('[data-next]')) showPerson((selected + 1) % people.length);
-  if (event.target.closest('[data-open-form]')) {
-    if (!anatomyMode) exitAnatomy();
-    profile.scrollTop = 0;
-    syncProfileScroll();
-    recording = true;
-    stage.setRecording(true);
-    hub.dataset.recording = 'true';
-    resetForm();
-    form.hidden = false;
-    hub.querySelector('.orbit-profile-readings').hidden = true;
-    hub.querySelector('[data-open-form]').hidden = true;
-    focusCustomSelect(form.elements.symptoms, { preventScroll: true });
-  }
   if (event.target.closest('[data-cancel]')) {
     recording = false;
     stage.setRecording(false);
     hub.dataset.recording = 'false';
     form.hidden = true;
     hub.querySelector('.orbit-profile-readings').hidden = false;
-    hub.querySelector('[data-open-form]').hidden = false;
     profile.scrollTop = 0;
     syncProfileScroll();
     focusCheckinAction();
   }
-  if (event.target.closest('button[data-anatomy], button[data-figure-anatomy]') && !suppressFigureClick) enterAnatomy();
+  if (event.target.closest('button[data-figure-anatomy]') && !suppressFigureClick) enterAnatomy();
   if (event.target.closest('[data-anatomy-exit]')) exitAnatomy();
   const category = event.target.closest('[data-anatomy-category]');
   if (category) {
@@ -871,7 +895,6 @@ hub.addEventListener('submit', event => {
     hub.dataset.recording = 'false';
     form.hidden = true;
     hub.querySelector('.orbit-profile-readings').hidden = false;
-    hub.querySelector('[data-open-form]').hidden = false;
     profile.scrollTop = 0;
     syncProfileScroll();
     focusCheckinAction();
@@ -896,9 +919,8 @@ async function enterAnatomy(category = 'circulation', metric = '', edit = false)
   syncProfileScroll();
   const current = selected;
   const request = ++anatomyRequest;
-  anatomyButton.disabled = true;
   figureButton.disabled = true;
-  anatomyButton.textContent = 'Preparing anatomy…';
+  figureButton.setAttribute('aria-busy', 'true');
   hub.querySelector('.orbit-anatomy-error').hidden = true;
   try {
     const opened = await stage.setAnatomy(true, people[current].model);
@@ -931,9 +953,8 @@ async function enterAnatomy(category = 'circulation', metric = '', edit = false)
     }
   } finally {
     if (request === anatomyRequest) {
-      anatomyButton.disabled = false;
       figureButton.disabled = false;
-      anatomyButton.innerHTML = '<span>Explore anatomy</span><i aria-hidden="true">↗</i>';
+      figureButton.removeAttribute('aria-busy');
     }
   }
 }
@@ -948,13 +969,12 @@ function exitAnatomy() {
   hub.dataset.anatomy = 'false';
   anatomyRoot.hidden = true;
   const available = typeof stage?.setAnatomy === 'function';
-  anatomyButton.disabled = !available;
   figureButton.disabled = !available;
-  anatomyButton.innerHTML = available ? '<span>Explore anatomy</span><i aria-hidden="true">↗</i>' : 'Anatomy unavailable';
+  figureButton.removeAttribute('aria-busy');
   if (wasOpen) {
     profile.scrollTop = 0;
     syncProfileScroll();
-    anatomyButton.focus({ preventScroll: true });
+    figureButton.focus({ preventScroll: true });
   }
 }
 
@@ -994,8 +1014,7 @@ async function begin() {
   try {
     stage = await createCrewStage(canvas, updateAnchors);
     hub.dataset.ready = 'true';
-    anatomyButton.disabled = false;
-    anatomyButton.innerHTML = '<span>Explore anatomy</span><i aria-hidden="true">↗</i>';
+    figureButton.disabled = false;
     hub.querySelector('.orbit-loading').hidden = true;
   } catch (error) {
     stage = { focus() {}, overview() {}, setRecording() {}, pause() {}, resume() {} };
@@ -1006,6 +1025,7 @@ async function begin() {
   }
   appNav.hidden = !CrewDesign.hasProfile();
   if (CrewDesign.hasProfile()) {
+    setActiveDashboard('profile');
     actors.inert = true;
     mobileControls.forEach(item => { item.inert = true; });
     showPerson(0);

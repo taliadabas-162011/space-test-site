@@ -86,7 +86,7 @@ function show(widget) {
   widget.open = true;
   widget.menu.hidden = false;
   const bounds = widget.trigger.getBoundingClientRect();
-  const scroller = widget.trigger.closest('.orbit-form, .crew-anatomy-content');
+  const scroller = widget.trigger.closest('.orbit-form, .crew-anatomy-content, .orbit-onboarding, .orbit-section-panel');
   const clipping = scroller?.getBoundingClientRect();
   const availableBelow = Math.min(window.innerHeight, clipping?.bottom ?? window.innerHeight) - bounds.bottom;
   const availableAbove = bounds.top - Math.max(0, clipping?.top ?? 0);
@@ -126,7 +126,8 @@ function labelFor(select) {
     const text = copy.textContent.replace(/\s+/g, ' ').trim();
     if (text) return text;
   }
-  return select.name || 'Choose an option';
+  const associated = [...select.labels].map(item => item.textContent.trim()).filter(Boolean).join(' ');
+  return associated || select.name || 'Choose an option';
 }
 
 function unwrapLabel(select) {
