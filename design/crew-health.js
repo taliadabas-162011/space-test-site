@@ -187,6 +187,12 @@
     if (!crew.some(person => person.id === personId)) return [];
     return symptomEntries(personId).map(item => structuredClone(item));
   }
+  function selfReportHistory(personId, field) {
+    if (!crew.some(person => person.id === personId) || !Object.hasOwn(selfReports, field)) return [];
+    const choices = selfReports[field];
+    const list = records[personId]?.[field];
+    return Array.isArray(list) ? list.filter(item => choices.includes(item?.value) && Number.isFinite(Date.parse(item?.time))).sort((a, b) => Date.parse(a.time) - Date.parse(b.time)).map(item => structuredClone(item)) : [];
+  }
   function selectCrew(id) {
     selected = crew.find(person => person.id === id) || crew[0];
     document.querySelectorAll('.crew-picker [data-crew]').forEach(item => item.setAttribute('aria-pressed', String(item.dataset.crew === selected.id)));
@@ -342,6 +348,6 @@
     refreshStories();
     window.dispatchEvent(new CustomEvent('crewhealth:update'));
   });
-  window.CrewDesign = { storyData, registerStories, hotspotLabel, crew, metrics, symptomOptions, summary, history, symptomHistory, selectCrew, saveOverview,
+  window.CrewDesign = { storyData, registerStories, hotspotLabel, crew, metrics, symptomOptions, summary, history, symptomHistory, selfReportHistory, selectCrew, saveOverview,
     hasProfile: () => Boolean(savedProfile), getProfile: () => savedProfile ? { ...savedProfile } : null, saveProfile };
 })();
