@@ -81,7 +81,8 @@
   function readRecords() {
     try {
       const value = JSON.parse(localStorage.getItem(storageKey) || '{}');
-      return value && typeof value === 'object' && !Array.isArray(value) ? value : {};
+      const stored=value && typeof value === 'object' && !Array.isArray(value) ? value : {};
+      return demoMode ? window.CrewDemo.refreshRecords(stored) : stored;
     } catch (_) { return {}; }
   }
   function entriesFor(personId, field) {
@@ -171,9 +172,7 @@
   let scenarioTime = Date.now();
   const scenarios = {
     routine: { tone: 'recorded', title: 'Routine overview', action: 'Review today’s observations or add a check-in.', values: {} },
-    recovery: { tone: 'attention', title: 'Recovery needs attention', action: 'Review the mission sleep schedule and discuss persistent fatigue with the crew medical officer.', values: { sleep: 5.1, water: 1.2, exercise: 35 } },
-    review: { tone: 'attention', title: 'Repeat & compare', action: 'Check the sensor fit, repeat the measurement under the same conditions, and follow the mission medical procedure.', values: { pulse: 96, pressure: { systolic: 142, diastolic: 92 }, oxygen: 94 } },
-    emergency: { tone: 'urgent', title: 'Urgent symptoms reported', action: 'Alert the crew and follow the mission emergency procedure now.', values: { pulse: 124, oxygen: 90 }, symptoms: 'urgent', tags: ['chest-pain','breathing-difficulty'], progression: 'worsening' },
+    emergency: { tone: 'urgent', title: 'Urgent response', action: 'Alert the crew and follow the mission emergency procedure now.', values: { pulse: 124, oxygen: 90 }, symptoms: 'urgent', tags: ['chest-pain','breathing-difficulty'], progression: 'worsening' },
   };
   function scenarioInfo() { return { key: currentScenario, startedAt: new Date(scenarioTime).toISOString(), ...structuredClone(scenarios[currentScenario]) }; }
   function setScenario(key) {
@@ -212,14 +211,7 @@
   function history(personId, field) {
     if (!crew.some(person => person.id === personId) || !metrics[field]) return [];
     const entries = entriesFor(personId, field).map(item => ({ ...structuredClone(item), source: item.source?.startsWith('Simulated') ? 'Scenario history' : item.source }));
-    if (currentScenario === 'recovery' && field === 'sleep') {
-      const localDay = time => { const d=new Date(time);return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`; };
-      for (let day=2;day>=0;day--) {
-        const when=new Date(scenarioTime);when.setDate(when.getDate()-day);
-        const key=localDay(when);for(let i=entries.length-1;i>=0;i--)if(localDay(entries[i].time)===key)entries.splice(i,1);
-        entries.push({ value: [5.1,5.4,5.2][day], time: when.toISOString(), recordedAt: when.toISOString(), source: 'Scenario preview' });
-      }
-    } else if (Object.hasOwn(scenarios[currentScenario].values, field) && !entries.some(entry=>entry.source==='Manual repeat' && Date.parse(entry.recordedAt)>scenarioTime && Date.parse(entry.time)>=scenarioTime-60000)) entries.push({ value: structuredClone(scenarios[currentScenario].values[field]), time: new Date(scenarioTime).toISOString(), recordedAt: new Date(scenarioTime).toISOString(), source: 'Scenario preview', context: field === 'glucose' ? 'fasting' : 'rest', ...(currentScenario === 'signal' ? { quality: 'unavailable' } : {}) });
+    if (Object.hasOwn(scenarios[currentScenario].values, field)) entries.push({ value: structuredClone(scenarios[currentScenario].values[field]), time: new Date(scenarioTime).toISOString(), recordedAt: new Date(scenarioTime).toISOString(), source: 'Scenario preview', context: 'rest' });
     return entries.sort((a,b)=>Date.parse(a.time)-Date.parse(b.time));
   }
   function symptomHistory(personId) {
@@ -410,6 +402,7 @@
     refreshStories();
     window.dispatchEvent(new CustomEvent('crewhealth:update'));
   });
-  window.CrewDesign = { demoMode, scenarioInfo, setScenario, storyData, registerStories, hotspotLabel, crew, metrics, symptomOptions, summary, history, symptomHistory, selfReportHistory, selectCrew, saveOverview, requestUrgentAssistance, endUrgentAssistance,
+  function refreshPresentation(){if(demoMode)records=window.CrewDemo.refreshRecords(records);refreshStories();window.dispatchEvent(new CustomEvent('crewhealth:update'));}
+  window.CrewDesign = { refreshPresentation, demoMode, scenarioInfo, setScenario, storyData, registerStories, hotspotLabel, crew, metrics, symptomOptions, summary, history, symptomHistory, selfReportHistory, selectCrew, saveOverview, requestUrgentAssistance, endUrgentAssistance,
     hasProfile: () => Boolean(savedProfile), getProfile: () => savedProfile ? { ...savedProfile } : null, saveProfile };
 })();

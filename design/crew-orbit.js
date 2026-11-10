@@ -1,21 +1,22 @@
-import {renderCollection,collectionFields,collectionHasEntry,collectionPayload,syncCollectionSymptoms,syncCollectionMeasurement,navigateCollection,urgentCollectionFields,advanceMeasurementGuide} from './crew-collection.js?v=9';
-import {renderAssistance,advanceAssistance,readAssistance,writeAssistance} from './crew-assistance.js?v=2';
-import {createLiquidInterface} from './crew-liquid-ui.js?v=5';
-import {responseKey,readResponse,recordResponse} from './crew-care.js?v=2';
-import { createCrewStage } from '/space-test-site/design/crew-motion-stage.js?v=astronaut-19';
+import {createRepeat,renderRepeat,repeatPayload} from './crew-repeat.js?v=1';
+import {renderCollection,collectionFields,collectionHasEntry,collectionPayload,syncCollectionSymptoms,syncCollectionMeasurement,navigateCollection,urgentCollectionFields,advanceMeasurementGuide,measurementGuides} from './crew-collection.js?v=10';
+import {renderAssistance,advanceAssistance,readAssistance,writeAssistance} from './crew-assistance.js?v=3';
+import {createLiquidInterface} from './crew-liquid-ui.js?v=8';
+import {responseKey,readResponse,recordResponse,handoffText} from './crew-care.js?v=3';
+import { createCrewStage } from '/space-test-site/design/crew-motion-stage.js?v=astronaut-33';
 import { renderObservationCheckin, renderObservationIdentity, renderObservationOverview, renderObservationProfile, renderObservationMobile, updateObservationCheckin } from '/space-test-site/design/crew-observation-ui.js?v=astronaut-9';
 import { renderAnatomyUI, setAnatomyCategory, setAnatomyMetric } from '/space-test-site/design/crew-anatomy-ui.js?v=astronaut-3';
 import { renderEmergencyGuide } from '/space-test-site/design/crew-guidance.js?v=astronaut-3';
-import { initializeCustomSelects, syncCustomSelects, focusCustomSelect } from '/space-test-site/design/crew-select.js?v=astronaut-9';
+import { initializeCustomSelects, syncCustomSelects, focusCustomSelect } from '/space-test-site/design/crew-select.js?v=astronaut-10';
 import { renderHealthTimeline } from '/space-test-site/design/crew-timeline-ui.js?v=astronaut-6';
 import { assessCrewHealth } from '/space-test-site/design/crew-assessment.js?v=astronaut-4';
 import { connectCrewSensor } from '/space-test-site/design/crew-device.js?v=astronaut-1';
 import { initializeCustomDateTimes, syncCustomDateTimes } from '/space-test-site/design/crew-datetime.js?v=3';
 import { compareHistory } from '/space-test-site/design/crew-insights.js?v=1';
 
-import { renderMission, missionState } from './crew-mission-ui.js?v=7';
+import { renderMission, missionState } from './crew-mission-ui.js?v=9';
 import { createCrewAlarm } from './crew-alarm.js?v=2';
-import { renderHistoryScene, initializeHistoryChart, updateHistoryScene } from './crew-history-scene.js?v=7';
+import { renderHistoryScene, initializeHistoryChart, updateHistoryScene } from './crew-history-scene.js?v=8';
 import { renderDeviceScene } from './crew-device-scene.js?v=2';
 
 const { CrewDesign } = window;
@@ -28,12 +29,12 @@ hub.dataset.single = 'true';
 hub.setAttribute('aria-label', 'Crew health overview');
 hub.innerHTML = `<div class="orbit-background" aria-hidden="true"></div><canvas class="orbit-canvas" aria-hidden="true"></canvas>
   <header class="orbit-header"><button class="mission-home" type="button" data-mission-action="overview" aria-label="Back to health overview"><span class="orbit-brand">CREW <i>/</i> HEALTH</span></button><div class="orbit-header-right"><button type="button" data-open-guidance>Guidance <span aria-hidden="true">↗</span></button><button type="button" data-emergency>Emergency <span aria-hidden="true">↗</span></button></div></header>
-  <nav class="mission-tools" aria-label="Health tools"><button type="button" data-mission-action="overview" aria-current="page">Overview</button><button type="button" data-mission-action="history">History</button><button type="button" data-mission-action="device">Devices</button></nav><button class="scene-return" type="button" data-scene-back hidden>← Overview</button><div class="scene-explore" data-scene-explore tabindex="0" role="group" aria-label="Explore astronaut. Drag to orbit; arrow keys to turn; plus and minus to zoom; Home to reset."></div><div class="scene-orbit-tools"><span>Drag to explore</span><button type="button" data-scene-reset aria-label="Reset astronaut view">↺</button></div><section class="orbit-mission" aria-label="Personal health overview" hidden></section><div class="orbit-scenario-control"><label><span class="scenario-caption">Scenario preview</span><select data-scenario aria-label="Scenario preview"><option value="routine">Routine</option><option value="recovery">Sleep &amp; recovery</option><option value="review">Repeat readings</option><option value="emergency">Urgent symptoms</option></select></label><button type="button" data-alert-sound aria-pressed="true">Audio enabled</button></div><button class="care-alert-return" type="button" data-mission-action="overview">Return to urgent response ↗</button><div class="orbit-intro"><h1 tabindex="-1">Space health</h1><p>One crew member · one personal record</p></div>
+  <nav class="mission-tools" aria-label="Health tools"><button type="button" data-mission-action="overview" aria-current="page">Overview</button><button type="button" data-mission-action="history">History</button><button type="button" data-mission-action="device">Devices</button></nav><button class="scene-return" type="button" data-scene-back hidden>← Overview</button><div class="scene-explore" data-scene-explore tabindex="0" role="group" aria-label="Explore astronaut. Drag to orbit; arrow keys to turn; plus and minus to zoom; Home to reset."></div><div class="scene-orbit-tools"><span>Drag to explore</span><button type="button" data-scene-reset aria-label="Reset astronaut view">↺</button></div><section class="orbit-mission" aria-label="Personal health overview" hidden></section><div class="orbit-scenario-control"><label><span class="scenario-caption">Scenario preview</span><select data-scenario aria-label="Scenario preview"><option value="routine">Routine</option><option value="emergency">Urgent response</option></select></label><button type="button" data-alert-sound aria-pressed="true">Audio enabled</button></div><button class="care-alert-return" type="button" data-mission-action="overview">Return to urgent response ↗</button><div class="orbit-intro"><h1 tabindex="-1">Space health</h1><p>One crew member · one personal record</p></div>
   <div class="orbit-actors">${people.map((person, index) => `<section class="orbit-actor" data-actor="${index}"><button class="orbit-hit" type="button" data-select="${index}" aria-label="Open astronaut health profile"></button><div class="orbit-actor-label"><span>ASTRONAUT PROFILE</span><h2></h2><div class="orbit-actor-status"></div><button type="button" data-record="${index}">Readings today <span aria-hidden="true">↗</span></button></div><div class="orbit-actor-readings"></div></section>`).join('')}</div>
   <div class="orbit-mobile-summary"></div>
   <nav class="orbit-mobile-crew" aria-label="Choose a crew member">${people.map((person, index) => `<button type="button" data-select="${index}">${person.name.split(' ')[0]} <span aria-hidden="true">↗</span></button>`).join('')}</nav>
   <div class="orbit-profile" hidden><button class="orbit-back" type="button" data-all>← Overview</button><button class="orbit-profile-edit" type="button" data-edit-profile>Edit profile <span aria-hidden="true">↗</span></button><div class="orbit-profile-identity"><div class="orbit-profile-name"></div></div><p class="orbit-anatomy-error" role="alert" hidden></p><button class="orbit-figure-hit" type="button" data-figure-anatomy aria-label="Explore this astronaut’s anatomy" disabled></button><div class="orbit-scanline" aria-hidden="true"></div><div class="orbit-profile-readings" role="region" aria-label="Health readings" tabindex="0"></div><form class="orbit-form" hidden></form><div class="orbit-anatomy-root" hidden></div><p class="orbit-gesture">Drag to explore the scene</p><nav class="orbit-switch" aria-label="Astronaut"><span class="orbit-position"></span></nav></div>
-  <section class="orbit-onboarding" hidden aria-labelledby="profile-setup-title"><h2 id="profile-setup-title">Create your profile</h2><p>Your details stay on this device.</p><form data-profile-form><label for="profile-name">Full name <span>Required</span></label><input id="profile-name" name="name" maxlength="48" autocomplete="name" required placeholder="Enter your full name"><label for="profile-age">Age <span>Optional</span></label><select id="profile-age" name="age" aria-label="Age in years"><option value="">Select age</option>${Array.from({length: 121}, (_, age) => `<option value="${age}">${age} years</option>`).join('')}</select><label for="profile-mass">Body mass <span>kg · optional</span></label><input id="profile-mass" name="bodyMass" type="number" min="0.1" max="400" step="0.1" inputmode="decimal" placeholder="Enter body mass in kilograms"><p class="orbit-profile-error" role="alert"></p><div class="orbit-profile-form-actions"><button type="submit">Save profile <span aria-hidden="true">↗</span></button><button type="button" data-cancel-profile hidden>Cancel</button></div></form></div></section>
+  <section class="orbit-onboarding profile-workspace" hidden aria-labelledby="profile-setup-title"><form novalidate class="collection-page profile-page" data-profile-form><header class="collection-heading"><div><h1 tabindex="-1" id="profile-setup-title">Your profile</h1><p>Your details stay on this device.</p></div></header><div class="collection-editor profile-editor"><div class="profile-name-field"><label class="collection-label" for="profile-name">Full name <small>Required</small></label><div class="collection-value profile-name-value"><input id="profile-name" name="name" maxlength="48" autocomplete="name" required placeholder="Your name"></div></div><div class="profile-personal-values"><div><label class="collection-label" for="profile-age">Age <small>Optional</small></label><div class="collection-value"><input id="profile-age" name="age" aria-label="Age in years" type="number" min="0" max="120" step="1" inputmode="numeric" placeholder="—"><span>years</span></div></div><div><label class="collection-label" for="profile-mass">Body mass <small>Optional</small></label><div class="collection-value"><input id="profile-mass" name="bodyMass" type="number" min="0.1" max="400" step="0.1" inputmode="decimal" placeholder="—"><span>kg</span></div></div></div><p id="profile-error" class="orbit-profile-error collection-error" role="alert"></p></div><div class="mission-figure-space collection-figure profile-figure" data-figure-space></div><footer class="collection-footer"><div class="collection-save"><button type="button" data-cancel-profile hidden>Cancel</button><button type="submit">Save profile</button></div></footer></form></section>
   <section class="orbit-section-panel" hidden role="region" aria-label="Dashboard section"><button class="orbit-section-close" type="button" data-section-close>Close <span aria-hidden="true">×</span></button><div class="orbit-section-content"></div></section>
   <div class="orbit-emergency" role="region" aria-label="Emergency guidance" hidden></div>
   <div class="orbit-timeline" role="region" aria-label="Observation history" hidden></div>
@@ -43,8 +44,9 @@ const canvas = hub.querySelector('canvas');
 const exploreSurface=hub.querySelector('[data-scene-explore]');
 const sceneTools=hub.querySelector('.scene-orbit-tools');
 function syncMissionFrame() {
-  const figure=mission.querySelector('[data-figure-space]');
-  if(hub.dataset.uiVariant!=='glass'||mission.hidden||!figure){stage?.setSceneFrame(null);return}
+  const surface=!onboarding.hidden?onboarding:mission;
+  const figure=surface.querySelector('[data-figure-space]');
+  if(hub.dataset.uiVariant!=='glass'||surface.hidden||!figure){stage?.setSceneFrame(null);return}
   const box=figure.getBoundingClientRect(),view=canvas.getBoundingClientRect();
   if(box.width>0&&box.height>0&&view.width>0&&view.height>0)stage?.setSceneFrame({width:box.width/view.width,x:(box.left+box.width/2-view.left)/view.width,y:(box.top+box.height/2-view.top)/view.height,height:box.height/view.height});
   else if(collectionMode)stage?.setSceneFrame({x:1.4,y:.4,width:.2,height:.25});
@@ -99,9 +101,15 @@ let pendingDashboardSection = null;
 let contextHistory = [];
 let checkinReturn = null;
 let checkinDraft = false;
+let profileReturn=null;
 let collectionMode='';
+let repeatState=null,repeatReturn=null;
+const repeatStorageKey='crew-health-guided-repeat-v1';
 let collectionDraft=null;
 let assistanceModeKey='';
+let assistanceView='steps';
+let assistanceStarted=false;
+let urgentReturnView='';
 const assistanceCache=new Map();
 let offlineCopyReady = false;
 let offlineSetupFailed = !('serviceWorker' in navigator);
@@ -324,7 +332,7 @@ function animateContext(panel) {
   viewAnimations.set(panel, targets.map(target=>target.animate([{ opacity: 0, transform: 'translateY(12px)' }, { opacity: 1, transform: 'translateY(0)' }], { duration: 520, easing: 'cubic-bezier(.22,1,.36,1)' })));
 }
 function currentContext() {
-  return { section: hub.dataset.panel || (recording ? 'checkin' : 'mission'), expanded: sectionContent.querySelector('[data-reading-detail][aria-expanded="true"]')?.dataset.readingDetail };
+  return { section: hub.dataset.panel || (collectionMode?'collection':recording ? 'checkin' : 'mission'), purpose:collectionMode, expanded: sectionContent.querySelector('[data-reading-detail][aria-expanded="true"]')?.dataset.readingDetail };
 }
 function rememberContext() { contextHistory.push(currentContext()); }
 function syncBackControls() {
@@ -339,6 +347,7 @@ function syncBackControls() {
   }
 }
 function restoreContext(context) {
+  if(context?.section==='collection'){showMission(false);collectionMode=context.purpose==='guided-repeat'?'daily':context.purpose;renderMissionView();animateContext(mission);return}
   if (!context || ['mission', 'profile', 'today'].includes(context.section)) { showMission(); return; }
   if (context?.section === 'checkin') {
     if (hub.dataset.panel) closeContextPanel(false);
@@ -833,13 +842,14 @@ function storeCollectionDraft(capture) {
   try{sessionStorage.setItem(draftStorageKey,JSON.stringify(collectionDraft));status.textContent=checkinDraft?'Draft saved':''}catch{status.textContent=checkinDraft?'Draft kept in this session':''}
 }
 function updateAssistance(question,answer) {
+  assistanceView='steps';assistanceStarted=true;
   const key=activeAlertKey,state=question?advanceAssistance(assistanceFor(key),question,answer):{events:assistanceFor(key).events||[]};
   assistanceCache.set(key,state);let persisted=true;try{writeAssistance(key,state,localStorage)}catch{persisted=false}
   renderMissionView();
-  const status=mission.querySelector('[data-assistance-status]');if(status)status.textContent=persisted?'Observation recorded':'Observation kept for this session';
+  const status=mission.querySelector('[data-assistance-status]');if(status){status.dataset.persisted=String(persisted);status.textContent=persisted?'Observation recorded':'Observation kept for this session'}
   mission.querySelector('.assistance-view h2')?.focus({preventScroll:true});
 }
-function renderMissionView() {
+function renderMissionView(force=false) {
   const summary = CrewDesign.summary(people[0].id);
   const scenario = CrewDesign.scenarioInfo();
   const histories=anatomyHistory(summary.person.id);
@@ -850,23 +860,27 @@ function renderMissionView() {
   if (state.tone === 'urgent') {
     const key = responseKey(summary,scenario);
     hub.dataset.alertAcknowledged=String(Boolean(response.acknowledgedAt));
-    if (key !== activeAlertKey) { activeAlertKey = key; assistanceModeKey='';playAlertSound(); }
+    if (key !== activeAlertKey) { activeAlertKey = key; assistanceModeKey='';assistanceView='steps';assistanceStarted=false;playAlertSound(); }
   } else { activeAlertKey = ''; alarm.stop(); }
   stage?.setSceneView?.(collectionMode?'collection':state.key);
   hub.dataset.collecting=String(Boolean(collectionMode));
+  if(!force&&collectionMode==='guided-repeat'&&mission.querySelector('[data-repeat-form]')){syncMissionFrame();return}
   const existingCapture=mission.querySelector('[data-collect-form]');
   if(collectionMode&&existingCapture?.dataset.purpose===collectionMode){const help=existingCapture.querySelector('.collection-help'),urgent=state.key==='emergency';help.toggleAttribute('data-urgent-response',urgent);help.toggleAttribute('data-collect-urgent',!urgent);help.textContent=urgent?(summary.symptomSource==='Scenario preview'?'Urgent preview active →':'Urgent report active →'):'I need urgent help ↗';syncMissionFrame();return}
   hub.append(exploreSurface,sceneTools);
   figureObserver.disconnect();
-  if(collectionMode){
+  if(collectionMode==='guided-repeat'){
+    mission.innerHTML=renderRepeat(repeatState);initializeCustomSelects(mission);initializeCustomDateTimes(mission);
+  }else if(collectionMode){
     const now=new Date(),observedAt=`${localDateKey(now)}T${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
     mission.innerHTML=renderCollection({summary,fields:collectionDraftFields(),purpose:collectionMode,symptomOptions:CrewDesign.symptomOptions,observedAt,urgent:state.key==='emergency',urgentPreview:summary.symptomSource==='Scenario preview'});
     initializeCustomSelects(mission);initializeCustomDateTimes(mission);syncCollectionSymptoms(mission.querySelector('[data-collect-form]'));syncCollectionMeasurement(mission.querySelector('[data-collect-form]'));
   }else{
-    mission.innerHTML=renderMission({summary,histories,scenario,connected:deviceConnections.size,response,draft:checkinDraft});
+    mission.innerHTML=renderMission({summary,histories,scenario,connected:deviceConnections.size,response,draft:checkinDraft,urgentReturn:urgentReturnView});
     if(state.key==='emergency'&&assistanceModeKey===activeAlertKey){
-      const focus=mission.querySelector('.care-focus'),handoff=focus.querySelector('.care-handoff'),silence=focus.querySelector('[data-alert-ack]');
-      focus.innerHTML=renderAssistance(response.assistance,summary.person.name);if(silence)focus.append(silence);if(handoff)focus.append(handoff);
+      mission.querySelector('.urgent-page')?.setAttribute('data-assisting','true');
+      const focus=mission.querySelector('.care-focus'),silence=focus.querySelector('[data-alert-ack]');
+      focus.innerHTML=renderAssistance(response.assistance,summary.person.name,assistanceView,handoffText(summary,scenario,response,histories),assistanceStarted?'steps':'response');const utilities=focus.querySelector('.assistance-utilities');if(silence&&utilities)utilities.append(silence);
     }
   }
   const figure=mission.querySelector('[data-figure-space]');
@@ -907,7 +921,7 @@ function showMission(focus = true) {
   mission.hidden = false;
   renderMissionView();
   animateContext(mission);
-  if (focus) mission.querySelector('h1')?.focus({ preventScroll: true });
+  if (focus) (mission.querySelector('#urgent-action-title')||mission.querySelector('h1'))?.focus({ preventScroll: true });
 }
 function updateAlarmControl(state = alarm.state) {
   const button = hub.querySelector('[data-alert-sound]');
@@ -937,6 +951,7 @@ function endRequestedHelpMode(){
   return result;
 }
 function startCheckin(fromReading=false,purpose='daily') {
+  urgentReturnView='';
   if(!CrewDesign.hasProfile()){pendingDashboardSection='checkin';openOnboarding(false);return}
   collectionDraftFields();endRequestedHelpMode();
   if(CrewDesign.scenarioInfo().key==='emergency'){CrewDesign.setScenario('routine');const select=hub.querySelector('[data-scenario]');select.value='routine';syncCustomSelects(hub.querySelector('.orbit-scenario-control'))}
@@ -945,9 +960,38 @@ function startCheckin(fromReading=false,purpose='daily') {
   const summary=CrewDesign.summary(people[0].id);
   if(missionState(summary,CrewDesign.scenarioInfo()).key==='emergency'&&summary.symptomSource!=='Scenario preview'){fields=urgentCollectionFields(fields,summary);collectionDraft={fields,purpose:collectionDraft?.purpose||purpose,details:[]}}
   if(fields.length&&checkinDraft)purpose=collectionDraft?.purpose||'full';
+  if(purpose==='repeat')purpose='full';
   showMission(false);collectionMode=purpose;renderMissionView();
   if(fromReading&&!fields.length){const capture=mission.querySelector('[data-collect-form]');if(capture){capture.elements.measuredAt.value=`${selectedReadingDate}T${String(new Date().getHours()).padStart(2,'0')}:${String(new Date().getMinutes()).padStart(2,'0')}`;syncCustomDateTimes(capture)}}
   animateContext(mission);mission.querySelector('.collection-heading h1')?.focus({preventScroll:true});
+}
+
+function storeRepeatDraft(){
+ const capture=mission.querySelector('[data-repeat-form]');
+ if(capture?.dataset.phase==='entry'&&repeatState?.phase==='entry')repeatState.fields=collectionFields(capture);
+ try{sessionStorage.setItem(repeatStorageKey,JSON.stringify(repeatState))}catch{}
+}
+function startRepeat(field){
+ const summary=CrewDesign.summary(people[0].id);
+ if(missionState(summary,CrewDesign.scenarioInfo()).key==='emergency'){showMission();return}
+ const baseline=CrewDesign.history(people[0].id,field).at(-1);
+ try{
+  let saved=repeatState;
+  if(!saved)try{saved=JSON.parse(sessionStorage.getItem(repeatStorageKey)||'null')}catch{}
+  const valid=saved?.field===field&&saved.phase!=='result'&&['guide','entry'].includes(saved.phase)&&Number.isInteger(saved.step)&&saved.step>=0&&saved.step<measurementGuides[field].steps.length&&Array.isArray(saved.fields);
+  repeatState=createRepeat(field,baseline);
+  if(valid)try{repeatState={...createRepeat(field,saved.baseline),...saved}}catch{}
+ }catch{return}
+ const capture=mission.querySelector('[data-collect-form]');if(capture)storeCollectionDraft(capture);
+ repeatReturn=currentContext();showMission(false);collectionMode='guided-repeat';renderMissionView();storeRepeatDraft();animateContext(mission);mission.querySelector('h1')?.focus({preventScroll:true});
+}
+function closeRepeat(){
+ storeRepeatDraft();
+ if(repeatState?.phase==='result'){repeatState=null;try{sessionStorage.removeItem(repeatStorageKey)}catch{}}
+ const destination=repeatReturn||{section:'mission'};repeatReturn=null;collectionMode='';restoreContext(destination);
+}
+function showRepeatStep(){
+ storeRepeatDraft();renderMissionView(true);animateContext(mission);mission.querySelector('.repeat-editor h2,.repeat-editor h3')?.focus({preventScroll:true});
 }
 
 function sectionMarkup(section) {
@@ -997,6 +1041,7 @@ function navigateDashboard(section, source) {
   showSection(section, source);
 }
 function openOnboarding(edit = false) {
+  profileReturn=currentContext();
   leaveMission();
   profile.hidden = true;
   if (hub.dataset.panel) closeContextPanel(false);
@@ -1006,19 +1051,24 @@ function openOnboarding(edit = false) {
   profileForm.elements.bodyMass.value = existing?.bodyMass ?? '';
   syncCustomSelects(profileForm);
   profileForm.querySelector('.orbit-profile-error').textContent = '';
-  hub.querySelector('#profile-setup-title').textContent = edit ? 'Edit your profile' : 'Create your profile';
-  profileForm.querySelector('button[type="submit"]').innerHTML = edit ? 'Save changes <span aria-hidden="true">↗</span>' : 'Save profile <span aria-hidden="true">↗</span>';
+  hub.querySelector('#profile-setup-title').textContent = edit ? 'Your profile' : 'Create your profile';
+  profileForm.querySelector('button[type="submit"]').textContent = edit ? 'Save changes' : 'Save profile';
   profileForm.querySelector('[data-cancel-profile]').hidden = !existing;
   onboarding.hidden = false;
+  stage?.resume();stage?.setMissionView?.(true);stage?.setSceneView?.('collection');hub.dataset.collecting='true';
+  figureObserver.disconnect();const figure=onboarding.querySelector('[data-figure-space]');figure.append(exploreSurface);figureObserver.observe(figure);syncMissionFrame();animateContext(onboarding);
   profileForm.elements.name.focus({ preventScroll: true });
 }
 profileForm.querySelector('[data-cancel-profile]').addEventListener('click', () => {
   onboarding.hidden = true;
-  showMission();
+  const destination=profileReturn;profileReturn=null;restoreContext(destination);
 });
+profileForm.addEventListener('input',event=>{event.target.removeAttribute('aria-invalid');event.target.removeAttribute('aria-describedby');profileForm.querySelector('.orbit-profile-error').textContent=''});
 profileForm.addEventListener('submit', event => {
   event.preventDefault();
-  if (!profileForm.reportValidity()) return;
+  const invalid=[...profileForm.elements].find(input=>input.willValidate&&!input.validity.valid);
+  if(invalid){invalid.setAttribute('aria-invalid','true');invalid.setAttribute('aria-describedby','profile-error');profileForm.querySelector('.orbit-profile-error').textContent=invalid.name==='name'?'Enter your full name.':invalid.validationMessage;invalid.focus({preventScroll:true});return}
+
   try {
     const prior = CrewDesign.getProfile();
     CrewDesign.saveProfile(profileForm.elements.name.value, CrewDesign.getProfile()?.model || 'male', profileForm.elements.age.value, profileForm.elements.bodyMass.value);
@@ -1116,10 +1166,17 @@ hub.addEventListener('click', event => {
     updateAlarmControl(); return;
   }
   if (event.target.closest('[data-alert-ack]')) { alarm.stop(); saveResponse('acknowledgedAt'); mission.querySelector('.mission-response')?.setAttribute('tabindex', '-1'); mission.querySelector('.mission-response')?.focus({ preventScroll: true }); return; }
-  if(event.target.closest('[data-assist-open]')){assistanceModeKey=activeAlertKey;renderMissionView();mission.querySelector('.assistance-view h2')?.focus({preventScroll:true});return}
-  if(event.target.closest('[data-assist-close]')){assistanceModeKey='';renderMissionView();return}
+  if(event.target.closest('[data-assist-open]')){assistanceModeKey=activeAlertKey;assistanceView='steps';assistanceStarted=true;renderMissionView();mission.querySelector('.assistance-view h2')?.focus({preventScroll:true});return}
+  if(event.target.closest('[data-assist-close]')){assistanceModeKey='';assistanceView='steps';assistanceStarted=false;renderMissionView();mission.querySelector('[data-assist-open]')?.focus({preventScroll:true});return}
+  const assistView=event.target.closest('[data-assist-view]');if(assistView){if(assistView.dataset.assistView==='response'){assistanceModeKey='';assistanceView='steps';assistanceStarted=false}else{assistanceModeKey=activeAlertKey;assistanceView=assistView.dataset.assistView}renderMissionView();mission.querySelector('.assistance-view h2,#urgent-action-title')?.focus({preventScroll:true});return}
   if(event.target.closest('[data-assist-reassess]')){updateAssistance();return}
   const observation=event.target.closest('[data-assist-question]');if(observation){updateAssistance(observation.dataset.assistQuestion,observation.dataset.assistAnswer);return}
+  const repeatButton=event.target.closest('[data-repeat-measurement]');if(repeatButton){startRepeat(repeatButton.dataset.repeatMeasurement);return}
+  if(event.target.closest('[data-repeat-close]')){closeRepeat();return}
+  if(event.target.closest('[data-repeat-urgent]')){urgentReturnView='repeat';storeRepeatDraft();CrewDesign.requestUrgentAssistance(people[0].id);showMission();return}
+  if(event.target.closest('[data-repeat-next]')){if(repeatState.step===measurementGuides[repeatState.field].steps.length-1)repeatState.phase='entry';else repeatState.step++;showRepeatStep();return}
+  if(event.target.closest('[data-repeat-back]')){repeatState.step=Math.max(0,repeatState.step-1);showRepeatStep();return}
+  if(event.target.closest('[data-repeat-guide]')){storeRepeatDraft();repeatState.phase='guide';showRepeatStep();return}
   const collectionNav=event.target.closest('[data-collection-measure],[data-collection-view],[data-collect-symptoms]');
   if(collectionNav){const capture=collectionNav.closest('[data-collect-form]');navigateCollection(capture,{measurement:collectionNav.dataset.collectionMeasure,view:collectionNav.hasAttribute('data-collect-symptoms')?'symptoms':collectionNav.dataset.collectionView});storeCollectionDraft(capture);mission.scrollTop=0;syncMissionFrame();return}
   const guideAbout=event.target.closest('[data-guide-about]');
@@ -1128,15 +1185,16 @@ hub.addEventListener('click', event => {
   const guideButton=event.target.closest('[data-guide-next],[data-guide-back]');if(guideButton){advanceMeasurementGuide(guideButton);return}
   if(event.target.closest('[data-collect-close]')){collectionMode='';const destination=checkinReturn||{section:'mission'};checkinReturn=null;restoreContext(destination);return}
   if(event.target.closest('[data-urgent-response]')){const capture=mission.querySelector('[data-collect-form]');if(capture)storeCollectionDraft(capture);showMission();return}
+  if(event.target.closest('[data-urgent-repeat-return]')){endRequestedHelpMode();if(repeatState&&missionState(CrewDesign.summary(people[0].id),CrewDesign.scenarioInfo()).key!=='emergency'){showMission(false);collectionMode='guided-repeat';renderMissionView();animateContext(mission);mission.querySelector('h1')?.focus({preventScroll:true})}else startCheckin();return}
   if(event.target.closest('[data-exit-urgent-preview]')){const select=hub.querySelector('[data-scenario]');select.value='routine';syncCustomSelects(hub.querySelector('.orbit-scenario-control'));CrewDesign.setScenario('routine');showMission();return}
   if(event.target.closest('[data-collect-urgent]')){
+    urgentReturnView='checkin';
     const capture=mission.querySelector('[data-collect-form]');storeCollectionDraft(capture);const payload=collectionPayload(collectionFields(capture));
     const result=CrewDesign.requestUrgentAssistance(people[0].id,payload.details);showMission();
     if(!result.persisted){const message=mission.querySelector('[data-response-status]');if(message)message.textContent='Urgent report is not saved. Get crew assistance now.'}
     return;
   }
   if(event.target.closest('[data-care-wellbeing]')){startCheckin();return}
-  if(event.target.closest('[data-care-repeat]')){startCheckin(false,'repeat');return}
   if(event.target.closest('[data-copy-handoff]')) {
     const container=event.target.closest('.care-handoff'),text=container.querySelector('textarea'),status=container.querySelector('[role=status]');
     const fallback=()=>{text.focus();text.select();status.textContent='Select and copy the summary. Nothing has been sent.'};
@@ -1372,11 +1430,12 @@ form.addEventListener('change', event => {
 });
 hub.addEventListener('change', event => {
   if (event.target.matches('[data-scenario]')) {
+    urgentReturnView='';
     hub.removeAttribute('data-alert-acknowledged');
     collectionDraftFields();endRequestedHelpMode();
     CrewDesign.setScenario(event.target.value);
     showMission(false);
-    if (hub.dataset.severity === 'urgent') { const title = mission.querySelector('.mission-state h2'); title?.setAttribute('tabindex', '-1'); title?.focus({ preventScroll: true }); }
+    if (hub.dataset.severity === 'urgent') { const title = mission.querySelector('#urgent-action-title,.mission-state h2'); title?.setAttribute('tabindex', '-1'); title?.focus({ preventScroll: true }); }
     return;
   }
 
@@ -1393,20 +1452,32 @@ form.addEventListener('input', storeCheckinDraft);
 form.addEventListener('change', storeCheckinDraft);
 form.addEventListener('toggle', event => { if (event.target.matches('details') && checkinDraft) storeCheckinDraft(); }, true);
 mission.addEventListener('toggle',event=>{const capture=event.target.closest('[data-collect-form]');if(!capture)return;if(event.target.matches('.collection-guide')&&event.target.open){event.target.querySelector('[data-guide-step]:not([hidden]) h3')?.focus({preventScroll:true});for(const other of capture.querySelectorAll('.collection-guide[open]'))if(other!==event.target)other.open=false;}syncMissionFrame();},true);
-mission.addEventListener('input',event=>{const capture=event.target.closest('[data-collect-form]');if(capture){clearCollectionValidation(capture,event.target);storeCollectionDraft(capture)}});
-mission.addEventListener('change',event=>{
+mission.addEventListener('input',event=>{if(event.target.closest('[data-repeat-form]'))storeRepeatDraft();const capture=event.target.closest('[data-collect-form]');if(capture){clearCollectionValidation(capture,event.target);storeCollectionDraft(capture)}});
+mission.addEventListener('change',event=>{if(event.target.closest('[data-repeat-form]'))storeRepeatDraft();
   const capture=event.target.closest('[data-collect-form]');if(!capture)return;
   clearCollectionValidation(capture,event.target);syncCollectionSymptoms(capture);syncCollectionMeasurement(capture);
   if(event.target.name==='symptoms'){navigateCollection(capture,{view:['concerning','urgent'].includes(event.target.value)?'symptoms':'today'})}
   storeCollectionDraft(capture);
 });
 hub.addEventListener('submit', event => {
+ const repeatForm=event.target.closest('[data-repeat-form]');
+ if(repeatForm){
+  event.preventDefault();if(repeatState.phase!=='entry')return;
+  storeRepeatDraft();
+  try{
+   const payload=repeatPayload(repeatState,repeatState.fields);
+   CrewDesign.saveOverview(people[0].id,payload.values,'',payload.details);
+   repeatState.result=payload.entry;repeatState.phase='result';showRepeatStep();
+  }catch(error){repeatForm.querySelector('[role=alert]').textContent=error.message||'Could not save. Your repeat is still here.'}
+  return;
+ }
+
   const capture=event.target.closest('[data-collect-form]');
   if(capture){
     event.preventDefault();const invalid=[...capture.elements].find(input=>input.willValidate&&!input.validity.valid);if(invalid){const metric=invalid.closest('[data-collection-metric]');if(metric)navigateCollection(capture,{measurement:metric.dataset.collectionMetric});const guide=metric?.querySelector('[data-measure-guide]');if(guide)guide.open=false;invalid.setAttribute('aria-invalid','true');invalid.setAttribute('aria-describedby','collection-error');const trigger=invalid.closest('.crew-select')?.querySelector('.crew-select__trigger');trigger?.setAttribute('aria-invalid','true');trigger?.setAttribute('aria-describedby','collection-error');capture.querySelector('.collection-error').textContent=invalid.name==='context'?'Choose the measurement conditions.':invalid.validationMessage;if(invalid.tagName==='SELECT')focusCustomSelect(invalid,{preventScroll:true});else invalid.focus({preventScroll:true});return}
     const payload=collectionPayload(collectionFields(capture));
     try{
-      CrewDesign.saveOverview(people[0].id,payload.values,payload.symptoms,{...payload.details,source:collectionMode==='repeat'?'Manual repeat':'Manual check-in'});
+      CrewDesign.saveOverview(people[0].id,payload.values,payload.symptoms,{...payload.details,source:'Manual check-in'});
       collectionMode='';collectionDraft=null;clearCheckinDraft();resetForm();showMission();
     }catch(error){capture.querySelector('.collection-error').textContent=error.message||'Could not save. Your entries are still here.'}
     return;
@@ -1672,4 +1743,6 @@ hub.addEventListener('keydown', event => {
 });
 
 let displayedDay=localDateKey(new Date());
-setInterval(()=>{const day=localDateKey(new Date());if(day!==displayedDay){displayedDay=day;renderData()}},60000);
+setInterval(()=>{const day=localDateKey(new Date());if(day!==displayedDay){displayedDay=day;CrewDesign.refreshPresentation()}},60000);
+
+document.addEventListener('visibilitychange',()=>{if(!document.hidden){const day=localDateKey(new Date());if(day!==displayedDay){displayedDay=day;CrewDesign.refreshPresentation()}}});

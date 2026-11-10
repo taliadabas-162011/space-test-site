@@ -1,4 +1,5 @@
-import { createSceneDirector, sceneShot, placeSceneCamera } from './crew-scene-director.js?v=4';
+import {orbitalMotion} from './crew-orbital-motion.js?v=1';
+import { createSceneDirector, sceneShot, placeSceneCamera } from './crew-scene-director.js?v=5';
 import { createSceneOrbit } from './crew-scene-orbit.js?v=2';
 import { Scene, WebGLRenderer, PerspectiveCamera, Vector3, PointLight, Plane } from '/space-test-site/design/vendor/three/three.module.min.js';
 import { GLTFLoader } from '/space-test-site/design/vendor/three/examples/jsm/loaders/GLTFLoader.js';
@@ -9,7 +10,7 @@ import {
 } from '/space-test-site/design/scars-camera-paths.js?v=astronaut-6';
 import { loadScarsMotion, createScarsPerformer } from '/space-test-site/design/scars-motion.js';
 import { createAstronautMotionRefinement } from '/space-test-site/design/astronaut-motion-refinement.js';
-import { createCrewEnvironment } from '/space-test-site/design/crew-environment.js?v=astronaut-8';
+import { createCrewEnvironment } from '/space-test-site/design/crew-environment.js?v=astronaut-19';
 
 const MODEL_URL = '/space-test-site/design/astronaut-preview/assets/grab3d.glb';
 const MODEL_HEIGHT = 1.9;
@@ -551,10 +552,8 @@ export async function createCrewStage(canvas, onFrame = () => {}) {
       model.pivot.position.x += movement.x;
       model.pivot.position.y += movement.y;
       model.pivot.position.z += movement.z;
-      if (missionMix > .001 && !isReduced) {
-        model.pivot.position.y += Math.sin(now / 1900) * (shot && shot.distance<3 ? .012 : .035) * missionMix;
-        model.pivot.rotation.z = Math.sin(now / 2700) * .012 * missionMix;
-      } else model.pivot.rotation.z = 0;
+      const drift=orbitalMotion(now/1000,{view:sceneView,reducedMotion:isReduced}).astronaut;
+      if(reveal<.001){model.pivot.position.x+=drift.x;model.pivot.position.y+=drift.y;model.pivot.rotation.y+=drift.yaw;model.pivot.rotation.z=drift.roll}else model.pivot.rotation.z=0;
       model.suitPlane.constant = model.pivot.position.y + MODEL_HEIGHT * (1.05 - 1.1 * reveal);
       if (model.anatomy) {
         model.anatomy.setOpacity(bodyOpacity);
@@ -571,7 +570,7 @@ export async function createCrewStage(canvas, onFrame = () => {}) {
     earthZ = -1 + (earthZ + 1) * layout;
     const earthLength = Math.hypot(earthX, earthZ) || 1;
     environment.update(now / 1000, { direction: [earthX / earthLength, earthZ / earthLength],
-      focus: [view.target[0] * layout, view.target[2] * layout], satelliteVisible: window.innerWidth >= 768, satelliteAnchor: null, planetHeight:missionView&&sceneView==='collection'?-40:-33, satelliteHeight: missionView ? 6.9 : 7.5, satelliteX: missionView ? -5 : -10, satelliteScale: missionView ? .65 : 1, reducedMotion: isReduced, anatomy: anatomyMix });
+      focus: [view.target[0] * layout, view.target[2] * layout], view:sceneView, habitatVisible: true, satelliteVisible: true, satelliteAnchor: null, planetHeight:missionView&&sceneView==='collection'?-40:sceneView==='emergency'?-38:-33, satelliteHeight: 8.6, satelliteX: -9, satelliteScale: .4, reducedMotion: isReduced, anatomy: anatomyMix });
     renderer.render(scene, camera);
     const anchors = models.map(model => {
       const p = model.pivot.position;

@@ -53,7 +53,7 @@ function render(widget) {
     option.textContent = item.text;
     if(select.matches('[data-scenario]')) {
       const description=document.createElement('span');description.className='crew-select__description';description.setAttribute('aria-hidden','true');
-      description.textContent={routine:'A regular day in orbit',recovery:'Sleep, intake and activity',review:'Check placement, repeat, compare',emergency:'Immediate crew assistance'}[select.options[item.index].value]||'';
+      description.textContent={routine:'A regular day in orbit',emergency:'Immediate crew assistance'}[select.options[item.index].value]||'';
       option.append(description);
     }
     menu.append(option);

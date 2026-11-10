@@ -18,5 +18,13 @@ test('observations persist per episode, validate stored input and retain an audi
  const data=new Map(),storage={getItem:k=>data.get(k)||null,setItem:(k,v)=>data.set(k,v)};
  const state=advanceAssistance({events:[]},'responding','no',1000);writeAssistance('episode',state,storage);assert.deepEqual(readAssistance('episode',storage),{...state,breathing:null});assert.deepEqual(readAssistance('other',storage),{events:[]});
  writeAssistance('episode',{events:state.events},storage);assert.equal(readAssistance('episode',storage).events.length,1);
- assert(renderAssistance({},'<crew>').includes('&lt;crew&gt;'));assert(renderAssistance({responding:'no',breathing:'no'},'Crew').includes('mission-trained microgravity CPR'));
+ assert(renderAssistance({},'Crew','handoff','<crew>').includes('&lt;crew&gt;'));assert(renderAssistance({responding:'no',breathing:'no'},'Crew').includes('mission-trained microgravity CPR'));
+});
+
+test('each outcome explains the observed answers and keeps reassessment secondary',()=>{
+ for(const [responding,breathing,kind] of [['no','no','resuscitation'],['yes','no','breathing'],['no','yes','unresponsive'],['yes','yes','responsive']]){
+  const html=renderAssistance({responding,breathing},'Crew');assert(html.includes(`data-outcome="${kind}"`));assert(html.includes('assistance-observed'));assert(html.includes('class="assistance-recheck"'));assert(!html.includes('<details'));
+ }
+ const source=renderAssistance({},'Crew','sources','','response');assert(source.includes('data-assist-view="response"'));assert(!source.includes('data-assist-question'));assert(source.includes('flight-approved'));
+ const handoff=renderAssistance({},'Crew','handoff','<report>');assert(handoff.includes('&lt;report&gt;'));assert(handoff.includes('readonly'));assert(handoff.includes('data-copy-handoff'));
 });

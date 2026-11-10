@@ -54,3 +54,7 @@
 .crew-orbit[data-ui-variant=glass]{--popover-surface:#15171dcf}
 .crew-orbit[data-ui-variant=glass][data-ui-variant] :is(.crew-select__menu,.crew-datetime__popup,.orbit-reading-calendar),.crew-orbit[data-ui-variant=glass][data-ui-variant] .orbit-scenario-control .crew-select__menu{background:var(--popover-surface);backdrop-filter:blur(5px) saturate(105%);-webkit-backdrop-filter:blur(5px) saturate(105%)}
 @media(prefers-reduced-transparency:reduce){.crew-orbit[data-ui-variant=glass][data-ui-variant]{--popover-surface:#191c23}.crew-orbit[data-ui-variant=glass][data-ui-variant] :is(.crew-select__menu,.crew-datetime__popup,.orbit-reading-calendar){background:var(--popover-surface)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}}
+
+/* Opening a menu must not move the separate audio control. */
+.crew-orbit[data-ui-variant=glass] .orbit-scenario-control>button{top:0;bottom:auto}
+.crew-orbit[data-ui-variant=glass] .orbit-scenario-control .crew-select__menu{top:calc(100% + 8px);transform-origin:50% 0}

@@ -1,3 +1,4 @@
+import {orbitalMotion} from './crew-orbital-motion.js?v=1';
 // Source material: EnduroSat Space Service, captured locally in
 // /clone-workspace/reference-clones/endurosat. The globe's two-hemisphere
 // sampling and the star sphere are adapted from that source scene's shaders;
@@ -207,6 +208,37 @@ async function loadSatellite(loader) {
   return shell;
 }
 
+async function loadHabitat(loader) {
+  if(!loader)return null;
+  const asset=await loader.loadAsync(`${ASSET_ROOT}/gateway-core.glb`);
+  const model=asset.scene;model.updateMatrixWorld(true);
+  const halo=model.getObjectByName('NG_HALO'),ihab=model.getObjectByName('iHAB');
+  if(!halo||!ihab)throw new Error('Gateway station assembly is incomplete');
+  const measure=root=>{let bounds;root.traverse(object=>{if(!object.isMesh)return;object.geometry.computeBoundingBox();const box=object.geometry.boundingBox.clone().applyMatrix4(object.matrixWorld);if(bounds)bounds.union(box);else bounds=box});return bounds};
+  const center=measure(halo).getCenter(new Vector3());
+  const spine=measure(ihab).getCenter(new Vector3()).sub(center).normalize();
+  const treated=new Set();
+  model.traverse(object=>{if(!object.isMesh)return;for(const material of (Array.isArray(object.material)?object.material:[object.material])){if(treated.has(material))continue;treated.add(material);if(material.name==='PPE_aux')material.color?.setRGB(.012,.1,.3);else material.color?.multiplyScalar(.2);material.emissive?.multiplyScalar(.15);material.envMapIntensity=.18;if(typeof material.roughness==='number')material.roughness=Math.max(.5,material.roughness)}});
+  model.position.sub(center);
+  const scale=new Group();scale.add(model);scale.scale.setScalar(.18);
+  const habitat=new Group();habitat.name='Connected Gateway orbital environment';habitat.add(scale);
+  habitat.position.set(0,3.3,-12);habitat.quaternion.setFromUnitVectors(spine,new Vector3(-1,-.2,-.5).normalize());habitat.rotateOnWorldAxis(new Vector3(-1,-.2,-.5).normalize(),1.3);habitat.rotateOnWorldAxis(new Vector3(0,0,1),Math.PI/2);
+  const baseRotation=habitat.rotation.clone();
+  const joints=['Little_Arm_3','Little_Arm_6','Little_Arm_8'].map(name=>{const object=habitat.getObjectByName(name);return object?{object,rotation:object.rotation.clone()}:null});
+  let activity=0,lastTime=null;
+  return {root:habitat,update(seconds,composition){
+    const dt=lastTime===null?0:Math.max(0,Math.min(.1,seconds-lastTime));lastTime=seconds;
+    const target=composition?.view==='device'?1:0,reduced=Boolean(composition?.reducedMotion);
+    activity+=(target-activity)*(reduced?1:1-Math.exp(-1.4*dt));
+    const motion=orbitalMotion(seconds,{view:composition?.view,reducedMotion:reduced,armActivity:activity});
+    habitat.position.y=3.3+motion.habitat.y;habitat.rotation.copy(baseRotation);habitat.rotation.y+=motion.habitat.yaw;habitat.rotation.z+=motion.habitat.roll;
+    for(const joint of joints)if(joint)joint.object.rotation.copy(joint.rotation);
+    if(joints[0])joints[0].object.rotation.y+=motion.arm.shoulder;
+    if(joints[1])joints[1].object.rotation.z+=motion.arm.elbow;
+    if(joints[2])joints[2].object.rotation.y+=motion.arm.wrist;
+  }};
+}
+
 /**
  * Attach a live EnduroSat-derived space environment to an existing scene.
  * @param {Scene} scene Shared astronaut scene.
@@ -230,12 +262,14 @@ export async function createCrewEnvironment(scene, options = {}) {
   const satPromise = satellite && loader
     ? loadSatellite(loader).catch(error => { warnings.push(`Spacecraft unavailable: ${error.message}`); return null; })
     : Promise.resolve(null);
-  const [north, south, clouds, solidNoise, sat] = await Promise.all([
+  const habitatPromise=loader?loadHabitat(loader).catch(error=>{warnings.push(`Habitat unavailable: ${error.message}`);return null}):Promise.resolve(null);
+  const [north, south, clouds, solidNoise, sat, habitat] = await Promise.all([
     load('america-north-2k.webp', MIRRORED_REPEAT),
     load('america-south.webp', MIRRORED_REPEAT),
     load('clouds.webp', REPEAT),
     load('noise.png', REPEAT),
     satPromise,
+    habitatPromise,
   ]);
   const starNoise = makeStarNoise();
   const skyUniforms = { uStarNoise: { value: starNoise }, uSolidNoise: { value: solidNoise }, uTime: { value: 0 } };
@@ -266,11 +300,13 @@ export async function createCrewEnvironment(scene, options = {}) {
   root.name = 'Crew environment';
   root.add(sky, planet);
   if (sat) root.add(sat);
+  if(habitat)root.add(habitat.root);
   scene.add(root);
   const satelliteAnchor = new Vector3();
   let disposed = false;
   return {
     satelliteLoaded: Boolean(sat),
+    habitatLoaded: Boolean(habitat),
     warnings,
     update(seconds, composition) {
       if (disposed || !Number.isFinite(seconds)) return;
@@ -285,6 +321,7 @@ export async function createCrewEnvironment(scene, options = {}) {
       const planetHeight=Number.isFinite(composition?.planetHeight)?composition.planetHeight:-33;
       planet.position.y+=(planetHeight-planet.position.y)*(composition?.reducedMotion?1:.06);
       planet.rotation.y = -.42 + time * .00045;
+      if(habitat){habitat.root.visible=composition?.habitatVisible!==false;if(habitat.root.visible)habitat.update(seconds,composition)}
       if (sat) {
         sat.visible = composition?.satelliteVisible !== false;
         const scale = Number.isFinite(composition?.satelliteScale) ? composition.satelliteScale : 1;

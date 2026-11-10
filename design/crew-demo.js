@@ -12,7 +12,7 @@
       const when = new Date(now);
       when.setDate(when.getDate() - daysAgo);
       if (daysAgo) when.setHours(9, 0, 0, 0);
-      else when.setTime(now.getTime() - 60000);
+      else when.setHours(0, 0, 0, 0);
       const time = when.toISOString();
       const pulse = 65 + Math.round(2 * Math.sin(daysAgo / 5)) + (daysAgo < 5 ? 11 : 0);
       append('pulse', pulse, time, 'Scenario history', 'rest');
@@ -34,5 +34,19 @@
     }
     return { alex: records };
   }
-  window.CrewDemo = { makeRecords };
+  // Rebuild only authored presentation rows; personal timestamps and values are immutable.
+  function refreshRecords(stored, now = new Date()) {
+    const next = structuredClone(stored && typeof stored === 'object' && !Array.isArray(stored) ? stored : {});
+    const sample = makeRecords(now).alex;
+    next.alex ||= {};
+    if (typeof next.alex !== 'object' || Array.isArray(next.alex)) next.alex = {};
+    for (const [field, rows] of Object.entries(sample)) {
+      const personal = (Array.isArray(next.alex[field]) ? next.alex[field] : []).filter(row => row?.source !== 'Scenario history');
+      // A refreshed 'none' report must never supersede an actual symptom report.
+      const hasReport = field === 'symptoms' && personal.some(row => !['Manual help request','Unsaved help request'].includes(row?.source) && ['none','concerning','urgent'].includes(row?.value));
+      next.alex[field] = [...(hasReport ? [] : rows), ...personal].sort((a,b) => Date.parse(a?.time) - Date.parse(b?.time));
+    }
+    return next;
+  }
+  window.CrewDemo = { makeRecords, refreshRecords };
 })();

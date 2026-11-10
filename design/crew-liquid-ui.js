@@ -8,7 +8,7 @@ export function createLiquidInterface(root) {
   function layer(element,radius=28) {
     if(!element||element.querySelector(':scope > liquid-glass'))return;
     const glass=document.createElement('liquid-glass');glass.className='glass-optics';glass.setAttribute('aria-hidden','true');
-    for(const [key,value] of Object.entries({renderer:'native',radius,frost:.005,blur:.6,scale:45,dispersion:3,'aberration-intensity':.2,saturation:115,'border-color':'rgba(255,255,255,.65)','reveal':'immediate'}))glass.setAttribute(key,String(value));
+    for(const [key,value] of Object.entries({renderer:'native',radius,frost:.005,blur:.6,scale:45,dispersion:3,'aberration-intensity':.2,saturation:115,'border-color':element.closest('.urgent-page')?'rgba(255,198,165,.8)':'rgba(255,255,255,.65)','reveal':'immediate'}))glass.setAttribute(key,String(value));
     element.prepend(glass);
   }
   function enhance() {
@@ -19,8 +19,8 @@ export function createLiquidInterface(root) {
       }
       for(const button of root.querySelectorAll('.mission-tools [data-mission-action]'))if(!button.querySelector('.glass-icon'))button.insertAdjacentHTML('afterbegin',icon(button.dataset.missionAction));
       for(const group of root.querySelectorAll('.mission-tools,.history-scene-nav,.history-scene-ranges'))syncSelectionLens(group,'[aria-current],[aria-pressed=true]');
-      for(const reading of root.querySelectorAll('.mission-reading'))layer(reading,22);
-      for(const control of root.querySelectorAll('.collection-value,.collection-pressure label,.collection-save button[type=submit],[data-guide-next],.mission-checkin,.mission-response .care-primary,.collection-page .crew-select__trigger,.collection-page .crew-datetime__trigger,.collection-navigation button,.collection-guide>summary,.collection-text-entry,.care-checkin-return'))layer(control,22);
+      for(const reading of root.querySelectorAll('.mission-reading,.urgent-vital'))layer(reading,22);
+      for(const control of root.querySelectorAll('.collection-value,.collection-pressure label,.collection-save button[type=submit],[data-guide-next],[data-repeat-next],.mission-checkin,.mission-response .care-primary,.assistance-answers>button,.assistance-recheck,.collection-page .crew-select__trigger,.collection-page .crew-datetime__trigger,.collection-navigation button,.collection-guide>summary,.collection-text-entry,.care-checkin-return'))layer(control,22);
       for(const nav of root.querySelectorAll('.collection-navigation')){syncSelectionLens(nav,'button[aria-current]');layer(nav.querySelector(':scope>.liquid-selection'),18)}
       for(const group of root.querySelectorAll('.collection-choices'))syncSelectionLens(group,'label:has(input:checked)');
       for(const menu of root.querySelectorAll('.crew-select__menu')){syncSelectionLens(menu,menu.querySelector('.is-active')?'.crew-select__option.is-active':'.crew-select__option[aria-selected=true]')}
@@ -30,7 +30,7 @@ export function createLiquidInterface(root) {
     observer.observe(root,{childList:true,subtree:true,attributes:true,attributeFilter:['aria-current','aria-pressed','aria-selected','aria-expanded','aria-activedescendant','data-view','data-scenario','data-severity']});
   }
   root.addEventListener('change',()=>queueMicrotask(enhance));
-  root.addEventListener('pointermove',event=>{const control=event.target.closest('.mission-reading,.collection-value,.collection-pressure label,.collection-page button');if(!control)return;const rect=control.getBoundingClientRect();control.style.setProperty('--glass-light-x',`${event.clientX-rect.left}px`);control.style.setProperty('--glass-light-y',`${event.clientY-rect.top}px`)});
+  root.addEventListener('pointermove',event=>{const control=event.target.closest('.mission-reading,.urgent-vital,.collection-value,.collection-pressure label,.collection-page button');if(!control)return;const rect=control.getBoundingClientRect();control.style.setProperty('--glass-light-x',`${event.clientX-rect.left}px`);control.style.setProperty('--glass-light-y',`${event.clientY-rect.top}px`)});
   root.addEventListener('pointerover',event=>{const option=event.target.closest('.crew-select__option');if(option)queueMicrotask(enhance)});
   let queued=false;
   const observer=new MutationObserver(()=>{if(!queued){queued=true;queueMicrotask(()=>{queued=false;enhance()})}});

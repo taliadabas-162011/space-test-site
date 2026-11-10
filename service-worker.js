@@ -1,5 +1,5 @@
 // Cache only the application shell and bundled assets, never observation data.
-const CACHE = 'crew-health-static-v31';
+const CACHE = 'crew-health-static-v42';
 const ROOT = '/space-test-site/';
 const FILES = [
   "",
@@ -13,6 +13,7 @@ const FILES = [
   "design/assets/camera-paths.raw",
   "design/assets/draco/draco_decoder.wasm",
   "design/assets/draco/draco_wasm_wrapper.js",
+  "design/assets/environment/gateway-core.glb",
   "design/assets/environment/GSG_PRO_STUDIOS_METAL_001_sm-gainmap.webp",
   "design/assets/environment/GSG_PRO_STUDIOS_METAL_001_sm.json",
   "design/assets/environment/GSG_PRO_STUDIOS_METAL_001_sm.webp",
@@ -44,6 +45,7 @@ const FILES = [
   "design/crew-observation-ui.js",
   "design/crew-orbit.css",
   "design/crew-orbit.js",
+  "design/crew-orbital-motion.js",
   "design/crew-mission-ui.js",
   "design/crew-mission.css",
   "design/crew-liquid-ui.js",
@@ -55,9 +57,11 @@ const FILES = [
   "design/assets/guides/glucose-lancing-v4.png",
 
   "design/crew-collection.js",
+  "design/crew-repeat.js",
   "design/crew-measurement-guides.js",
   "design/crew-assistance.js",
   "design/crew-workflow.css",
+  "design/crew-urgent.css",
   "design/crew-care.css",
   "design/crew-liquid-base.css",
   "design/crew-liquid.css",

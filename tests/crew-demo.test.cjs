@@ -34,7 +34,8 @@ console.log('Scenarios preview values without writing history, retain the origin
 
 const beforeCases = new Map(data);
 window.CrewDesign.setScenario('recovery');
-assert.deepEqual(Array.from(window.CrewDesign.history('alex','sleep').slice(-3),entry=>entry.value),[5.2,5.4,5.1]);
+assert.equal(window.CrewDesign.scenarioInfo().key,'routine','removed recovery preview cannot be entered');
+window.CrewDesign.setScenario('review');assert.equal(window.CrewDesign.scenarioInfo().key,'routine','repeating is a flow, not a scenario');
 for(const [key,value] of beforeCases)assert.equal(data.get(key),value);
 window.CrewDesign.setScenario('routine');
 window.CrewDesign.saveOverview('alex',{},'urgent',{symptomTags:['chest-pain'],source:'Manual check-in'});

@@ -14,7 +14,7 @@ export function sceneShot(view,{frame=null,aspect=1.6,screenWidth=1280,variant='
   else if(view==='device'){framing={x:.5,y:.54,width:.82,height:.84};yaw=-.42;pitch=.025;height=1.04}
   else if(view==='recovery'){yaw=.2;pitch=.045}
   else if(view==='review'||view==='symptoms'){yaw=-.22}
-  else if(view==='emergency'){yaw=-.12;pitch=0}
+  else if(view==='emergency'||view==='assistance'){yaw=-.12;pitch=0}
   return {yaw,pitch,height,distance:sceneFitDistance(framing,aspect),x:framing.x,y:framing.y,nearDistance:Math.max(2.7,3.2/Math.max(.45,aspect))};
 }
 

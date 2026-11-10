@@ -52,3 +52,44 @@
 .collection-page .collection-daily-return:hover{color:white;text-decoration:underline;text-underline-offset:4px}
 @media(min-width:768px) and (max-width:1150px){.collection-nav-title{font-size:20px;padding-left:12px}}
 @media(max-width:767px){.collection-measurement-nav{margin-top:0}.collection-page .collection-daily-return{margin-left:12px}.collection-heading [role=status]{display:inline;margin-left:10px}}
+
+/* Repeating one reading uses the same workspace, never a nested check-in. */
+.repeat-page{grid-template-columns:minmax(0,1fr) minmax(170px,28%);column-gap:6%;max-width:1280px}
+.repeat-page>.repeat-editor{grid-column:1;max-width:720px}
+.crew-orbit[data-ui-variant=glass] .repeat-page>.collection-figure{grid-column:2}
+.repeat-page .collection-heading{align-items:start}
+.repeat-page .repeat-intent,.repeat-advice{font-size:15px;line-height:1.6;color:#c1d1df;max-width:48ch;margin:0 0 24px}
+.repeat-guide{margin-top:0}.repeat-guide .measurement-visual{grid-template-rows:minmax(240px,auto);min-height:260px}.repeat-guide .measurement-steps{align-self:center}
+.repeat-page .repeat-source{display:inline-block;margin-top:22px;color:#b3cadc;font-size:12px;line-height:1.5}
+.repeat-page .collection-metric>.collection-label,.repeat-page .collection-last{display:none}
+.repeat-context{display:flex;flex-wrap:wrap;margin-top:26px;max-width:650px;gap:18px}.repeat-context>label{flex:1;min-width:180px;font-size:12px;color:#b7cbdc}
+.repeat-page .repeat-guide-return{padding-left:0;color:#b3cadc;font-size:12px;margin-top:16px}
+.repeat-page .collection-footer{grid-column:1/-1;align-items:center;gap:15px}.repeat-progress{font-size:12px;color:#a9c0d3}
+.repeat-page [data-repeat-next]{position:relative;isolation:isolate;overflow:hidden;background:#d9eeff13;box-shadow:var(--liquid-shadow)}
+.repeat-results{display:grid;grid-template-columns:1fr 1fr;gap:32px;margin:32px 0}.repeat-results>div{display:flex;flex-direction:column;gap:10px;min-width:0}.repeat-results span{font-size:12px;line-height:1.5;color:#b7cbdc}.repeat-results>div>span:first-child{font-size:16px;color:#eaf3fa}.repeat-results strong{font-size:clamp(28px,3.8vw,46px);font-weight:500;line-height:1.4;white-space:nowrap}.repeat-results small{font-size:13px;font-weight:400;color:#b7cbdc;margin-left:8px}.repeat-change{font-size:16px;line-height:1.5;margin:26px 0 16px}.repeat-advice{font-size:14px}
+.collection-page .collection-repeat-link{padding-left:0;font-size:12px;color:#b7d1e2;margin-top:8px}.history-scene .history-repeat{font:inherit;font-size:12px;color:#c7dce9;background:none;border:0;padding:8px 0;text-align:left;cursor:pointer}
+.crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-recovery>.recovery-title{grid-column:1/-1;font-size:18px;line-height:1.4;font-weight:500;letter-spacing:0;margin:0 0 12px;color:#edf5fc}
+.crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-recovery .mission-reading--sleep .mission-reading-comparison{display:block;font-size:11px;line-height:1.5;max-width:none;white-space:normal}
+@media(max-width:767px){.repeat-page{grid-template-columns:1fr;row-gap:22px}.repeat-page>.repeat-editor{grid-column:1;grid-row:2}.repeat-page .collection-heading{min-height:114px}.repeat-page>.collection-footer{grid-column:1;grid-row:3;display:flex;flex-wrap:wrap}.repeat-page .collection-save{margin-top:0;margin-left:auto}.repeat-page .repeat-progress{width:100%}.repeat-page .measurement-visual{grid-template-columns:minmax(90px,.65fr) minmax(0,1.35fr)}.repeat-page .repeat-context{display:flex}.repeat-context>label{min-width:145px}.repeat-results{gap:20px}.repeat-results strong{font-size:28px}.repeat-results small{font-size:11px}.repeat-page .repeat-results span{font-size:11px}}
+
+.collection-measurement:has(.collection-guide[open]) .collection-repeat-link{display:none}
+
+/* Profile is an in-scene workspace with the same controls as a measurement. */
+.crew-orbit[data-ui-variant=glass][data-workspace] .orbit-onboarding.profile-workspace{inset:0;width:100%;height:100%;max-height:none;padding:0;margin:0;border:0;border-radius:0;background:none!important;box-shadow:none;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;overflow:auto;animation:none;overscroll-behavior:contain;pointer-events:none}
+.crew-orbit[data-ui-variant=glass] .profile-workspace .profile-page{grid-template-columns:minmax(0,520px) minmax(240px,1fr);grid-template-rows:auto auto auto;align-content:start;gap:32px 8%;max-width:1200px;min-height:100%;padding-top:130px}
+.crew-orbit[data-ui-variant=glass] .profile-workspace .profile-page>.collection-heading{grid-column:1;grid-row:1}
+.crew-orbit[data-ui-variant=glass] .profile-workspace .collection-heading h1{font-size:36px;line-height:1.25;font-weight:500;margin:0;letter-spacing:0}
+.crew-orbit[data-ui-variant=glass] .profile-workspace .profile-editor{grid-column:1;grid-row:2;align-self:start}
+.crew-orbit[data-ui-variant=glass] .profile-page>.profile-figure{grid-column:2;grid-row:1/4;min-height:400px}
+.profile-name-field{margin-bottom:32px}.profile-personal-values{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.crew-orbit[data-ui-variant=glass] .profile-page .collection-label{font-size:15px;font-weight:400;margin:0 0 12px;line-height:1.5;color:#d7e5f0}.crew-orbit[data-ui-variant=glass] .profile-page .collection-label small{display:inline;font-size:12px;color:#9fb5c7;margin-left:8px}
+.crew-orbit[data-ui-variant=glass] .profile-page .collection-value{width:100%;padding:0 18px;border-radius:20px}
+.crew-orbit[data-ui-variant=glass] .profile-page .collection-value input{font-family:inherit;font-weight:400;font-size:30px;line-height:1.3;min-height:0;height:72px;margin:0;padding:12px 0;background:none;border:0;border-radius:0;box-shadow:none;color:white}
+.crew-orbit[data-ui-variant=glass] .profile-page .profile-name-value input{font-size:24px}.crew-orbit[data-ui-variant=glass] .profile-page .collection-value input::placeholder{color:#8a9caf;opacity:1}
+.crew-orbit[data-ui-variant=glass] .profile-page .collection-label+.collection-value>span{margin:0;font-size:13px;color:#b7cbdc}
+.crew-orbit[data-ui-variant=glass] .profile-page .collection-footer{grid-column:1;grid-row:3;display:flex;align-items:center;gap:20px;justify-content:flex-end}
+.crew-orbit[data-ui-variant=glass] .profile-page button{margin:0;min-height:44px;padding:11px 20px;font-size:14px;font-weight:400;line-height:1.4;border:0;border-radius:24px;background:none;font-family:inherit}.crew-orbit[data-ui-variant=glass] .profile-page .collection-save button[type=submit]{background:#d9eeff13;box-shadow:var(--liquid-shadow);position:relative;isolation:isolate;overflow:hidden;color:#f1f7fc}
+.profile-page .orbit-profile-error{margin-top:16px;min-height:0}.profile-page .orbit-profile-error:empty{display:none}
+@media(max-width:767px){.crew-orbit[data-ui-variant=glass] .profile-workspace .profile-page{grid-template-columns:1fr;grid-template-rows:auto auto auto;gap:28px;padding:150px 22px 28px}.crew-orbit[data-ui-variant=glass] .profile-workspace .collection-heading{min-height:88px;padding-right:92px}.crew-orbit[data-ui-variant=glass] .profile-workspace .collection-heading h1{font-size:28px}.crew-orbit[data-ui-variant=glass] .profile-workspace .profile-editor{grid-column:1;grid-row:2;align-self:start}.crew-orbit[data-ui-variant=glass] .profile-page>.profile-figure{grid-area:auto;min-height:100px}.profile-personal-values{gap:16px}.crew-orbit[data-ui-variant=glass] .profile-page .collection-label{font-size:14px}.crew-orbit[data-ui-variant=glass] .profile-page .collection-label small{display:block;margin:3px 0 0}.crew-orbit[data-ui-variant=glass] .profile-page .collection-footer{display:block}.profile-page .collection-save{margin-top:20px}.profile-name-field{margin-bottom:26px}}
+
+@media(max-width:767px){.repeat-results strong{font-size:clamp(22px,5.4vw,28px)}.repeat-results strong small{display:block;margin:0;line-height:1.5}}

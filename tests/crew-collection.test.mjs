@@ -8,10 +8,6 @@ test('daily collection uses the scene, makes every measurement directly reachabl
  for(const name of ['pulse','oxygen','systolic','diastolic','sleep','water','exercise','context'])assert.equal((html.match(new RegExp(`name="${name}"`,'g'))||[]).length,1,name);
  const ids=[...html.matchAll(/\bid="([^"]+)"/g)].map(match=>match[1]);assert.equal(ids.length,new Set(ids).size);
 });
-test('a repeat contains only the requested vital measurements and matching-condition context',()=>{
- const html=renderCollection({...options,purpose:'repeat'});assert(!html.includes('name="sleep"'));assert(!html.includes('name="glucose"'));assert(!html.includes('collection-extra'));assert(html.includes('name="context" required'));assert(html.includes('Show me how'));
- for(const name of ['pulse','oxygen','systolic','diastolic'])assert.equal((html.match(new RegExp(`name="${name}"`,'g'))||[]).length,1,name);
-});
 test('collection preserves zero, symptom choices, context, date and partial entries',()=>{
  const fields=Object.entries({water:'0',sleep:'7.5',symptoms:'concerning',mood:'neutral',measuredAt:'2026-11-10T10:00',context:'rest'}).map(([name,value])=>({name,value}));fields.push({name:'symptomTags',value:'fatigue',checked:true});
  const result=collectionPayload(fields);assert.equal(result.values.water,'0');assert.equal(result.values.pulse,'');assert.equal(result.symptoms,'concerning');assert.deepEqual(result.details.symptomTags,['fatigue']);assert.equal(result.details.context,'rest');assert.equal(result.details.measuredAt,'2026-11-10T10:00');
