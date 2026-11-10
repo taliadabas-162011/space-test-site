@@ -1,0 +1,63 @@
+.device-scene {
+  position: absolute;
+  inset: 0;
+  color: #f5f6f5;
+  pointer-events: none;
+  font-family: inherit;
+}
+.device-scene * { box-sizing: border-box; }
+.device-scene__heading { position: absolute; top: 2%; left: 4%; }
+.device-scene__heading > span, .device-scene__index {
+  color: #a8b6bc;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+}
+.device-scene__heading h2 { margin: 10px 0 4px; font-size: clamp(27px, 3.1vw, 44px); font-weight: 400; letter-spacing: -.045em; line-height: 1; }
+.device-scene__heading p { margin: 0; color: #b7c3c7; font-size: 13px; }
+.device-scene__links { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.device-scene__links path { fill: none; stroke: #a9bbc1; stroke-width: 1; stroke-dasharray: 3 7; opacity: .34; vector-effect: non-scaling-stroke; }
+.device-scene__links path.is-connected { stroke: #a8e6c5; stroke-dasharray: none; opacity: .8; }
+.device-scene__node { position: absolute; width: min(24%, 250px); pointer-events: auto; }
+.device-scene__node--pulse { left: 4%; top: 27%; }
+.device-scene__node--oxygen { right: 4%; top: 27%; }
+.device-scene__node--pressure { left: 4%; top: 64%; }
+.device-scene__node--glucose { right: 4%; top: 64%; }
+.device-scene__index span { color: #6d858f; padding: 0 5px; }
+.device-scene__identity { display: flex; align-items: center; gap: 12px; margin-top: 10px; }
+.device-scene__icon { flex: 0 0 auto; width: 35px; height: 35px; color: #d9e7e9; }
+.device-scene__identity h3 { font-size: clamp(16px, 1.5vw, 20px); font-weight: 500; line-height: 1.15; margin: 0; }
+.device-scene__name { display: block; margin-top: 3px; font-size: 11px; color: #a8b6bc; overflow-wrap: anywhere; }
+.device-scene__status, .device-scene__reading { margin-top: 8px; color: #bac8cc; font-size: 11px; }
+.device-scene__status span { display: inline-block; width: 5px; height: 5px; margin-right: 7px; border-radius: 50%; background: #879ca3; vertical-align: 2px; }
+.device-scene__node.is-connected .device-scene__status span { background: #a8e6c5; }
+.device-scene__reading { color: #f5f6f5; }
+.device-scene__node button { padding: 6px 0; margin-top: 3px; border: 0; border-bottom: 1px solid #83979e; color: inherit; background: transparent; font: inherit; font-size: 12px; cursor: pointer; }
+.device-scene__node button span { margin-left: 16px; }
+.device-scene__node button:hover { border-color: #fff; }
+.device-scene__node button:focus-visible { outline: 2px solid #a8e6c5; outline-offset: 4px; }
+.device-scene__footer { position: absolute; bottom: 1%; left: 4%; right: 4%; display: flex; gap: 18px; align-items: baseline; flex-wrap: wrap; color: #a8b6bc; font-size: 11px; }
+.device-scene__footer [data-device-message] { color: #f5f6f5; }
+@media (max-width: 650px) {
+  .device-scene__heading { top: 1%; }
+  .device-scene__heading h2 { font-size: 28px; margin-top: 7px; }
+  .device-scene__heading p { font-size: 11px; }
+  .device-scene__node { width: 28%; }
+  .device-scene__node--pulse, .device-scene__node--oxygen { top: 25%; }
+  .device-scene__node--pressure, .device-scene__node--glucose { top: 62%; }
+  .device-scene__identity { gap: 6px; margin-top: 6px; align-items: flex-start; }
+  .device-scene__icon { width: 24px; height: 24px; }
+  .device-scene__identity h3 { font-size: 14px; }
+  .device-scene__name, .device-scene__status, .device-scene__reading { font-size: 10px; }
+  .device-scene__index { font-size: 9px; }
+  .device-scene__node button { font-size: 11px; }
+  .device-scene__node button span { margin-left: 6px; }
+  .device-scene__links { opacity: .75; }
+  .device-scene__footer { font-size: 10px; gap: 4px 12px; }
+}
+@media (max-height: 580px) {
+  .device-scene { position: relative; min-height: 700px; }
+  .device-scene__node--pulse, .device-scene__node--oxygen { top: 25%; }
+  .device-scene__node--pressure, .device-scene__node--glucose { top: 61%; }
+}

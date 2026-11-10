@@ -110,7 +110,7 @@ export function renderObservationMobile(summary, index = 1) {
 }
 
 function input(name, title, unit, min, max, step, inputmode = 'numeric') {
-  return `<label class="observation-field"><span class="observation-field-name"><span class="observation-field-label">${title}</span><em data-checkin-last="${name}" hidden></em></span><span class="observation-entry"><input name="${name}" type="number" min="${min}" max="${max}" step="${step}" inputmode="${inputmode}" placeholder="—"><small>${unit}</small></span></label>`;
+  return `<label class="observation-field"><span class="observation-field-name"><span class="observation-field-label">${title}</span><em data-checkin-last="${name}" hidden></em></span><span class="observation-entry"><input name="${name}" type="number" min="${min}" max="${max}" step="${step}" inputmode="${inputmode}" placeholder="Enter"><small>${unit}</small></span></label>`;
 }
 
 const symptomOptions = [
@@ -138,17 +138,20 @@ export function updateObservationCheckin(form, summary) {
 }
 
 export function renderObservationCheckin() {
-  return `<header class="observation-checkin-head"><h3>Health check</h3><p>Start with how you feel, then add the readings you have.</p></header>
+  return `<header class="observation-checkin-head"><h3>Health check</h3><p>Enter what you have. Save at least one item.</p></header>
     <fieldset class="observation-symptom-section"><legend>How are you feeling?</legend>
       <label class="observation-select observation-symptoms"><span class="observation-sr-only">Symptoms</span><select name="symptoms"><option value="">Not recorded</option><option value="none">No symptoms to report</option><option value="concerning">I feel unwell</option><option value="urgent">Urgent symptoms</option></select></label>
       <p class="observation-urgent" role="status" hidden>Alert the crew and follow the emergency procedure now.</p>
-      <button class="observation-emergency-link" type="button" data-emergency>Open emergency guidance <span aria-hidden="true">↗</span></button>
+      <details class="observation-emergency-info"><summary>Need urgent help?</summary><p>Alert nearby crew now using the mission channel. Follow the approved onboard emergency procedure with the medical officer. Do not wait to finish this form.</p><small>Mission procedure is not loaded here. This website does not contact anyone.</small></details>
       <fieldset class="observation-symptom-note" hidden><legend>What are you experiencing?</legend>
         <div class="observation-symptom-tags">${symptomOptions.map(([value, label]) => `<label><input type="checkbox" name="symptomTags" value="${value}"><span>${label}</span></label>`).join('')}</div>
         <div class="observation-symptom-meta"><label>When did it begin? <span>Optional</span><input type="datetime-local" name="symptomOnset"></label><label>How is it changing? <span>Optional</span><select name="symptomProgression"><option value="">Not specified</option><option value="improving">Improving</option><option value="unchanged">Unchanged</option><option value="worsening">Worsening</option></select></label></div>
         <label class="observation-note-field">Anything else? <span>Optional</span><textarea name="symptomNote" maxlength="240" rows="2" placeholder="Describe what happened"></textarea></label>
       </fieldset>
     </fieldset>
+    <fieldset class="observation-group observation-recovery"><legend>Sleep &amp; mood <span>Optional</span></legend>
+      <div class="observation-daily-fields">${input('sleep', 'Last sleep', 'hrs', 0, 24, 0.1, 'decimal')}</div>
+    <div class="observation-reports"><label class="observation-select"><span>Mood</span><select name="mood"><option value="">Not recorded</option><option value="good">Good</option><option value="neutral">Neutral</option><option value="low">Low</option></select></label><label class="observation-select"><span>Sleep quality</span><select name="sleepQuality"><option value="">Not recorded</option><option value="restful">Restful</option><option value="mixed">Mixed</option><option value="poor">Poor</option></select></label></div>    </fieldset>
     <fieldset class="observation-group"><legend>Measurements <span>Optional</span></legend><div class="observation-vital-fields">
       ${input('pulse', 'Heart rate', 'bpm', 0, 300, 1)}
       ${input('oxygen', 'Oxygen saturation', '%', 0, 100, 1)}
@@ -160,12 +163,10 @@ export function renderObservationCheckin() {
     <div class="observation-context-pair"><label class="observation-select observation-vital-context"><span>Vitals taken</span><select name="context"><option value="">Context not specified</option><option value="rest">At rest</option><option value="after-activity">After activity</option><option value="other">Other context</option></select></label>
       <label class="observation-select observation-glucose-context"><span>Glucose taken</span><select name="glucoseContext"><option value="">Context not specified</option><option value="fasting">Fasting</option><option value="after-meal">After a meal</option><option value="other">Other context</option></select></label></div>
     </fieldset>
-    <details class="observation-daily-context"><summary>Daily context and recovery <span aria-hidden="true">↗</span></summary><fieldset class="observation-group observation-daily"><legend class="observation-sr-only">Daily context</legend><div class="observation-daily-fields">
-      ${input('sleep', 'Last sleep', 'hrs', 0, 24, 0.1, 'decimal')}
+    <section class="observation-daily-context"><fieldset class="observation-group observation-daily"><legend>Daily activity <span>Optional</span></legend><div class="observation-daily-fields">
       ${input('water', 'Water · 24h', 'L', 0, 15, 0.1, 'decimal')}
       ${input('exercise', 'Exercise · 24h', 'min', 0, 1440, 1)}
-    </div></fieldset>
-    <div class="observation-reports"><label class="observation-select"><span>Mood</span><select name="mood"><option value="">Not recorded</option><option value="good">Good</option><option value="neutral">Neutral</option><option value="low">Low</option></select></label><label class="observation-select"><span>Sleep quality</span><select name="sleepQuality"><option value="">Not recorded</option><option value="restful">Restful</option><option value="mixed">Mixed</option><option value="poor">Poor</option></select></label></div></details>
+    </div></fieldset></section>
     <details class="observation-time" open><summary>Reading date and time</summary><label>Observed at <input type="datetime-local" lang="en" name="measuredAt"></label><small>Set the date and time before saving the measurements.</small></details>
     <details class="observation-guide"><summary>How to take a measurement <span aria-hidden="true">↗</span></summary><div>
       <p><strong>Heart rate</strong> — Follow the device instructions, or count the wrist pulse for 60 seconds. Note whether the reading was taken at rest or after activity. <a href="https://www.heart.org/en/health-topics/high-blood-pressure/the-facts-about-high-blood-pressure/all-about-heart-rate-pulse" target="_blank" rel="noopener noreferrer">AHA guide ↗</a></p>
@@ -175,5 +176,5 @@ export function renderObservationCheckin() {
       <p><strong>Blood glucose</strong> — Follow the meter instructions and record whether the reading was taken fasting or after a meal. <a href="https://medlineplus.gov/lab-tests/blood-glucose-test/" target="_blank" rel="noopener noreferrer">MedlinePlus ↗</a></p>
       <p>If a reading is unexpected, check the device and follow the mission medical protocol. Do not delay urgent care to enter data.</p>
     </div></details>
-    <div class="observation-footer"><p class="orbit-error" role="alert"></p><div class="orbit-form-actions observation-actions"><button type="button" data-cancel>Cancel</button><button type="submit">Save this reading <span aria-hidden="true">↗</span></button></div></div>`;
+    <div class="observation-footer"><p class="orbit-error" role="alert"></p><div class="orbit-form-actions observation-actions"><button type="button" data-cancel>Cancel</button><button type="submit">Save check-in <span aria-hidden="true">↗</span></button></div></div>`;
 }

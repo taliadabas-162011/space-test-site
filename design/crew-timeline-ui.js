@@ -11,6 +11,7 @@ const MEASURES = {
 };
 const CONTEXT = { rest: 'At rest', 'after-activity': 'After activity', fasting: 'Fasting', 'after-meal': 'After a meal', other: 'Other context' };
 const WITH_CONTEXT = new Set(['pulse', 'pressure', 'oxygen', 'glucose', 'temperature']);
+const SELF_REPORTS = { mood: ['Mood', { good: 'Good', neutral: 'Neutral', low: 'Low' }], sleepQuality: ['Sleep quality', { restful: 'Restful', mixed: 'Mixed', poor: 'Poor' }] };
 const PROGRESSION = { improving: 'Improving', unchanged: 'Unchanged', worsening: 'Worsening' };
 const STATUS = { none: 'No symptoms reported', concerning: 'Symptoms reported', urgent: 'Urgent symptoms reported' };
 const escapeHtml = value => String(value).replace(/[&<>"']/g, char => ({
@@ -39,7 +40,7 @@ function measureValue(key, value) {
 }
 
 /** Render recorded observations only; display samples nowhere in this panel. */
-export function renderHealthTimeline(summary, histories = {}, symptomHistory = [], symptomLabels = {}) {
+export function renderHealthTimeline(summary, histories = {}, symptomHistory = [], symptomLabels = {}, selfReports = {}) {
   const groups = new Map();
   let sequence = 0;
   function add(entry, item) {
@@ -61,6 +62,13 @@ export function renderHealthTimeline(summary, histories = {}, symptomHistory = [
       add(entry, { type: 'reading', key, label, value, unit, context: [context, source].filter(Boolean).join(' · ') });
     }
   }
+  for (const [key, [label, choices]] of Object.entries(SELF_REPORTS)) {
+    if (!Array.isArray(selfReports[key])) continue;
+    for (const entry of selfReports[key]) {
+      if (!Object.hasOwn(choices, entry?.value)) continue;
+      add(entry, { type: 'reading', key, label, value: choices[entry.value], unit: '', context: 'Self-report' });
+    }
+  }
   for (const report of Array.isArray(symptomHistory) ? symptomHistory : []) {
     if (!Object.hasOwn(STATUS, report?.value)) continue;
     const tags = Array.isArray(report.tags) ? report.tags.filter(tag => typeof tag === 'string' && Object.hasOwn(symptomLabels, tag)).map(tag => symptomLabels[tag]) : [];
@@ -72,12 +80,12 @@ export function renderHealthTimeline(summary, histories = {}, symptomHistory = [
       const context = [report.onset == null ? '' : `Began ${displayTime(report.onset)}`, report.progression].filter(Boolean).join(' · ');
       return `<div class="timeline-report" data-status="${report.status}"><h3>${STATUS[report.status]}</h3>${report.tags.length ? `<p>${report.tags.map(escapeHtml).join(' · ')}</p>` : ''}${context ? `<p class="timeline-context">${escapeHtml(context)}</p>` : ''}${report.note ? `<p class="timeline-note">${escapeHtml(report.note)}</p>` : ''}${report.status === 'urgent' ? '<button type="button" class="timeline-urgent-action" data-emergency>Emergency guidance <span aria-hidden="true">↗</span></button>' : ''}</div>`;
     }).join('');
-    const readings = group.readings.length ? `<dl class="timeline-readings">${group.readings.map(reading => `<div><dt><span>${reading.label}</span>${reading.key === 'weight' ? '<button type="button" class="timeline-repeat" data-timeline-weight aria-label="Record body mass">Record ↗</button>' : `<button type="button" class="timeline-repeat" data-timeline-measure="${reading.key}" aria-label="Record a new ${reading.label}">Record <span aria-hidden="true">↗</span></button>`}</dt><dd><strong>${escapeHtml(reading.value)}</strong> <span>${reading.unit}</span></dd>${reading.context ? `<dd class="timeline-context">${escapeHtml(reading.context)}</dd>` : ''}</div>`).join('')}</dl>` : '';
+    const readings = group.readings.length ? `<dl class="timeline-readings">${group.readings.map(reading => `<div data-history-metric="${reading.key}"><dt><span>${reading.label}</span></dt><dd><strong>${escapeHtml(reading.value)}</strong> <span>${reading.unit}</span></dd>${reading.context ? `<dd class="timeline-context">${escapeHtml(reading.context)}</dd>` : ''}</div>`).join('')}</dl>` : '';
     const saved = group.saved != null && Math.abs(group.saved - group.observed) >= 60000 ? `<span class="timeline-saved">Saved ${escapeHtml(displayTime(group.saved))}</span>` : '';
     return `<li class="timeline-entry"><header><time datetime="${escapeHtml(new Date(group.observed).toISOString())}">${escapeHtml(displayTime(group.observed))}</time>${saved}</header>${reports}${readings}</li>`;
   }).join('');
   const person = escapeHtml(summary?.person?.name || 'Crew member');
-  return `<section class="crew-timeline" aria-labelledby="timeline-title"><header class="timeline-heading"><div><p>HEALTH RECORD</p><h2 id="timeline-title" tabindex="-1">Observation history</h2><span>${person} · saved on this device</span></div><button type="button" data-timeline-close aria-label="Close observation history">Close <span aria-hidden="true">×</span></button></header>
-    <button type="button" class="timeline-record" data-timeline-record>New check-in <span aria-hidden="true">↗</span></button>
+  return `<section class="crew-timeline" aria-labelledby="timeline-title"><header class="timeline-heading"><div><p>HEALTH RECORD</p><h2 id="timeline-title" tabindex="-1">History</h2><span>${person} · saved on this device</span></div><button type="button" data-timeline-close aria-label="Close observation history">Close <span aria-hidden="true">×</span></button></header>
+    <button type="button" class="timeline-record" data-timeline-record>Start health check <span aria-hidden="true">↗</span></button>
     ${items ? `<ol class="timeline-list" aria-label="Recorded observations, newest first">${items}</ol>` : '<p class="timeline-empty">No observations have been recorded yet.</p>'}</section>`;
 }

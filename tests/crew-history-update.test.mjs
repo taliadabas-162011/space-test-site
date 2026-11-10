@@ -1,0 +1,27 @@
+import assert from 'node:assert/strict';
+import {updateHistoryScene} from '../design/crew-history-scene.js';
+const button = selected => ({selected,getAttribute(){return String(this.selected)},setAttribute(_,value){this.selected=value==='true'}});
+const fields=[button(true),button(false)],periods=[button(false),button(true)];
+const replacements=[];const selectors=['.history-scene-current','figcaption','[data-history-visual]','.history-scene-inspect'];
+const nodes=new Map(selectors.map(selector=>[selector,{replaceWith(next){replacements.push([selector,next])}}]));
+const nextFields=[button(false),button(true)],nextPeriods=[button(true),button(false)];
+let animationCount=0;
+const line={style:{},getTotalLength(){return 100},animate(){animationCount++;return {}}};
+const visual={animate(){animationCount++},querySelectorAll(){return [line]}};
+const current={querySelectorAll(selector){return selector.includes('field')?fields:periods},querySelector(selector){return nodes.get(selector)}};
+const incoming={querySelectorAll(selector){return selector.includes('field')?nextFields:nextPeriods},querySelector(selector){return {selector}}};
+globalThis.document={createElement(tag){assert.equal(tag,'template');return {content:{querySelector(){return incoming}}}}};
+globalThis.matchMedia=()=>({matches:true});
+const root={querySelector(){return current}};
+updateHistoryScene(root,'new chart');
+assert.deepEqual(fields.map(b=>b.selected),[false,true]);assert.deepEqual(periods.map(b=>b.selected),[true,false]);
+assert.equal(root.querySelector().querySelectorAll('[data-history-scene-field]'),fields,'measurement controls retain their identity');
+assert.equal(root.querySelector().querySelectorAll('[data-history-scene-days]'),periods,'period controls retain their identity');
+assert.equal(replacements.length,4);assert.equal(animationCount,0,'reduced motion does not animate the chart');
+const empty={querySelector(){return null}};updateHistoryScene(empty,'initial chart');assert.equal(empty.innerHTML,'initial chart');
+// Chart motion is optional; replacing a chart never replaces its selection controls.
+nodes.set('[data-history-visual]',{...visual,replaceWith(){}});
+globalThis.matchMedia=()=>({matches:false});
+updateHistoryScene(root,'animated chart');assert.equal(animationCount,1);assert.equal(line.style.strokeDasharray,undefined,'transitions never turn complete data into dashed segments');
+delete globalThis.document;delete globalThis.matchMedia;
+console.log('History updates preserve both control groups, refresh content and honor reduced motion.');

@@ -1,0 +1,12 @@
+import assert from 'node:assert/strict';
+import { renderDeviceScene } from '../design/crew-device-scene.js';
+const html = renderDeviceScene({ devices: [{field:'pulse',name:'<Sensor & one>',connected:true,reading:'72 < bpm'}], supported:false });
+assert(html.includes('&lt;Sensor &amp; one&gt;'));
+assert(html.includes('72 &lt; bpm'));
+assert.equal((html.match(/data-device-connect=/g)||[]).length,4);
+assert(html.includes('Disconnect &lt;Sensor &amp; one&gt;'));
+assert(html.includes('Bluetooth is unavailable'));
+const links=html.match(/<svg class="device-scene__links"[\s\S]*?<\/svg>/)[0];
+assert.equal((links.match(/class="is-connected"/g)||[]).length,1);
+assert(!renderDeviceScene({devices:[{field:'pulse',connected:'yes'}]}).includes('class="is-connected"'));
+console.log('Device labels are escaped, four controls remain available, and only actual connections illuminate paths.');
