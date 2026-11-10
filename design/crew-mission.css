@@ -1,0 +1,185 @@
+/* Health observations live in the scene. There is no enclosing dashboard surface. */
+.crew-orbit{--ink:#edf5f8;--muted:#9bb2bf;--signal:#a8d9e8;--ease:cubic-bezier(.22,1,.36,1)}
+.crew-orbit[data-severity="attention"]{--signal:#edc393}
+.crew-orbit[data-severity="urgent"]{--signal:#ffa695}
+.crew-orbit .orbit-app-nav,.crew-orbit .orbit-actors,.crew-orbit .orbit-mobile-summary,.crew-orbit .orbit-mobile-crew,.crew-orbit .orbit-intro,.crew-orbit .orbit-header-right{display:none!important}
+.crew-orbit .orbit-header{inset:26px 5% auto;z-index:40;opacity:1}
+.crew-orbit .mission-home{border:0;padding:7px 0;background:none;color:var(--ink);cursor:pointer}
+.crew-orbit .orbit-brand{font-size:11px;letter-spacing:.16em}
+.crew-orbit .mission-tools{position:absolute;right:5%;top:30px;z-index:41;display:flex;gap:26px}
+.crew-orbit .mission-tools button{font:400 12px Orbit Magnetik,sans-serif;border:0;background:none;color:#9cb3c1;cursor:pointer;padding:4px 0;position:relative}
+.mission-tools button:after{content:'';position:absolute;left:0;bottom:-6px;width:100%;height:1px;transform:scaleX(0);transform-origin:left;background:#d3edf6;transition:transform .4s var(--ease)}
+.crew-orbit .mission-tools button:hover,.crew-orbit .mission-tools button[aria-current]{color:#eef8fc}.mission-tools button:hover:after,.mission-tools button[aria-current]:after{transform:scaleX(1)}
+.crew-orbit .orbit-scenario-control{top:22px;left:50%;width:190px;gap:0;z-index:45;display:block}
+.crew-orbit .orbit-scenario-control label{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:#91a9b7}
+.crew-orbit .orbit-scenario-control .crew-select{margin-top:0}
+.crew-orbit .orbit-scenario-control .crew-select__trigger{font-size:14px;min-height:32px;padding:4px 0;border-color:rgba(160,200,219,.35);color:#edf5f8}
+.crew-orbit .orbit-scenario-control>button{position:absolute;left:calc(100% + 22px);bottom:0;font-size:10px;white-space:nowrap;min-height:32px;padding:4px 0;border-color:transparent;color:#b2c7d2}
+.crew-orbit .orbit-scenario-control>button[data-playback="playing"]{color:#ffb5a5}
+.crew-orbit .orbit-mission{position:absolute;inset:0;z-index:10;overflow:hidden;pointer-events:none}
+.crew-orbit .orbit-mission[hidden]{display:none}
+.orbit-mission button,.mission-response{pointer-events:auto}
+.mission-eyebrow{font-size:9px;letter-spacing:.14em;line-height:1.5;color:var(--muted)}
+.mission-intro{position:absolute;left:6%;top:16%;width:31%}
+.mission-intro h1{font-size:clamp(36px,4.8vw,68px);font-weight:400;line-height:1;letter-spacing:-.06em;margin:9px 0 10px;outline:none}
+.mission-intro h1>span{color:var(--signal)}
+.mission-intro p{font-size:11px;color:#a2bdcd;margin:0;text-transform:none}
+.crew-orbit .mission-intro button{font:400 10px Orbit Magnetik,sans-serif;color:#a7bfcd;border:0;background:none;padding:8px 0;cursor:pointer}
+.mission-state{position:absolute;top:16%;left:73%;width:23%}
+.mission-state .mission-eyebrow{color:var(--signal)}
+.mission-state h2{font-size:clamp(20px,2vw,29px);font-weight:400;line-height:1.18;letter-spacing:-.035em;color:#e7f3f8;margin:10px 0 0;outline:none}
+.mission-state p{font-size:11px;line-height:1.6;color:#ccb4ae;margin:12px 0 0}
+.mission-constellation{position:absolute;inset:0;pointer-events:none}
+.crew-orbit .mission-reading{position:relative;display:block;width:max-content;max-width:100%;text-align:left;border:0;background:none;color:var(--ink);padding:0;font-family:Orbit Magnetik,sans-serif;cursor:pointer;outline-offset:8px}
+.mission-reading-label{display:block;font-size:17px;line-height:1.4;color:#b3cbd7;margin-bottom:7px;transition:color .3s ease}
+.mission-reading strong{display:block;font-size:clamp(43px,5vw,72px);line-height:1;font-weight:400;letter-spacing:-.055em;font-variant-numeric:tabular-nums}
+.mission-reading strong small{font-size:13px;color:#a7c9d9;letter-spacing:0;margin-left:7px;font-weight:400}
+.mission-value-divider{color:#67899b;font-size:.68em;margin:0 3px}
+.mission-reading-context{display:block;margin-top:10px;font-size:11px;color:#8fabbc}
+.mission-reading-comparison{display:block;font-size:11px;line-height:1.5;margin-top:5px;color:#c3dce7;letter-spacing:0;font-variant-numeric:tabular-nums}
+.mission-recovery .mission-reading-comparison,.mission-body-readings .mission-reading-comparison{font-size:10px;max-width:17em;color:#9ebdcd}
+.mission-reading-detail{position:absolute;left:0;top:100%;display:block;min-width:220px;max-width:300px;padding-top:8px;font-size:10px;line-height:1.5;color:#b9d0dd;opacity:0;transform:translateY(5px);transition:opacity .25s ease,transform .35s var(--ease);pointer-events:none}
+.mission-reading-detail i{font-style:normal;color:var(--signal)}
+.mission-reading:hover .mission-reading-detail,.mission-reading:focus-visible .mission-reading-detail{opacity:1;transform:translateY(0)}
+.mission-reading:hover .mission-reading-label,.mission-reading:focus-visible .mission-reading-label{color:white}
+.mission-reading[data-focus="true"] strong,.mission-reading[data-focus="true"] .mission-reading-label{color:var(--signal)}
+.mission-primary-readings>.mission-reading{position:absolute}
+.mission-primary-readings>.mission-reading:nth-child(1){left:6%;top:37%}
+.mission-primary-readings>.mission-reading:nth-child(2){left:24%;top:58%}
+.mission-primary-readings>.mission-reading:nth-child(3){left:73%;top:36%}
+.mission-primary-readings>.mission-reading:nth-child(2) strong{font-size:clamp(32px,3.8vw,52px)}
+.mission-primary-readings>.mission-reading:nth-child(2) strong small{font-size:11px}
+.mission-recovery{position:absolute;left:73%;top:58%;width:22%;display:grid;grid-template-columns:1fr 1fr;gap:18px 20px;align-items:start}
+.mission-recovery>.mission-eyebrow{grid-column:1/-1}
+.mission-recovery>.mission-reading:first-of-type{grid-column:1/-1}
+.mission-recovery .mission-reading-label{font-size:13px;margin-bottom:5px}
+.mission-recovery .mission-reading strong{font-size:30px;letter-spacing:-.035em}
+.mission-recovery .mission-reading:first-of-type strong{font-size:43px}
+.mission-recovery .mission-reading strong small{font-size:11px}
+.mission-recovery .mission-reading-context{display:none}
+.mission-recovery .mission-reading-detail{left:auto;right:0;min-width:230px}
+.mission-body-readings{position:absolute;left:6%;top:80%;width:43%;display:flex;gap:clamp(22px,3vw,48px);align-items:start}
+.mission-body-readings .mission-reading{flex:0 1 auto}
+.mission-body-readings .mission-reading strong{font-size:27px;letter-spacing:-.04em}
+.mission-body-readings .mission-reading strong small{font-size:10px;margin-left:4px}
+.mission-body-readings .mission-reading-label{font-size:13px;margin-bottom:8px}
+.mission-body-readings .mission-reading-context{display:none}
+.mission-body-readings .mission-reading-detail{top:auto;bottom:100%;padding:0 0 10px;min-width:180px}
+.mission-ground{position:absolute;inset:auto 6% 28px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+.mission-ground>span{font-size:9px;color:#91adbe}
+.crew-orbit .mission-checkin{display:flex;align-items:center;gap:30px;padding:9px 0;color:#e2f3fb;background:none;border:0;border-bottom:1px solid #6b9ab2;font:400 13px Orbit Magnetik,sans-serif;cursor:pointer}
+.mission-checkin i{font-size:22px;font-style:normal;transition:transform .4s var(--ease)}
+.mission-checkin:hover i{transform:translate(3px,-3px)}
+.mission-response{position:absolute;left:71%;top:43%;width:25%;padding:0;border:0;background:none;outline:none}
+.mission-response>.mission-eyebrow{color:var(--signal)}
+.mission-response ol{padding:0;margin:22px 0;list-style:none}
+.mission-response li{display:flex;align-items:baseline;gap:15px;margin:20px 0}
+.mission-response li>span{color:var(--signal);font-size:11px}
+.mission-response li strong{font-size:17px;font-weight:400;line-height:1.4;color:#f6e7e0}
+.crew-orbit .mission-ack{display:flex;align-items:center;gap:12px;border:0;border-bottom:1px solid #dc947e;background:none;color:#ffe3d7;font:400 12px Orbit Magnetik,sans-serif;padding:12px 0;cursor:pointer;text-align:left}
+.mission-ack>span{font-size:24px}.mission-ack:disabled{cursor:default;color:#bdaca5}
+.mission-response>small{display:block;color:#bfa29a;font-size:9px;line-height:1.6;max-width:27em;margin-top:15px}
+.mission-response--review{left:6%;top:60%;width:28%}
+.mission-response--review p{font-size:14px;line-height:1.9;color:#d6c3b0;margin:15px 0 0}
+.crew-orbit[data-scenario="recovery"] .mission-primary-readings>.mission-reading:nth-child(2),.crew-orbit[data-scenario="review"] .mission-primary-readings>.mission-reading:nth-child(2),.crew-orbit[data-scenario="symptoms"] .mission-primary-readings>.mission-reading:nth-child(2){left:52%;top:77%}
+.crew-orbit[data-scenario="recovery"] .mission-primary-readings>.mission-reading:nth-child(2) strong,.crew-orbit[data-scenario="review"] .mission-primary-readings>.mission-reading:nth-child(2) strong{font-size:35px}
+.crew-orbit[data-severity="attention"] .mission-recovery{top:65%;left:73%;gap:14px}
+.crew-orbit[data-severity="attention"] .mission-recovery .mission-reading:first-of-type strong{font-size:30px}
+.crew-orbit[data-severity="urgent"]:after{content:'';position:absolute;inset:0;z-index:2;pointer-events:none;border:0;animation:none;background:radial-gradient(ellipse at 51% 47%,rgba(157,35,25,.1),transparent 45%),linear-gradient(90deg,rgba(46,7,8,.25),transparent 45%,rgba(46,7,8,.35));box-shadow:none}
+.crew-orbit[data-severity="urgent"] .mission-tools{display:none}
+.crew-orbit[data-severity="urgent"] .mission-state{left:70%;top:17%;width:27%}
+.crew-orbit[data-severity="urgent"] .mission-state h2{font-size:clamp(32px,4vw,57px);color:#ffddcf;line-height:1.04}
+.crew-orbit[data-severity="urgent"] .mission-intro h1{font-size:42px}
+.crew-orbit[data-severity="urgent"] .mission-primary-readings>.mission-reading:nth-child(1){left:6%;top:36%}
+.crew-orbit[data-severity="urgent"] .mission-primary-readings>.mission-reading:nth-child(2){left:6%;top:62%}
+.crew-orbit[data-severity="urgent"] .mission-primary-readings strong,.crew-orbit[data-severity="urgent"] .mission-primary-readings>.mission-reading:nth-child(2) strong{font-size:clamp(66px,8vw,112px)}
+.crew-orbit[data-alert-acknowledged="true"] .mission-state .mission-eyebrow{color:#c3a69d}
+/* The atmosphere is shared by every page, never a dimmed page behind a modal. */
+.crew-orbit[data-workspace="mission"] .orbit-canvas,.crew-orbit[data-workspace="scene"] .orbit-canvas{inset:0!important;width:100%!important;height:100%!important;opacity:1!important;filter:none;transform:none!important;visibility:visible!important}
+.crew-orbit[data-workspace="mission"] .orbit-background,.crew-orbit[data-workspace="scene"] .orbit-background{transform:none;filter:none}
+.crew-orbit[data-workspace="mission"]:before,.crew-orbit[data-workspace="scene"]:before{content:'';position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(90deg,rgba(2,8,16,.65),transparent 38%,transparent 62%,rgba(2,8,16,.7)),linear-gradient(0deg,rgba(2,8,16,.6),transparent 45%)}
+.crew-orbit[data-panel="history"]:before{background:linear-gradient(90deg,rgba(2,8,16,.9),rgba(2,8,16,.76) 72%,rgba(2,8,16,.35))}
+.crew-orbit[data-workspace="scene"] .orbit-timeline,.crew-orbit[data-workspace="scene"] .orbit-section-panel{position:absolute;inset:115px 3% 40px!important;width:auto!important;max-width:none!important;max-height:none!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;box-shadow:none!important;background:none!important;backdrop-filter:none!important;transform:none!important;overflow:hidden;text-shadow:none;z-index:10;animation:none}
+.crew-orbit[data-workspace="scene"] .orbit-section-content{height:100%}
+.crew-orbit[data-workspace="scene"] .orbit-section-close{position:absolute;z-index:5;left:1%;top:2px;float:none;display:none}
+.crew-orbit .scene-return{position:absolute;top:78px;left:6%;z-index:35;background:none;border:0;padding:2px 0;font:400 10px Orbit Magnetik,sans-serif;color:#a4bfce;cursor:pointer}
+.crew-orbit .scene-return[hidden]{display:none}
+.crew-orbit[data-panel="history"] .history-scene{height:100%;padding:12px 3% 0}
+
+
+.crew-orbit[data-panel="device"] .device-scene__node--pressure,.crew-orbit[data-panel="device"] .device-scene__node--glucose{top:61%}
+.crew-orbit[data-panel="device"] .device-scene__heading h2{font-size:clamp(34px,4vw,56px)}
+/* Entry remains a single page; only input controls have a surface. */
+.crew-orbit[data-workspace="task"] .orbit-canvas{inset:0!important;width:100%!important;height:100%!important;opacity:.3!important;filter:none;transform:none!important}
+.crew-orbit[data-workspace="task"] .orbit-profile-identity,.crew-orbit[data-workspace="task"] .orbit-profile-edit,.crew-orbit[data-workspace="task"] .orbit-profile-readings,.crew-orbit[data-workspace="task"] .orbit-figure-hit,.crew-orbit[data-workspace="task"] .orbit-gesture,.crew-orbit[data-workspace="task"] .orbit-scanline{display:none!important}
+.crew-orbit[data-workspace="task"] .orbit-profile{visibility:visible}
+.crew-orbit[data-workspace="task"] .orbit-section-panel,.crew-orbit[data-workspace="task"] .orbit-timeline,.crew-orbit[data-workspace="task"] .orbit-onboarding,.crew-orbit[data-workspace="task"] .orbit-form{position:absolute;inset:130px 6% 35px;width:auto;max-height:none;max-width:none;margin:0;padding:10px 20px 25px;border:0;border-radius:0;background:none;box-shadow:none;backdrop-filter:none;transform:none;overflow-y:auto;overflow-x:hidden;animation:none}
+.crew-orbit[data-workspace="task"] .orbit-form:not([hidden]){display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);grid-template-rows:auto auto auto auto auto auto;gap:0 60px;align-content:start;align-items:start}
+.crew-orbit[data-workspace="task"] .orbit-form .observation-checkin-head{grid-column:1;grid-row:1;margin:0 0 25px}.crew-orbit[data-workspace="task"] .orbit-form .observation-checkin-head h3{font-size:38px}
+.crew-orbit[data-workspace="task"] .orbit-form .observation-time{grid-column:2;grid-row:1;margin:0 0 20px;padding:0;border:0}.crew-orbit[data-workspace="task"] .orbit-form .observation-time>summary{font-size:11px}.crew-orbit[data-workspace="task"] .orbit-form .observation-time>small{display:none}
+.crew-orbit[data-workspace="task"] .orbit-form .observation-symptom-section{grid-column:1;grid-row:2;margin:0 0 22px}.crew-orbit[data-workspace="task"] .orbit-form .observation-recovery{grid-column:1;grid-row:3;margin:0 0 20px}
+.crew-orbit[data-workspace="task"] .orbit-form>.observation-group:not(.observation-recovery){grid-column:2;grid-row:2/5;margin:0}.crew-orbit[data-workspace="task"] .orbit-form>.observation-daily-context{grid-column:1;grid-row:4;margin:0;border:0;padding:0}
+.crew-orbit[data-workspace="task"] .orbit-form .observation-guide{grid-column:1/-1;grid-row:5;margin-top:18px}.crew-orbit[data-workspace="task"] .orbit-form .observation-footer{grid-column:1/-1;grid-row:6;position:sticky;bottom:0;background:#06101b;padding:15px 0;margin-top:18px}
+.crew-orbit[data-workspace="task"] .orbit-form .observation-daily-fields{max-width:none;grid-template-columns:repeat(2,minmax(0,1fr))}.crew-orbit[data-workspace="task"] .orbit-form .observation-recovery .observation-daily-fields{grid-template-columns:1fr}
+.crew-orbit[data-workspace="task"] .orbit-form .observation-vital-fields .observation-field,.crew-orbit[data-workspace="task"] .orbit-form .observation-pressure{padding:8px 0;min-height:61px}
+.crew-orbit[data-workspace="task"] .orbit-profile .orbit-back{top:90px;left:7%;font-size:11px;letter-spacing:0;text-transform:none;z-index:30}
+.crew-orbit .orbit-form fieldset{min-width:0}.crew-orbit .orbit-form .observation-sr-only{position:absolute!important;width:1px!important;height:1px!important;clip-path:inset(50%)!important;overflow:hidden!important;white-space:nowrap!important}
+.crew-orbit[data-workspace="task"] .orbit-onboarding{left:18%;right:18%;padding:10px 25px 40px}.crew-orbit[data-workspace="task"] .orbit-onboarding h2{font-size:43px}.crew-orbit[data-workspace="task"] .orbit-onboarding>p{max-width:36em;font-size:13px}
+@media(min-width:768px) and (max-height:650px){.mission-intro{top:18%}.mission-intro h1{font-size:40px}.mission-primary-readings>.mission-reading:nth-child(1),.mission-primary-readings>.mission-reading:nth-child(3){top:39%}.mission-reading strong{font-size:45px}.mission-recovery{gap:12px;top:58%}.mission-recovery .mission-reading:first-of-type strong{font-size:32px}.mission-body-readings{top:82%}.mission-body-readings .mission-reading strong{font-size:22px}.mission-ground{bottom:15px}.mission-response li{margin:12px 0}.mission-response li strong{font-size:14px}}
+@media(max-width:1000px) and (min-width:768px){.mission-primary-readings>.mission-reading:nth-child(2){left:23%}.mission-reading strong{font-size:52px}.mission-primary-readings>.mission-reading:nth-child(2) strong{font-size:34px}.mission-recovery{width:24%;left:73%;gap:16px 10px}.mission-reading strong small{font-size:11px}.mission-state{width:24%}.mission-body-readings{gap:22px;width:45%}.mission-body-readings .mission-reading strong{font-size:24px}.mission-body-readings .mission-reading strong small{font-size:9px}}
+@media(max-width:767px){
+ .crew-orbit .orbit-header{top:18px;left:20px;right:20px}.crew-orbit .orbit-brand{font-size:9px}.crew-orbit .mission-tools{top:23px;right:20px;gap:19px}.crew-orbit .mission-tools button{font-size:10px}
+ .crew-orbit .orbit-scenario-control{top:64px;left:50%;right:auto;transform:translateX(-50%);width:180px}.crew-orbit .orbit-scenario-control>button{left:calc(100% + 12px);font-size:9px}
+ .crew-orbit .orbit-mission{inset:120px 0 0;overflow-y:auto;pointer-events:auto;padding:0 22px 25px}
+ .mission-intro{position:relative;left:0;top:0;width:55%;min-height:100px}.mission-intro h1{font-size:36px}.mission-intro .mission-eyebrow{font-size:8px}.mission-intro p{font-size:10px;line-height:1.5}.mission-intro button{font-size:9px!important}
+ .mission-state{position:relative;left:0;top:0;width:100%;margin-top:115px}.mission-state h2{font-size:26px;max-width:14em}.mission-state h2 br{display:none}.mission-state .mission-eyebrow{font-size:8px}
+ .mission-constellation{position:relative;inset:auto;display:flex;flex-direction:column;gap:22px;margin-top:27px}
+ .mission-primary-readings{display:grid;grid-template-columns:1fr 1fr;gap:24px 20px}.mission-primary-readings>.mission-reading{position:relative!important;inset:auto!important}.mission-primary-readings>.mission-reading:first-child{grid-column:1/-1}.mission-primary-readings .mission-reading strong{font-size:46px!important}.mission-primary-readings>.mission-reading:first-child strong{font-size:65px!important}.mission-reading-context{font-size:9px}.mission-reading-detail{display:none}
+ .mission-recovery{position:static;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:auto!important;gap:15px 12px}.mission-recovery>.mission-reading:first-of-type{grid-column:auto}.mission-recovery .mission-reading strong,.mission-recovery .mission-reading:first-of-type strong{font-size:30px!important}.mission-recovery .mission-reading-label{font-size:13px}.mission-recovery .mission-reading strong small{font-size:10px;margin-left:4px}
+ .mission-body-readings{position:static;width:auto;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.mission-body-readings .mission-reading strong{font-size:24px}.mission-body-readings .mission-reading strong small{display:block;margin:5px 0 0;font-size:10px}
+ .mission-ground{position:static;display:flex;flex-wrap:wrap;flex-direction:column-reverse;align-items:stretch;margin-top:28px;gap:25px}.mission-ground>span{font-size:8px}.crew-orbit .mission-checkin{justify-content:space-between}
+ .crew-orbit[data-workspace="mission"] .orbit-canvas{inset:100px 0 auto auto!important;left:32%!important;width:68%!important;height:285px!important}
+ .crew-orbit[data-workspace="mission"]:before{background:linear-gradient(0deg,#030913 55%,transparent 80%);opacity:.3}
+ .mission-response,.mission-response--review{position:static;max-width:none;width:auto;margin-top:25px}.mission-response--review p{font-size:13px;line-height:1.8}.crew-orbit[data-severity="attention"] .mission-recovery{position:static}
+ .crew-orbit[data-severity="urgent"] .mission-state{position:relative;left:auto;top:auto;width:auto;margin-top:95px}.crew-orbit[data-severity="urgent"] .mission-state h2{font-size:39px;max-width:8em}.crew-orbit[data-severity="urgent"] .mission-state p{display:none}.crew-orbit[data-severity="urgent"] .mission-primary-readings{grid-template-columns:1fr 1fr}.crew-orbit[data-severity="urgent"] .mission-primary-readings>.mission-reading:first-child{grid-column:auto}.crew-orbit[data-severity="urgent"] .mission-primary-readings strong,.crew-orbit[data-severity="urgent"] .mission-primary-readings>.mission-reading:nth-child(2) strong{font-size:54px!important}.crew-orbit[data-severity="urgent"] .mission-reading-context{display:none}.mission-response ol{margin:17px 0}.mission-response li{margin:13px 0}.mission-response li strong{font-size:15px}.mission-response>small{font-size:9px}.crew-orbit[data-severity="urgent"] .mission-ground{margin-top:18px}
+ .crew-orbit .scene-return{top:115px;left:22px}.crew-orbit[data-workspace="scene"] .orbit-timeline,.crew-orbit[data-workspace="scene"] .orbit-section-panel{inset:145px 0 15px!important;overflow-y:auto}
+ .crew-orbit[data-panel="history"] .history-scene{padding:15px 22px 25px}.crew-orbit[data-panel="history"] .history-scene h2{font-size:29px}.crew-orbit[data-panel="history"] .history-scene-plot{height:240px}.crew-orbit[data-panel="history"] .history-scene-current strong{font-size:29px}.crew-orbit[data-panel="history"] .history-scene-current>span:last-child{font-size:9px}
+ .crew-orbit[data-panel="device"] .device-scene{min-height:670px;position:relative}.crew-orbit[data-panel="device"] .device-scene__node{width:41%}.crew-orbit[data-panel="device"] .device-scene__node--pulse,.crew-orbit[data-panel="device"] .device-scene__node--oxygen{top:29%}.crew-orbit[data-panel="device"] .device-scene__node--pressure,.crew-orbit[data-panel="device"] .device-scene__node--glucose{top:62%}.crew-orbit[data-panel="device"] .device-scene__links{display:none}
+ .crew-orbit[data-workspace="task"] .orbit-form:not([hidden]){display:block}.crew-orbit[data-workspace="task"] .orbit-form,.crew-orbit[data-workspace="task"] .orbit-onboarding,.crew-orbit[data-workspace="task"] .orbit-section-panel{inset:155px 6px 15px;padding:15px 16px 0}.crew-orbit[data-workspace="task"] .orbit-profile .orbit-back{top:123px;left:22px}.crew-orbit[data-workspace="task"] .orbit-form .observation-footer{bottom:0}.crew-orbit[data-workspace="task"] .orbit-onboarding{padding-bottom:30px}
+}
+@media(min-width:768px) and (max-height:500px){.crew-orbit .orbit-mission{overflow-y:auto;min-height:500px}.crew-orbit[data-workspace="scene"] .orbit-timeline,.crew-orbit[data-workspace="scene"] .orbit-section-panel{overflow-y:auto}.mission-ground{bottom:12px}}
+@media(prefers-reduced-motion:reduce){.mission-reading-detail,.mission-checkin i,.mission-tools button:after{transition:none}}
+.crew-orbit[data-panel="history"] .history-scene-plot{grid-template-rows:minmax(0,1fr)}
+.crew-orbit[data-panel="history"] .history-scene-plot svg,.crew-orbit[data-panel="history"] .history-scene-y{min-width:0;min-height:0;height:100%}
+.crew-orbit[data-panel="history"] .history-scene-plot svg{display:block;align-self:stretch}
+@media(max-width:767px){
+ .crew-orbit[data-panel="device"] .orbit-canvas{inset:155px 0 auto 36%!important;width:64%!important;height:230px!important}
+ .crew-orbit[data-panel="device"] .device-scene__node--pulse,.crew-orbit[data-panel="device"] .device-scene__node--oxygen{top:37%}
+ .crew-orbit[data-panel="device"] .device-scene__node--pressure,.crew-orbit[data-panel="device"] .device-scene__node--glucose{top:67%}
+}
+@media(max-width:767px){
+ .crew-orbit[data-workspace="mission"] .orbit-canvas,.crew-orbit[data-panel="device"] .orbit-canvas{mask-image:linear-gradient(to bottom,#000 65%,transparent);-webkit-mask-image:linear-gradient(to bottom,#000 65%,transparent)}
+ .crew-orbit[data-panel="device"] .orbit-canvas{top:205px!important}
+ .history-scene-nav{scrollbar-width:none;mask-image:linear-gradient(to right,#000 92%,transparent)}
+ .history-scene-nav::-webkit-scrollbar{display:none}
+}
+.mission-page{position:relative;width:100%;height:100%}
+@media(max-width:767px){.mission-page{height:auto;min-height:100%}}
+@media(min-width:768px) and (max-height:500px){.crew-orbit .orbit-mission{min-height:0;overflow-y:auto}.mission-page{height:600px;min-height:600px}}
+.crew-orbit[data-workspace="task"] .orbit-canvas{opacity:.12!important}
+.crew-orbit[data-workspace="task"] .orbit-form .orbit-error:empty{display:none}
+.crew-orbit[data-workspace="task"] .orbit-form .observation-footer{background:linear-gradient(0deg,#030a13 65%,rgba(3,10,19,.1));border:0;padding:12px 0}
+.crew-orbit[data-workspace="task"] .orbit-form .observation-actions{margin-top:0}
+.crew-orbit[data-workspace="task"] .orbit-form:not([hidden]){grid-template-rows:auto max-content max-content max-content auto auto}
+.crew-orbit .mission-reading{text-shadow:0 1px 14px rgba(0,5,12,.9),0 1px 2px #030913}
+@media(min-width:768px){
+ .crew-orbit[data-scenario="recovery"] .mission-primary-readings>.mission-reading:nth-child(2),.crew-orbit[data-scenario="review"] .mission-primary-readings>.mission-reading:nth-child(2),.crew-orbit[data-scenario="symptoms"] .mission-primary-readings>.mission-reading:nth-child(2){left:24%;top:49%}
+ .mission-recovery .mission-reading--pressure strong{font-size:24px}
+ .mission-recovery .mission-reading--pressure strong small{display:block;margin:5px 0 0;font-size:9px}
+}
+@media(max-width:600px){.crew-orbit .orbit-scenario-control{left:22px;transform:none;width:calc(100% - 165px)}.crew-orbit .orbit-scenario-control>button{left:calc(100% + 18px)}}
+@media(min-width:768px) and (max-width:1100px){.crew-orbit .mission-tools{top:83px}.mission-recovery .mission-reading-comparison{font-size:9px}.mission-primary-readings>.mission-reading:nth-child(2){left:6%;top:59%}}
+.crew-orbit[data-severity="urgent"] .mission-reading-comparison{color:#d6aca0}
+
+
+@media(max-width:767px){.crew-orbit .orbit-mission{scrollbar-width:thin;scrollbar-color:#47606e transparent}.crew-orbit[data-panel="history"] .history-scene h2{font-size:20px}}

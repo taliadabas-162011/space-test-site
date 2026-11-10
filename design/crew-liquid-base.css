@@ -1,0 +1,478 @@
+
+.glass-optics{position:absolute!important;inset:0;display:block;pointer-events:none!important;width:100%;height:100%;z-index:0;opacity:.65;border-radius:inherit;overflow:hidden}
+
+.crew-orbit[data-ui-variant=glass]{--ink:#f6f8fc;--muted:#bdc9d7;--signal:#a9d7ff;--glass-bg:linear-gradient(135deg,#b5c7df28,#6d89a31c 42%,#41637f18);--glass-border:#ffffff2e;--glass-shadow:inset 0 1px 0 #ffffff30,inset 1px 0 0 #ffffff09,0 12px 36px #00000019;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+
+.crew-orbit[data-ui-variant=glass] :is(button,input,textarea,select,.history-scene,.mission-reading,.device-scene,.orbit-form,.orbit-onboarding){font-family:inherit}
+
+.crew-orbit[data-ui-variant=glass] :is(button,input,textarea):focus-visible{outline:2px solid #a9d7ff;outline-offset:4px}
+
+.crew-orbit[data-ui-variant=glass] button{touch-action:manipulation}
+
+.crew-orbit[data-ui-variant=glass] .orbit-header{inset:28px 5% auto}
+
+.crew-orbit[data-ui-variant=glass] .orbit-brand{font-size:12px;letter-spacing:.1em}
+
+.crew-orbit[data-ui-variant=glass] .mission-home{padding:10px 0;font-family:inherit}
+
+.crew-orbit[data-ui-variant=glass] .orbit-scenario-control{top:24px;width:194px}
+
+.crew-orbit[data-ui-variant=glass] .orbit-scenario-control>label{font-size:10px;letter-spacing:.02em;text-transform:none;color:#c0cddb;font-weight:400}
+
+.crew-orbit[data-ui-variant=glass] .orbit-scenario-control .crew-select__trigger{min-height:36px;margin-top:5px;padding:7px 12px;border:1px solid #ffffff30;border-radius:18px;font-size:13px;background:#a2b7cc16;box-shadow:inset 0 1px 0 #ffffff20;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+
+.crew-orbit[data-ui-variant=glass] .orbit-scenario-control>button{left:calc(100% + 18px);bottom:0;min-height:36px;padding:8px 10px;font-size:11px;border:0;color:#c9d7e7;border-radius:18px}
+
+.crew-orbit[data-ui-variant=glass] .orbit-scenario-control>button:hover{background:#ffffff14}
+
+.crew-orbit[data-ui-variant=glass] .mission-tools{top:27px;right:5%;padding:5px;gap:2px;border:1px solid #ffffff38;border-radius:28px;background:#9aafc61b;box-shadow:var(--glass-shadow);backdrop-filter:blur(20px) saturate(1.4);-webkit-backdrop-filter:blur(20px) saturate(1.4);isolation:isolate}
+
+.crew-orbit[data-ui-variant=glass] .mission-tools:before{content:'';position:absolute;z-index:1;left:var(--nav-x,5px);top:5px;bottom:5px;width:var(--nav-width,100px);border-radius:22px;background:#d8e8fc26;box-shadow:inset 0 1px 0 #ffffff3b,0 2px 12px #0002;transition:left .45s cubic-bezier(.16,1,.3,1),width .45s cubic-bezier(.16,1,.3,1);pointer-events:none}
+
+.crew-orbit[data-ui-variant=glass] .mission-tools button{position:relative;z-index:2;display:flex;align-items:center;gap:7px;min-height:36px;padding:9px 13px;border-radius:22px;font-size:12px;color:#c8d5e5;font-family:inherit;transition:color .2s,transform .25s}
+
+.crew-orbit[data-ui-variant=glass] .mission-tools button[aria-current]{color:#fff}
+.crew-orbit[data-ui-variant=glass] .mission-tools button:after{display:none}
+.crew-orbit[data-ui-variant=glass] .mission-tools button:active{transform:scale(.95)}
+
+.glass-icon{width:21px;height:21px;display:block;flex:none}
+.mission-tools .glass-icon{width:16px;height:16px}
+
+.crew-orbit[data-ui-variant=glass] .mission-intro .mission-eyebrow{font-size:11px;font-weight:400;letter-spacing:.03em;color:#b6c8dc}
+
+.crew-orbit[data-ui-variant=glass] .mission-intro h1{font-size:clamp(36px,4.6vw,60px);font-weight:600;letter-spacing:normal;line-height:1.04;margin:12px 0 10px}
+
+.crew-orbit[data-ui-variant=glass] .mission-intro h1>span{display:none}
+
+.crew-orbit[data-ui-variant=glass] .mission-intro p{font-size:12px;color:#c4d2e2;line-height:1.5}
+
+.crew-orbit[data-ui-variant=glass] .mission-intro button{display:inline-flex;align-items:center;font-size:11px;padding:8px 12px;margin:12px 0 0;border:1px solid #ffffff24;border-radius:18px;background:#b5c7dd13;color:#e0eaf8;font-family:inherit;transition:background .2s}
+
+.crew-orbit[data-ui-variant=glass] .mission-intro button:hover{background:#ffffff20}
+
+.crew-orbit[data-ui-variant=glass] .mission-state .mission-eyebrow{display:inline-block;font-size:11px;letter-spacing:0;font-weight:500;padding:6px 10px;border-radius:20px;background:#b6d7ff12;color:#c7dff7}
+
+.crew-orbit[data-ui-variant=glass] .mission-state h2{font-size:clamp(22px,2.3vw,31px);line-height:1.15;font-weight:500;letter-spacing:normal;margin-top:12px;max-width:13em}
+
+.crew-orbit[data-ui-variant=glass] .glass-section-title,.crew-orbit[data-ui-variant=glass] .mission-recovery>.mission-eyebrow{display:block;font-size:12px;line-height:1.4;font-weight:600;letter-spacing:0;color:#e3edf8;margin:0 0 14px;grid-column:1/-1}
+
+.crew-orbit[data-ui-variant=glass] .mission-reading{position:relative!important;inset:auto!important;display:grid;grid-template-columns:22px minmax(0,1fr) max-content;grid-template-rows:auto auto;column-gap:10px;row-gap:4px;align-items:center;min-height:52px;width:100%;max-width:none;text-shadow:none;padding:6px 0!important;border-radius:14px;transition:transform .28s cubic-bezier(.2,.8,.2,1.25),background .25s}
+
+.crew-orbit[data-ui-variant=glass] .mission-reading:hover{transform:translateX(3px)}
+
+.crew-orbit[data-ui-variant=glass] .mission-reading:active{transform:scale(.97)}
+
+.crew-orbit[data-ui-variant=glass] .mission-reading>.glass-icon{grid-column:1;grid-row:1/3;width:20px;height:20px;color:#c7ddf5}
+
+.crew-orbit[data-ui-variant=glass] .mission-reading--pulse>.glass-icon{color:#ff9fae;fill:#ff9fae20}
+.crew-orbit[data-ui-variant=glass] .mission-reading--oxygen>.glass-icon{color:#93ceff}
+.crew-orbit[data-ui-variant=glass] .mission-reading--sleep>.glass-icon{color:#c6b6ff}
+.crew-orbit[data-ui-variant=glass] .mission-reading--water>.glass-icon{color:#8fcbff}
+.crew-orbit[data-ui-variant=glass] .mission-reading--exercise>.glass-icon{color:#c4efb2}
+
+.crew-orbit[data-ui-variant=glass] .mission-reading-label{grid-column:2;grid-row:1;display:block;font-size:14px;line-height:1.25;font-weight:500;margin:0;color:#f1f6fc}
+
+.crew-orbit[data-ui-variant=glass] .mission-reading strong{grid-column:3;grid-row:1/3;display:block;font-size:32px!important;letter-spacing:normal;line-height:1;font-weight:400;color:#fff}
+
+.crew-orbit[data-ui-variant=glass] .mission-reading strong small{display:inline;font-size:10px!important;font-weight:400;color:#c1d1e3;letter-spacing:0;margin-left:4px}
+
+.crew-orbit[data-ui-variant=glass] .mission-reading--pressure strong{font-size:25px!important}
+
+.crew-orbit[data-ui-variant=glass] .mission-reading--pressure strong small{display:block!important;text-align:right;margin:5px 0 0}
+
+.crew-orbit[data-ui-variant=glass] .mission-reading-context,.crew-orbit[data-ui-variant=glass] .mission-reading-detail{display:none}
+
+.crew-orbit[data-ui-variant=glass] .mission-reading-comparison{grid-column:2;grid-row:2;display:block;font-size:10px;line-height:1.4;margin:0;color:#c0cfe0;letter-spacing:0;max-width:18em}
+
+.crew-orbit[data-ui-variant=glass] .mission-reading+.mission-reading{margin-top:5px}
+
+.crew-orbit[data-ui-variant=glass] .mission-body-readings>.glass-section-title{grid-column:1;margin:0;max-width:9em;font-size:13px;line-height:1.4;color:#bfd0e2;font-weight:400}
+
+.crew-orbit[data-ui-variant=glass] .mission-body-readings .mission-reading{margin:0;grid-template-columns:20px 1fr;column-gap:12px;min-height:50px}
+
+.crew-orbit[data-ui-variant=glass] .mission-body-readings .mission-reading-label{grid-column:2;grid-row:1;font-size:12px;font-weight:400;color:#c5d4e5}
+
+.crew-orbit[data-ui-variant=glass] .mission-body-readings .mission-reading strong{grid-column:2;grid-row:2;font-size:26px!important;white-space:nowrap}
+
+.crew-orbit[data-ui-variant=glass] .mission-body-readings .mission-reading-comparison{display:none}
+
+.crew-orbit[data-ui-variant=glass] .mission-ground>span{font-size:10px;line-height:1.5;color:#b2c5db}
+
+.crew-orbit[data-ui-variant=glass] .mission-checkin{border:1px solid #ffffff5e;border-radius:24px;background:linear-gradient(#e4f3ff,#cce4fb);color:#122333;padding:12px 18px;font-weight:500;font-size:13px;line-height:1.4;font-family:inherit;gap:20px;box-shadow:inset 0 1px 0 #fff9,0 5px 20px #0002;transition:transform .3s cubic-bezier(.2,.8,.2,1.25),box-shadow .3s}
+
+.crew-orbit[data-ui-variant=glass] .mission-checkin:hover{box-shadow:inset 0 1px 0 #fff,0 8px 25px #6da4e52b;transform:translateY(-2px)}
+
+.crew-orbit[data-ui-variant=glass] .mission-checkin:active{transform:scale(.97)}
+
+.crew-orbit[data-ui-variant=glass] .mission-checkin i{font-size:18px}
+
+.crew-orbit[data-ui-variant=glass][data-workspace=mission]:before{background:linear-gradient(90deg,#030d1b44,transparent 36%,transparent 60%,#030d1b55),linear-gradient(0deg,#03101c77,transparent 50%)}
+
+.crew-orbit[data-ui-variant=glass] .scene-return{top:93px;font-size:12px;font-family:inherit;color:#d5e7fa;padding:8px 13px;border-radius:20px;background:#bbcfe815;border:1px solid #ffffff1a}
+
+/* Full-page history, with the graph as the content layer and controls in the foreground. */
+.crew-orbit[data-ui-variant=glass][data-workspace=scene] .orbit-timeline,.crew-orbit[data-ui-variant=glass][data-workspace=scene] .orbit-section-panel{inset:145px 4% 100px!important}
+
+.crew-orbit[data-ui-variant=glass] .history-scene{padding:0 2%;font-family:inherit}
+
+.crew-orbit[data-ui-variant=glass] .history-scene-header{align-items:center;margin-bottom:20px}
+
+.crew-orbit[data-ui-variant=glass] .history-scene h2{font-size:31px;font-weight:600;letter-spacing:normal}
+
+.crew-orbit[data-ui-variant=glass] .history-scene-current strong{font-size:34px;font-weight:500;letter-spacing:normal}
+.crew-orbit[data-ui-variant=glass] .history-scene-current>span:first-child{font-size:10px;letter-spacing:.04em;color:#b7cde5}
+
+.crew-orbit[data-ui-variant=glass] .history-scene-layout{grid-template-columns:170px minmax(0,1fr);gap:24px}
+
+.crew-orbit[data-ui-variant=glass] .history-scene-nav{gap:2px;padding:6px;border-radius:22px;background:#91a8c020;border:1px solid #ffffff20;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);align-self:start}
+
+.crew-orbit[data-ui-variant=glass] .history-scene-nav button{padding:9px 11px;border-radius:15px;font-size:12px;line-height:1.3;min-height:32px;color:#c8d7e9;transition:background .2s,transform .2s}
+.crew-orbit[data-ui-variant=glass] .history-scene-nav button[aria-pressed=true]{background:#dcecff28;color:#fff;box-shadow:inset 0 1px 0 #ffffff30}
+.crew-orbit[data-ui-variant=glass] .history-scene-nav button[aria-pressed=true]:before{display:none}
+
+.crew-orbit[data-ui-variant=glass] .history-scene-figure{padding:22px 24px;border-radius:26px;background:#48638121;border:1px solid #ffffff29;box-shadow:var(--glass-shadow);backdrop-filter:blur(15px);-webkit-backdrop-filter:blur(15px)}
+
+.crew-orbit[data-ui-variant=glass] .history-scene-figure figcaption{margin-bottom:12px;align-items:center}
+.crew-orbit[data-ui-variant=glass] .history-scene-figure h3{font-size:18px;font-weight:500;letter-spacing:normal}
+
+.crew-orbit[data-ui-variant=glass] .history-scene-plot{height:clamp(170px,calc(100dvh - 490px),520px)}
+
+.crew-orbit[data-ui-variant=glass] .history-scene-line{stroke:#a6d3ff;stroke-width:2.4}
+.crew-orbit[data-ui-variant=glass] .history-scene-line-secondary{stroke:#d8c7ff;stroke-dasharray:none;opacity:.9}
+
+.crew-orbit[data-ui-variant=glass] .history-scene-grid line{stroke-opacity:.12}
+.crew-orbit[data-ui-variant=glass] .history-scene-y,.crew-orbit[data-ui-variant=glass] .history-scene-dates{color:#b7cae1;font-size:10px}
+
+.crew-orbit[data-ui-variant=glass] .history-scene-tooltip{background:#d7e6faeb;color:#112133;border-radius:12px;box-shadow:inset 0 1px 0 #ffffffb0,0 6px 25px #0004;padding:10px 13px;font-size:11px}
+.crew-orbit[data-ui-variant=glass] .history-scene-tooltip strong{font-size:17px;font-weight:600}
+
+.crew-orbit[data-ui-variant=glass] .history-scene-controls{gap:20px;margin-top:18px}
+.crew-orbit[data-ui-variant=glass] .history-scene-ranges{padding:3px;background:#ffffff0b;border:1px solid #ffffff14;border-radius:20px;align-self:start}
+.crew-orbit[data-ui-variant=glass] .history-scene-ranges button{font-size:10px;border-radius:16px;padding:7px 11px}
+.crew-orbit[data-ui-variant=glass] .history-scene-ranges button[aria-pressed=true]{background:#dbeafe23;box-shadow:inset 0 1px 0 #ffffff20;color:white}
+.crew-orbit[data-ui-variant=glass] .history-scene-inspect{font-size:10px;width:min(100%,320px)}
+
+/* Devices share one scene rather than opening a dialog. */
+.crew-orbit[data-ui-variant=glass] .device-scene{position:absolute;inset:0;padding:0 2%;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:85px 1fr 1fr 35px;gap:18px 32%;pointer-events:none}
+
+.crew-orbit[data-ui-variant=glass] .device-scene__heading{position:static;grid-column:1/-1}
+.crew-orbit[data-ui-variant=glass] .device-scene__heading>span{display:none}
+.crew-orbit[data-ui-variant=glass] .device-scene__heading h2{font-size:32px;font-weight:600;letter-spacing:normal;margin-top:0}
+.crew-orbit[data-ui-variant=glass] .device-scene__heading p{font-size:12px;color:#b9cce2}
+
+.crew-orbit[data-ui-variant=glass] .device-scene__links{display:none}
+
+.crew-orbit[data-ui-variant=glass] .device-scene__node{position:static;width:auto;padding:19px 22px;background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:25px;box-shadow:var(--glass-shadow);backdrop-filter:blur(18px) saturate(1.3);-webkit-backdrop-filter:blur(18px) saturate(1.3)}
+
+.crew-orbit[data-ui-variant=glass] .device-scene__index{display:none}
+.crew-orbit[data-ui-variant=glass] .device-scene__identity{margin-top:0}
+.crew-orbit[data-ui-variant=glass] .device-scene__icon{width:28px;height:28px;color:#bedfff}
+.crew-orbit[data-ui-variant=glass] .device-scene__identity h3{font-size:17px;font-weight:500;letter-spacing:normal}
+.crew-orbit[data-ui-variant=glass] .device-scene__name{font-size:10px;color:#bdcce0}
+
+.crew-orbit[data-ui-variant=glass] .device-scene__status{font-size:11px}
+.crew-orbit[data-ui-variant=glass] .device-scene__reading{font-size:12px;margin-top:8px}
+.crew-orbit[data-ui-variant=glass] .device-scene__node button{padding:8px 13px;font-weight:500;font-size:11px;line-height:1.4;font-family:inherit;border-radius:18px;background:#cee5ff24;border:1px solid #ffffff24;margin-top:13px;transition:transform .2s,background .2s}
+.crew-orbit[data-ui-variant=glass] .device-scene__node button:hover{background:#cee5ff3b}
+.crew-orbit[data-ui-variant=glass] .device-scene__node button:active{transform:scale(.96)}
+
+.crew-orbit[data-ui-variant=glass] .device-scene__footer{position:static;grid-column:1/-1;align-self:end;font-size:10px;color:#bcd0e8}
+
+/* Entering data uses the same type hierarchy and standard translucent material. */
+.crew-orbit[data-ui-variant=glass][data-workspace=task] .orbit-canvas{opacity:.35!important}
+
+.crew-orbit[data-ui-variant=glass][data-workspace=task] .orbit-form,.crew-orbit[data-ui-variant=glass][data-workspace=task] .orbit-onboarding{inset:148px 6% 98px;padding:27px 32px;background:#46617e20;border:1px solid #ffffff29;border-radius:28px;box-shadow:var(--glass-shadow);backdrop-filter:blur(24px) saturate(1.2);-webkit-backdrop-filter:blur(24px) saturate(1.2)}
+
+.crew-orbit[data-ui-variant=glass][data-workspace=task] .orbit-onboarding{left:22%;right:22%}
+
+.crew-orbit[data-ui-variant=glass] .orbit-onboarding h2,.crew-orbit[data-ui-variant=glass] .observation-checkin-head h3{font-size:34px!important;font-weight:600;letter-spacing:normal;line-height:1.1}
+.crew-orbit[data-ui-variant=glass] .orbit-panel-kicker{font-size:10px;letter-spacing:.04em;color:#b7cce3}
+
+.crew-orbit[data-ui-variant=glass] .observation-field-name{font-size:13px;font-weight:400}
+.crew-orbit[data-ui-variant=glass] .observation-entry{gap:10px}
+.crew-orbit[data-ui-variant=glass] .observation-entry input{min-height:38px;width:100px!important;text-align:center!important;background:#c2d7f312!important;border:1px solid #c3d8f33d!important;border-radius:11px;padding:8px 10px!important;font-size:17px!important;color:#fff;box-shadow:inset 0 1px 2px #00000016}
+.crew-orbit[data-ui-variant=glass] .observation-entry small{font-size:11px}
+
+.crew-orbit[data-ui-variant=glass] .observation-pressure-inputs input{width:70px!important}
+.crew-orbit[data-ui-variant=glass] .orbit-form textarea,.crew-orbit[data-ui-variant=glass] .orbit-onboarding input{border:1px solid #c3d8f338;background:#b8cde813;border-radius:11px;padding:12px 14px;color:#fff;font-size:14px;min-height:44px}
+
+.crew-orbit[data-ui-variant=glass] .orbit-onboarding label{font-size:13px;color:#d9e5f5}
+.crew-orbit[data-ui-variant=glass] .orbit-onboarding label>span{font-size:11px;color:#aabed5}
+
+.crew-orbit[data-ui-variant=glass] .orbit-form .observation-footer{border:0;background:linear-gradient(0deg,#1b2a40f5,#1b2a4000);padding:15px 0;margin-top:20px}
+
+.crew-orbit[data-ui-variant=glass] :is(.observation-actions,.orbit-profile-form-actions)>button{padding:10px 17px;border:1px solid #ffffff30;border-radius:22px;font-weight:500;font-size:13px;line-height:1.4;font-family:inherit;background:#cadff51a;color:#f2f7ff;transition:transform .2s}
+
+.crew-orbit[data-ui-variant=glass] :is(.observation-actions,.orbit-profile-form-actions)>button[type=submit]{background:#e0edfc;color:#142332;border-color:#ffffff8c}
+
+.crew-orbit[data-ui-variant=glass] :is(.observation-actions,.orbit-profile-form-actions)>button:active{transform:scale(.96)}
+
+.crew-orbit[data-ui-variant=glass] .crew-select__trigger{border:1px solid #c3d8f338;background:#adc6e215;border-radius:11px;padding:10px 13px;font-family:inherit;font-size:14px;font-weight:400;min-height:42px;box-shadow:inset 0 1px 0 #ffffff11}
+
+.crew-orbit[data-ui-variant=glass] .crew-select__arrow{font-size:17px;color:#c7d9ef}
+
+.crew-orbit[data-ui-variant=glass] .crew-select__menu{padding:6px;border:1px solid #e3efff40;border-radius:16px;background:#354a61ec;box-shadow:inset 0 1px 0 #ffffff2b,0 14px 40px #0005;backdrop-filter:blur(25px);-webkit-backdrop-filter:blur(25px)}
+
+.crew-orbit[data-ui-variant=glass] .crew-select__option{border:0;border-radius:10px;padding:10px 12px;font-weight:400;font-size:13px;line-height:1.4;font-family:inherit;min-height:40px;background:none;text-transform:none;letter-spacing:0}
+.crew-orbit[data-ui-variant=glass] .crew-select__option:hover,.crew-orbit[data-ui-variant=glass] .crew-select__option.is-active{background:#d4e6ff20;color:white}
+.crew-orbit[data-ui-variant=glass] .crew-select__option[aria-selected=true]{color:#fff}
+.crew-orbit[data-ui-variant=glass] .crew-select__option[aria-selected=true]:after{border-color:#d9eaff}
+
+.crew-orbit[data-ui-variant=glass] .crew-datetime__trigger{padding:10px 13px;border-radius:11px;background:#bcd3ed13;border:1px solid #c3d8f338;font-family:inherit;font-size:13px;min-height:42px}
+
+.crew-orbit[data-ui-variant=glass] .crew-datetime__popup{padding:19px;border:1px solid #e3efff38;border-radius:22px;background:#263c53f5;box-shadow:inset 0 1px 0 #ffffff2b,0 14px 40px #0006;backdrop-filter:blur(25px);-webkit-backdrop-filter:blur(25px)}
+
+.crew-orbit[data-ui-variant=glass] .crew-datetime__calendar-head strong{font-weight:500;font-size:15px;line-height:1.4;font-family:inherit}
+.crew-orbit[data-ui-variant=glass] .crew-datetime__calendar-head button{border-radius:50%;border:0;background:#ffffff0d;min-width:30px;min-height:30px}
+.crew-orbit[data-ui-variant=glass] .crew-datetime__days button{border-radius:50%;border:0;min-height:32px;color:#ecf4ff}
+.crew-orbit[data-ui-variant=glass] .crew-datetime__days button[aria-pressed=true]{background:#d7eaff;color:#152437}
+.crew-orbit[data-ui-variant=glass] .crew-datetime__actions button{border-radius:18px;padding:8px 12px;border:1px solid #ffffff2b;font-family:inherit}
+.crew-orbit[data-ui-variant=glass][data-severity=urgent] .mission-state h2{font-size:clamp(34px,4vw,52px);color:#ffe9df}
+.crew-orbit[data-ui-variant=glass][data-severity=urgent] .mission-state .mission-eyebrow{color:#ffbfa8;background:#ff997a17}
+.crew-orbit[data-ui-variant=glass][data-severity=urgent] .mission-primary-readings>.mission-reading{min-height:82px}
+.crew-orbit[data-ui-variant=glass][data-severity=urgent] .mission-primary-readings strong{font-size:46px!important}
+.crew-orbit[data-ui-variant=glass][data-severity=urgent] .mission-reading-comparison{display:none}
+
+.crew-orbit[data-ui-variant=glass] .mission-response>.mission-eyebrow{font-size:10px;letter-spacing:.05em}
+.crew-orbit[data-ui-variant=glass] .mission-response ol{margin:15px 0}
+.crew-orbit[data-ui-variant=glass] .mission-response li{gap:12px;margin:15px 0}
+.crew-orbit[data-ui-variant=glass] .mission-response li strong{font-size:14px;font-weight:500;line-height:1.45}
+.crew-orbit[data-ui-variant=glass] .mission-response li>span{font-size:10px}
+.crew-orbit[data-ui-variant=glass] .mission-response>small{font-size:9px;line-height:1.6;max-width:none;color:#e6c5bc}
+
+.crew-orbit[data-ui-variant=glass] .mission-ack{padding:10px 13px;border:1px solid #ffbea75e;border-radius:20px;background:#ffccba1a;font-family:inherit;font-size:11px;line-height:1.4;gap:10px}
+.crew-orbit[data-ui-variant=glass] .mission-ack>span{font-size:16px}
+.crew-orbit[data-ui-variant=glass] .mission-response--review p{font-size:12px;line-height:1.6;margin:0;color:#e3d8c8}
+.crew-orbit[data-ui-variant=glass][data-severity=attention] .mission-primary-readings>.mission-reading:nth-child(2){inset:auto}
+
+@media(min-width:768px) and (max-width:1150px){
+ .crew-orbit[data-ui-variant=glass] .mission-tools{top:86px}
+.crew-orbit[data-ui-variant=glass] .scene-return{top:88px}
+.crew-orbit[data-ui-variant=glass] .mission-reading{column-gap:8px;grid-template-columns:18px minmax(0,1fr) max-content}
+.crew-orbit[data-ui-variant=glass] .mission-reading-label{font-size:13px}
+.crew-orbit[data-ui-variant=glass] .mission-reading strong{font-size:28px!important}
+.crew-orbit[data-ui-variant=glass] .mission-reading--pressure strong{font-size:22px!important}
+.crew-orbit[data-ui-variant=glass] .mission-reading-comparison{font-size:9px}
+
+ .crew-orbit[data-ui-variant=glass] .history-scene-layout{grid-template-columns:145px minmax(0,1fr);gap:18px}
+.crew-orbit[data-ui-variant=glass] .history-scene-figure{padding:20px}
+.crew-orbit[data-ui-variant=glass] .history-scene-controls{flex-wrap:wrap;gap:12px}
+.crew-orbit[data-ui-variant=glass] .history-scene-plot{height:clamp(170px,calc(100dvh - 530px),500px)}
+
+ .crew-orbit[data-ui-variant=glass] .device-scene{gap:20px 25%}
+.crew-orbit[data-ui-variant=glass] .device-scene__node{padding:18px}
+}
+
+@media(min-width:768px) and (max-height:760px){.crew-orbit[data-ui-variant=glass] .mission-intro h1{font-size:43px}
+.crew-orbit[data-ui-variant=glass] .mission-intro button{margin-top:8px;padding:6px 11px}
+.crew-orbit[data-ui-variant=glass] .mission-reading{min-height:48px}
+.crew-orbit[data-ui-variant=glass] .glass-section-title,.crew-orbit[data-ui-variant=glass] .mission-recovery>.mission-eyebrow{margin-bottom:8px}
+.crew-orbit[data-ui-variant=glass] .mission-checkin{padding:10px 16px}
+.crew-orbit[data-ui-variant=glass] .mission-response li{margin:10px 0}
+.crew-orbit[data-ui-variant=glass] .mission-response>small{font-size:8px}
+}
+
+@media(max-width:767px){
+ .crew-orbit[data-ui-variant=glass] .orbit-header{inset:17px auto auto 22px}
+.crew-orbit[data-ui-variant=glass] .orbit-brand{font-size:9px;letter-spacing:.08em}
+.crew-orbit[data-ui-variant=glass] .mission-home{padding:7px 0}
+
+ .crew-orbit[data-ui-variant=glass] .mission-tools{top:16px;right:16px;padding:3px;gap:0}
+.crew-orbit[data-ui-variant=glass] .mission-tools button{min-height:32px;padding:7px 10px;font-size:10px;gap:5px}
+.crew-orbit[data-ui-variant=glass] .mission-tools .glass-icon{width:13px;height:13px}
+.crew-orbit[data-ui-variant=glass] .mission-tools:before{top:3px;bottom:3px}
+
+ .crew-orbit[data-ui-variant=glass] .orbit-scenario-control{top:68px;left:22px;right:auto;width:calc(100% - 165px);transform:none}
+.crew-orbit[data-ui-variant=glass] .orbit-scenario-control .crew-select__trigger{margin-top:4px;font-size:12px}
+.crew-orbit[data-ui-variant=glass] .orbit-scenario-control>button{left:calc(100% + 14px);font-size:10px;white-space:nowrap}
+.crew-orbit[data-ui-variant=glass] .mission-intro .mission-eyebrow{font-size:9px;line-height:1.5}
+.crew-orbit[data-ui-variant=glass] .mission-intro h1{font-size:38px}
+.crew-orbit[data-ui-variant=glass] .mission-intro p{font-size:11px}
+.crew-orbit[data-ui-variant=glass] .mission-intro button{margin-top:8px;font-size:10px!important}
+.crew-orbit[data-ui-variant=glass] .mission-state h2{font-size:27px;max-width:100%;margin-top:10px}
+.crew-orbit[data-ui-variant=glass] .mission-state .mission-eyebrow{font-size:10px;padding:5px 9px}
+
+ .crew-orbit[data-ui-variant=glass] .mission-primary-readings>.mission-reading{position:relative!important;inset:auto!important;grid-column:auto;min-height:58px}
+.crew-orbit[data-ui-variant=glass] .mission-primary-readings .mission-reading strong,.crew-orbit[data-ui-variant=glass] .mission-primary-readings>.mission-reading:first-child strong{font-size:35px!important}
+.crew-orbit[data-ui-variant=glass] .mission-primary-readings .mission-reading--pressure strong{font-size:29px!important}
+.crew-orbit[data-ui-variant=glass] .mission-reading-label{font-size:15px}
+.crew-orbit[data-ui-variant=glass] .mission-reading-comparison{font-size:10px}
+.crew-orbit[data-ui-variant=glass] .mission-reading{grid-template-columns:22px 1fr max-content}
+.crew-orbit[data-ui-variant=glass] .mission-recovery>.mission-reading:first-of-type{grid-column:auto}
+.crew-orbit[data-ui-variant=glass] .mission-recovery .mission-reading{display:block;margin:0;min-height:55px;padding:0!important}
+.crew-orbit[data-ui-variant=glass] .mission-recovery .glass-icon{display:none}
+.crew-orbit[data-ui-variant=glass] .mission-recovery .mission-reading-label{font-size:12px;white-space:nowrap}
+.crew-orbit[data-ui-variant=glass] .mission-recovery .mission-reading strong,.crew-orbit[data-ui-variant=glass] .mission-recovery .mission-reading:first-of-type strong{font-size:27px!important;margin-top:9px}
+.crew-orbit[data-ui-variant=glass] .mission-recovery .mission-reading-comparison{display:none}
+.crew-orbit[data-ui-variant=glass] .mission-body-readings>.glass-section-title{max-width:none;margin-bottom:10px;font-size:12px}
+.crew-orbit[data-ui-variant=glass] .mission-body-readings .mission-reading{display:grid;grid-template-columns:22px 1fr max-content;min-height:52px}
+.crew-orbit[data-ui-variant=glass] .mission-body-readings .mission-reading-label{grid-column:2;grid-row:1/3;font-size:14px}
+.crew-orbit[data-ui-variant=glass] .mission-body-readings .mission-reading strong{grid-column:3;grid-row:1/3;font-size:26px!important}
+.crew-orbit[data-ui-variant=glass] .mission-body-readings .mission-reading strong small{display:inline;margin-left:4px}
+.crew-orbit[data-ui-variant=glass] .mission-ground>span{font-size:9px}
+.crew-orbit[data-ui-variant=glass] .mission-checkin{justify-content:space-between;font-size:13px;padding:12px 18px}
+
+ .crew-orbit[data-ui-variant=glass] .scene-return{top:120px;left:22px;padding:4px 9px;font-size:10px}
+
+ .crew-orbit[data-ui-variant=glass][data-workspace=scene] .orbit-timeline,.crew-orbit[data-ui-variant=glass][data-workspace=scene] .orbit-section-panel{inset:160px 0 76px!important;overflow-y:auto}
+
+ .crew-orbit[data-ui-variant=glass] .history-scene{padding:14px 20px 20px}
+.crew-orbit[data-ui-variant=glass] .history-scene h2{font-size:26px}
+.crew-orbit[data-ui-variant=glass] .history-scene-header{margin-bottom:12px;align-items:center}
+.crew-orbit[data-ui-variant=glass] .history-scene-current strong{font-size:27px}
+.crew-orbit[data-ui-variant=glass] .history-scene-current>span:last-child{font-size:8px}
+
+ .crew-orbit[data-ui-variant=glass] .history-scene-layout{display:flex;flex-direction:column;gap:13px}
+.crew-orbit[data-ui-variant=glass] .history-scene-nav{flex-direction:row;overflow-x:auto;gap:2px;max-width:100%;margin:0;padding:4px;border-radius:18px;align-self:stretch;flex-shrink:0}
+.crew-orbit[data-ui-variant=glass] .history-scene-nav button{font-size:11px;white-space:nowrap;min-height:30px;padding:7px 11px}
+
+ .crew-orbit[data-ui-variant=glass] .history-scene-figure{padding:17px 14px;border-radius:23px}
+.crew-orbit[data-ui-variant=glass] .history-scene-figure figcaption{flex-direction:row;align-items:center;gap:12px}
+.crew-orbit[data-ui-variant=glass] .history-scene-figure h3{font-size:16px}
+.crew-orbit[data-ui-variant=glass] .history-scene-figure figcaption p{font-size:9px;text-align:right}
+.crew-orbit[data-ui-variant=glass] .history-scene-plot{height:210px;min-height:180px;grid-template-columns:43px 1fr}
+.crew-orbit[data-ui-variant=glass] .history-scene-dates{margin-left:43px;font-size:8px;gap:2px}
+.crew-orbit[data-ui-variant=glass] .history-scene-y{font-size:9px}
+
+ .crew-orbit[data-ui-variant=glass] .history-scene-controls{flex-wrap:wrap;gap:10px;margin-top:14px}
+.crew-orbit[data-ui-variant=glass] .history-scene-inspect{font-size:9px;width:100%}
+.crew-orbit[data-ui-variant=glass] .history-scene-inspect p{display:none}
+.crew-orbit[data-ui-variant=glass] .history-scene-tooltip{font-size:9px;padding:8px 10px}
+.crew-orbit[data-ui-variant=glass] .history-scene-tooltip strong{font-size:15px}
+
+ .crew-orbit[data-ui-variant=glass] .device-scene{position:relative;min-height:0!important;grid-template-columns:1fr 1fr;grid-template-rows:auto auto auto auto;gap:14px;padding:14px 20px 20px}
+.crew-orbit[data-ui-variant=glass] .device-scene__heading{margin-bottom:100px}
+.crew-orbit[data-ui-variant=glass] .device-scene__heading h2{font-size:29px}
+.crew-orbit[data-ui-variant=glass] .device-scene__node{position:static;width:auto;padding:15px 12px;min-width:0;border-radius:22px}
+.crew-orbit[data-ui-variant=glass] .device-scene__identity{gap:8px}
+.crew-orbit[data-ui-variant=glass] .device-scene__identity h3{font-size:14px}
+.crew-orbit[data-ui-variant=glass] .device-scene__icon{display:none}
+.crew-orbit[data-ui-variant=glass] .device-scene__node button{font-size:10px;padding:7px 11px}
+
+ .crew-orbit[data-ui-variant=glass][data-workspace=task] .orbit-form,.crew-orbit[data-ui-variant=glass][data-workspace=task] .orbit-onboarding{inset:158px 10px 76px;padding:22px 18px;overflow-y:auto;border-radius:24px}
+.crew-orbit[data-ui-variant=glass] .observation-checkin-head h3,.crew-orbit[data-ui-variant=glass] .orbit-onboarding h2{font-size:30px!important}
+.crew-orbit[data-ui-variant=glass][data-severity=urgent] .mission-state h2{font-size:37px}
+.crew-orbit[data-ui-variant=glass][data-severity=urgent] .mission-primary-readings>.mission-reading{min-height:60px}
+.crew-orbit[data-ui-variant=glass][data-severity=urgent] .mission-primary-readings strong{font-size:38px!important}
+.crew-orbit[data-ui-variant=glass] .mission-response--review p{margin-top:12px}
+}
+
+@media(prefers-reduced-motion:reduce){.crew-orbit[data-ui-variant=glass] :is(.mission-tools:before,.mission-tools button,.mission-reading,.mission-checkin){transition:none!important}
+}
+
+@media(prefers-reduced-transparency:reduce){.crew-orbit[data-ui-variant=glass]{--glass-bg:#172c44}
+.glass-optics{display:none!important}
+.crew-orbit[data-ui-variant=glass] :is(.mission-tools,.history-scene-figure,.history-scene-nav,.device-scene__node,.orbit-form,.orbit-onboarding){background:#172c44!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+}
+
+@supports not (backdrop-filter:blur(1px)){.crew-orbit[data-ui-variant=glass]{--glass-bg:#1b3048}
+}
+
+
+
+@media(min-width:768px){.crew-orbit[data-ui-variant=glass] .history-scene-nav button{min-height:28px;padding:6px 10px;font-size:12px;line-height:1.2}
+}
+
+.crew-orbit[data-ui-variant=glass] .crew-select__option{outline:0!important;box-shadow:none!important;border-left:0!important}
+
+.crew-orbit[data-ui-variant=glass] .orbit-form input[type=number]{min-height:38px;background:#c2d7f312!important;border:1px solid #c3d8f33d!important;border-radius:11px;padding:8px 10px!important;color:#fff;font-family:inherit;font-size:16px;text-align:center}
+
+.crew-orbit[data-ui-variant=glass] .crew-datetime__popup{max-height:min(420px,calc(100dvh - 285px))}
+
+.crew-orbit[data-ui-variant=glass] .crew-datetime__actions{bottom:-19px;padding:12px 0 2px;background:linear-gradient(#263c53e0,#263c53);border:0}
+
+.crew-orbit[data-ui-variant=glass] .crew-datetime__time input{border:1px solid #c3d8f338!important;background:#b9d1ee13!important;border-radius:10px!important;font-family:inherit!important}
+
+.crew-orbit[data-ui-variant=glass] .observation-field-name,.crew-orbit[data-ui-variant=glass] .observation-field-name em{letter-spacing:0}
+
+@media(min-width:1151px){.crew-orbit[data-ui-variant=glass] .history-scene-plot{height:clamp(170px,calc(100dvh - 540px),520px)}
+}
+
+.crew-orbit[data-ui-variant=glass] .orbit-profile>.orbit-back{top:92px;left:6%;padding:7px 12px;border:1px solid #ffffff1a;border-radius:20px;background:#bbcfe815;color:#d5e7fa;font:400 12px/1.4 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;letter-spacing:0;text-transform:none}
+
+@media(max-width:767px){.crew-orbit[data-ui-variant=glass] .scene-return,.crew-orbit[data-ui-variant=glass] .orbit-profile>.orbit-back{top:128px;font-size:10px;padding:4px 9px}
+}
+
+@media(min-width:768px) and (max-width:1150px){.crew-orbit[data-ui-variant=glass] .mission-reading-label{font-size:14px}
+.crew-orbit[data-ui-variant=glass] .mission-reading-comparison{font-size:10px}
+}
+
+.crew-orbit[data-ui-variant=glass] .history-scene-chart:focus-visible{outline:1px solid #a6d3ff99;outline-offset:5px;border-radius:10px}
+
+@media(min-width:768px){.crew-orbit[data-ui-variant=glass][data-workspace=scene] .orbit-timeline,.crew-orbit[data-ui-variant=glass][data-workspace=scene] .orbit-section-panel{bottom:85px!important}
+.crew-orbit[data-ui-variant=glass] .history-scene-inspect output{max-height:64px;overflow:auto}
+}
+
+@media(min-width:768px) and (max-width:1150px){.crew-orbit[data-ui-variant=glass] .history-scene-plot{height:clamp(170px,calc(100dvh - 580px),500px)}
+}
+
+.crew-orbit[data-ui-variant=glass][data-severity=attention]{--signal:#ffcf91}
+
+.crew-orbit[data-ui-variant=glass][data-severity=attention] .mission-state .mission-eyebrow{color:#ffdaa8;background:#d9a85a1b}
+
+.crew-orbit[data-ui-variant=glass][data-severity=attention] .mission-reading[data-focus=true] strong{color:#ffdfb6}
+
+.crew-orbit[data-ui-variant=glass][data-severity=attention] .mission-reading[data-focus=true]>.glass-icon{color:#f7cb94}
+
+/* Liquid: an open spatial canvas; glass belongs to the controls. */
+.scene-explore,.scene-orbit-tools{display:none}
+
+.crew-orbit[data-workspace=mission] .scene-explore{display:block;position:absolute;z-index:12;left:35%;top:26%;width:30%;height:42%;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;border-radius:45%;outline-offset:6px}
+
+.crew-orbit[data-exploring=true] .scene-explore{cursor:grabbing}
+
+.crew-orbit[data-workspace=mission] .scene-orbit-tools{position:absolute;z-index:15;left:50%;bottom:29%;transform:translateX(-50%);display:flex;align-items:center;gap:12px;padding:4px 5px 4px 14px;border:1px solid #ffffff30;border-radius:24px;background:#7894b01a;box-shadow:inset 0 1px 0 #ffffff38,0 4px 18px #0002;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);font:11px -apple-system,BlinkMacSystemFont,sans-serif;color:#d5e5f3}
+
+.scene-orbit-tools>span,.scene-orbit-tools>button{position:relative;z-index:2}
+.scene-orbit-tools>button{display:grid;place-items:center;width:30px;height:30px;border:0;border-radius:50%;background:#ffffff15;color:#fff;font:22px/1 sans-serif;cursor:pointer}
+.scene-orbit-tools>button:hover{background:#ffffff30}
+
+.crew-orbit[data-severity=urgent] .scene-explore,.crew-orbit[data-severity=urgent] .scene-orbit-tools{display:none}
+
+.crew-orbit[data-ui-variant=glass] .mission-tools:before{background:linear-gradient(150deg,#e7f4ff45,#c9d8ef17);transition:left .5s cubic-bezier(.22,1.22,.32,1),width .5s cubic-bezier(.22,1.22,.32,1)}
+
+.crew-orbit[data-ui-variant=glass] .crew-select__menu{border-radius:22px;padding:6px;background:linear-gradient(135deg,#24374ded,#15283fe8);border:1px solid #ffffff30;box-shadow:inset 0 1px 0 #ffffff35,0 16px 45px #0005;backdrop-filter:blur(12px) saturate(1.2);-webkit-backdrop-filter:blur(12px) saturate(1.2);transform-origin:50% 0}
+
+.crew-orbit[data-ui-variant=glass] .crew-select.is-open .crew-select__menu{animation:glass-menu-in .38s cubic-bezier(.16,1,.3,1)}
+
+.crew-orbit[data-ui-variant=glass] .crew-select__option{padding:12px 15px;border-radius:16px;font-size:13px;transition:background .18s}
+
+.crew-orbit[data-ui-variant=glass] .crew-select__option[aria-selected=true]:after{content:'✓';margin-left:auto;color:#e4f4ff}
+
+@keyframes glass-menu-in{from{opacity:0;transform:translateY(-7px) scale(.94)}to{opacity:1;transform:translateY(0) scale(1)}}
+
+@media(min-width:768px) and (max-height:760px){
+
+
+.crew-orbit[data-workspace=mission] .scene-orbit-tools{bottom:31%}
+}
+
+@media(max-width:767px){
+ .crew-orbit[data-workspace=mission] .scene-explore{top:150px;left:56%;width:42%;height:190px}
+.crew-orbit[data-workspace=mission] .scene-orbit-tools{top:340px;bottom:auto;left:75%;font-size:9px;padding-left:10px;gap:7px;white-space:nowrap}
+.scene-orbit-tools>button{width:26px;height:26px;font-size:19px}
+}
+
+@media(prefers-reduced-motion:reduce){.crew-orbit[data-ui-variant=glass] .mission-tools:before,.crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-reading:before{transition:none}
+.crew-orbit[data-ui-variant=glass] .crew-select.is-open .crew-select__menu{animation:none}
+}
+
+@media(prefers-reduced-transparency:reduce){.scene-orbit-tools{background:#172c44!important;backdrop-filter:none!important}
+.crew-orbit[data-ui-variant=glass] .crew-select__menu{background:#172c44!important;backdrop-filter:none!important}
+}
+
+
+.crew-orbit[data-exploring=true]{user-select:none;-webkit-user-select:none}
+
+.crew-orbit[data-ui-variant=glass] .orbit-scenario-control>button{width:36px;height:36px;border:1px solid #ffffff30;padding:0;font-size:0!important;background:#a4bdd914;box-shadow:inset 0 1px 0 #ffffff25;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+
+.crew-orbit[data-ui-variant=glass] .orbit-scenario-control>button:before{content:'';display:block;width:18px;height:18px;margin:auto;background:currentColor;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='black' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round' d='M11 4 6 8H3v8h3l5 4V4Zm4 4a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14'/%3E%3C/svg%3E") center/contain no-repeat}
+
+.crew-orbit[data-ui-variant=glass] .orbit-scenario-control>button[aria-pressed=false]:after{content:'';position:absolute;left:8px;top:17px;width:20px;height:1.5px;background:currentColor;transform:rotate(-45deg);box-shadow:0 0 0 2px #162337}
+
+
+.scene-explore[data-pointer-focus]:focus{outline:none}
+
+
+@media(max-width:767px){.crew-orbit[data-ui-variant=glass][data-workspace=mission] .orbit-canvas{left:0!important;top:130px!important;width:100%!important;height:255px!important;mask-image:linear-gradient(to bottom,#000 62%,transparent);-webkit-mask-image:linear-gradient(to bottom,#000 62%,transparent)}
+}

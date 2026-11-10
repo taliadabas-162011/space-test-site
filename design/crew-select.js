@@ -1,3 +1,4 @@
+import {openPopover,closePopover} from './crew-popover.js';
 /** Accessible in-scene comboboxes backed by the original native form controls. */
 const widgets = new WeakMap();
 const watchedDocuments = new WeakSet();
@@ -15,12 +16,21 @@ function optionsFor(select) {
 function close(widget, focus = false) {
   if (!widget.open) return;
   widget.open = false;
-  widget.menu.hidden = true;
+  if(widget.floating)closePopover(widget.menu);
+  else if(widget.select.matches('[data-scenario]')&&!matchMedia('(prefers-reduced-motion: reduce)').matches&&typeof widget.menu.animate==='function') {
+    const menu=widget.menu, ratio=Math.min(1,widget.trigger.offsetWidth/Math.max(1,menu.offsetWidth));
+    menu.setAttribute('aria-hidden','true');menu.inert=true;
+    const prefix=innerWidth<768?'':'translateX(-50%) ';
+    widget.closeAnimation?.cancel();
+    widget.closeAnimation=menu.animate([{opacity:1,transform:getComputedStyle(menu).transform},{opacity:0,transform:`${prefix}scale(${ratio},.18)`}],{duration:180,easing:'cubic-bezier(.4,0,.8,.4)'});
+    widget.closeAnimation.onfinish=()=>{if(!widget.open)menu.hidden=true;widget.closeAnimation=null};
+  } else widget.menu.hidden = true;
+
   widget.trigger.setAttribute('aria-expanded', 'false');
   widget.trigger.removeAttribute('aria-activedescendant');
   widget.container.classList.remove('is-open');
   if (openWidget === widget) openWidget = null;
-  if (focus && widget.trigger.isConnected) widget.trigger.focus();
+  if (focus && widget.trigger.isConnected) widget.trigger.focus({preventScroll:true});
 }
 
 function render(widget) {
@@ -41,6 +51,11 @@ function render(widget) {
     option.setAttribute('aria-selected', String(item.index === select.selectedIndex));
     if (item.disabled) option.setAttribute('aria-disabled', 'true');
     option.textContent = item.text;
+    if(select.matches('[data-scenario]')) {
+      const description=document.createElement('span');description.className='crew-select__description';description.setAttribute('aria-hidden','true');
+      description.textContent={routine:'A regular day in orbit',recovery:'Sleep, intake and activity',review:'Check placement, repeat, compare',emergency:'Immediate crew assistance'}[select.options[item.index].value]||'';
+      option.append(description);
+    }
     menu.append(option);
   });
   if (widget.open) setActive(widget, Math.min(widget.active, Math.max(select.options.length - 1, 0)));
@@ -79,12 +94,19 @@ function move(widget, direction, edge = false) {
   if (index >= 0) setActive(widget, index);
 }
 
+function selectLimit(widget){return widget.select.matches('[data-scenario]')?410:Math.min(250,window.innerHeight*.4)}
+
 function show(widget) {
   if (widget.select.disabled || widget.open) return;
   if (openWidget && openWidget !== widget) close(openWidget);
+  widget.closeAnimation?.cancel();widget.closeAnimation=null;
+  widget.menu.removeAttribute('aria-hidden');widget.menu.inert=false;
   render(widget);
   widget.open = true;
   widget.menu.hidden = false;
+  widget.floating=Boolean(widget.select.closest('.collection-page'));
+  if(widget.floating)openPopover(widget.menu,widget.trigger,{width:Math.max(widget.trigger.offsetWidth,240),maxHeight:340});
+  else {
   const bounds = widget.trigger.getBoundingClientRect();
   const scroller = widget.trigger.closest('.orbit-form, .crew-anatomy-content, .orbit-onboarding, .orbit-section-panel');
   const clipping = scroller?.getBoundingClientRect();
@@ -94,7 +116,8 @@ function show(widget) {
   const openUp = availableBelow < widget.menu.offsetHeight && availableAbove > availableBelow;
   widget.container.classList.toggle('opens-up', openUp);
   const available = Math.max(44, (openUp ? availableAbove : availableBelow) - 8);
-  widget.menu.style.maxHeight = `${Math.min(250, window.innerHeight * .4, available)}px`;
+  widget.menu.style.maxHeight = `${Math.min(selectLimit(widget), available)}px`;
+  }
   widget.trigger.setAttribute('aria-expanded', 'true');
   widget.container.classList.add('is-open');
   openWidget = widget;
@@ -113,7 +136,7 @@ function choose(widget, index) {
   }
   close(widget, true);
   render(widget);
-  if (changed) widget.select.dispatchEvent(new Event('change', { bubbles: true }));
+  if (changed || widget.select.matches('[data-scenario]')) widget.select.dispatchEvent(new Event('change', { bubbles: true }));
 }
 
 function labelFor(select) {
@@ -211,6 +234,11 @@ function attach(select) {
       const match = optionsFor(select).find(option => !option.disabled && option.text.toLocaleLowerCase().startsWith(widget.search));
       if (match) setActive(widget, match.index);
     }
+  });
+  menu.addEventListener('pointermove', event => {
+    const option=event.target.closest('[role=option]');
+    if(!option||!menu.contains(option)||option.getAttribute('aria-disabled')==='true')return;
+    const index=Number(option.dataset.index);if(Number.isInteger(index)&&index!==widget.active)setActive(widget,index);
   });
   menu.addEventListener('click', event => {
     const option = event.target.closest('[role="option"]');

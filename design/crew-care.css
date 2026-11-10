@@ -1,0 +1,72 @@
+/* Keep the scene and controls; let each situation have one clear message. */
+.crew-orbit[data-ui-variant=glass][data-ui-variant] :is(h1,h2,h3,strong,legend,button){letter-spacing:normal!important;font-style:normal;text-transform:none}
+.crew-orbit[data-ui-variant=glass][data-ui-variant] :is(.mission-eyebrow,.glass-section-title,.orbit-panel-kicker){display:none}
+.crew-orbit[data-ui-variant=glass][data-ui-variant] :is(input,textarea,button,.history-scene-y,.history-scene-dates){font-family:inherit}
+.crew-orbit[data-ui-variant=glass][data-ui-variant] .orbit-mission{bottom:0!important;mask-image:none!important;-webkit-mask-image:none!important}
+.crew-orbit[data-ui-variant=glass][data-workspace=scene] :is(.orbit-timeline,.orbit-section-panel){bottom:20px!important}
+.crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-page{padding-bottom:30px;min-height:100%}
+.crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-intro h1{grid-row:1;font-weight:500}
+.crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-intro>button{grid-row:1;border:0;background:none;padding:6px 0;border-radius:0}
+.crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-intro>p{grid-row:2}
+.crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-state h2{font-size:clamp(24px,2.4vw,34px);font-weight:500;line-height:1.2;margin:0;text-wrap:balance}
+.crew-orbit[data-ui-variant=glass][data-ui-variant] .care-reason{display:block;font-size:14px;line-height:1.5;color:#c4d4e3;margin:16px 0;max-width:34ch}
+.crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-reading{grid-template-rows:auto auto}
+.crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-reading strong{grid-column:3;grid-row:1/3;align-self:center}
+.crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-reading-comparison{grid-column:2;grid-row:2;font-size:11px;color:#bacbda;line-height:1.5;margin:5px 0 0}
+.crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-body-readings .mission-reading strong{grid-column:2;grid-row:2}
+.crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-body-readings .mission-reading-comparison{display:none}
+.crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-reading[data-quality=missing] strong{color:#bacbda}
+.crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-page:not([data-care-view=routine]){grid-template-rows:auto minmax(max-content,1fr) auto}
+.crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-page:not([data-care-view=routine]) .care-focus{grid-column:3;grid-row:1/3;align-self:center;display:block;padding:0;background:none;border:0;box-shadow:none;border-radius:0;pointer-events:auto}
+.crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-page:not([data-care-view=routine]) .mission-ground{grid-row:3}
+.crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-response p{display:block;font-size:14px;line-height:1.55;color:#c4d4e3;margin:16px 0;max-width:35ch}
+.crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-response .care-onset{font-size:12px;margin-top:-8px;color:#c4d4e3}
+.crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-response .care-escalation{font-size:12px;line-height:1.55;margin-top:20px}
+.crew-orbit[data-ui-variant=glass][data-ui-variant] :is(.mission-response button,.mission-checkin){min-height:42px;padding:11px 16px;font-family:inherit;font-size:13px;font-weight:500;line-height:1.35;color:#e7f3ff;border:0;background:#193047;border-radius:12px;box-shadow:none;cursor:pointer;letter-spacing:normal;text-transform:none}
+.crew-orbit[data-ui-variant=glass][data-ui-variant] :is(.mission-response button,.mission-checkin):hover{background:#27435d}
+.crew-orbit[data-ui-variant=glass][data-ui-variant] :is(.mission-response button,.mission-checkin):focus-visible{outline:2px solid #bce3ff;outline-offset:4px}
+.crew-orbit[data-ui-variant=glass][data-ui-variant] :is(.mission-response button.care-primary,.mission-checkin){background:#deebf6;color:#152a3e;box-shadow:none;border:0}
+.crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-response button:disabled{opacity:1;cursor:default;background:none;color:#e5c5bb;padding-left:0}
+.crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-ground>div{max-width:70%;pointer-events:auto}
+.care-explanation,.care-handoff{font-size:12px;line-height:1.6;pointer-events:auto}
+.care-explanation summary,.care-handoff summary{cursor:pointer;color:#c4d4e3;padding:8px 0;list-style-position:inside}
+.care-explanation p{max-width:70ch;margin:12px 0;color:#b9cbda}
+.care-explanation a{color:#bddcf0}
+.care-handoff{margin-top:14px;border:0}
+.care-handoff textarea{width:100%;resize:vertical;min-height:150px;border:0;border-radius:12px;background:#102338;color:#e4edf5;padding:14px;font:12px/1.6 -apple-system,BlinkMacSystemFont,sans-serif;margin:10px 0}
+.care-copy-status,.care-response-status{display:block;font-size:12px;line-height:1.5;color:#c5ddda;margin-top:8px}
+.care-repeat-table{display:grid;grid-template-columns:1fr auto;gap:12px 16px;font-size:14px;color:#c4d4e3;margin:18px 0}
+.care-repeat-table strong{font-weight:500;color:#eff6fc}
+.care-alert-return{display:none;position:absolute;z-index:55;left:50%;bottom:18px;transform:translateX(-50%);padding:10px 16px;background:none;border:0;border-radius:0;box-shadow:none;color:#ffd1c2;font:500 13px/1.5 -apple-system,BlinkMacSystemFont,sans-serif;cursor:pointer;text-shadow:0 2px 6px #000}
+.crew-orbit[data-severity=urgent]:not([data-workspace=mission]) .care-alert-return{display:block}
+.crew-orbit .orbit-form[data-purpose=repeat] :is(.observation-recovery,.observation-daily-context,.observation-glucose-context,.observation-field:has(input[name=temperature]),.observation-field:has(input[name=glucose]),.observation-field:has(input[name=weight])){display:none}
+.crew-orbit .orbit-form[data-purpose=wellbeing] :is(.observation-group:has(.observation-vital-fields),.observation-daily-context){display:none}
+.observation-emergency-info{font-size:13px;line-height:1.6;color:#c4d4e3;margin-top:14px}.observation-emergency-info summary{cursor:pointer;color:#ffc9b9}.observation-emergency-info p{max-width:60ch}.observation-emergency-info small{font-size:12px}
+@media(min-width:768px) and (max-height:850px){.crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-page:not([data-care-view=routine]){padding-top:115px;gap:18px 5%}.crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-page:not([data-care-view=routine]) .mission-figure-space{min-height:330px}}
+@media(max-width:767px){
+ .crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-page:not([data-care-view=routine]){grid-template-rows:auto auto auto auto;gap:24px 12px}
+ .crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-page:not([data-care-view=routine]) .mission-figure-space{grid-column:2;grid-row:1;min-height:150px}
+ .crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-page:not([data-care-view=routine]) .care-focus{grid-column:1/-1;grid-row:2}
+ .crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-page:not([data-care-view=routine]) .mission-primary-readings{grid-column:1/-1;grid-row:3;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+ .crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-page:not([data-care-view=routine]) .mission-ground{grid-column:1/-1;grid-row:4}
+ .crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-ground>div{max-width:none}
+ .crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-page:not([data-care-view=routine]) .mission-primary-readings>.mission-reading{display:block;padding:0!important}
+ .crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-page:not([data-care-view=routine]) .mission-primary-readings .mission-reading-label{display:block;font-size:14px}
+ .crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-page:not([data-care-view=routine]) .mission-primary-readings strong{display:block;font-size:30px!important;margin:8px 0}
+ .crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-state h2{font-size:27px}
+ .crew-orbit[data-ui-variant=glass][data-ui-variant][data-severity=urgent] .mission-page{padding-top:140px;gap:18px}
+ .crew-orbit[data-ui-variant=glass][data-ui-variant][data-severity=urgent] .mission-page .mission-figure-space{min-height:150px;grid-row:1}
+ .crew-orbit[data-ui-variant=glass][data-ui-variant][data-severity=urgent] .mission-page .mission-intro h1{font-size:28px}
+ .care-alert-return{width:calc(100% - 40px);bottom:12px}
+}
+
+.crew-orbit[data-ui-variant=glass][data-ui-variant] .history-scene-current>span:first-child{text-transform:none;letter-spacing:normal}
+.crew-orbit[data-ui-variant=glass][data-ui-variant] .orbit-scenario-control .crew-select__menu:before{display:none}
+.crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-intro{grid-template-columns:minmax(0,max-content) auto}
+.crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-intro>button{grid-column:2;grid-row:1}
+@media(max-width:767px){.crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-intro{grid-template-columns:minmax(0,1fr)}.crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-intro>button{grid-column:1;grid-row:3}}
+
+@media(max-width:767px){.crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-page:not([data-care-view=routine]){align-content:start}}
+
+.crew-orbit[data-ui-variant=glass]{--glass-bg:#13283c99}
+.crew-orbit[data-ui-variant=glass][data-ui-variant] .crew-select__menu,.crew-orbit[data-ui-variant=glass][data-ui-variant] .orbit-scenario-control .crew-select__menu{background:#182c40ed}

@@ -9,12 +9,12 @@
 .crew-select__arrow{flex:none;padding:0 2px;color:#a7d9ee;font:400 20px/1 sans-serif;transition:transform .2s ease}
 .crew-select.is-open{z-index:30}
 .crew-select.is-open .crew-select__arrow{transform:rotate(180deg)}
-.crew-select__menu{position:absolute;z-index:30;top:calc(100% + 5px);right:0;left:0;display:block;max-height:min(250px,40vh);overflow-y:auto;overscroll-behavior:contain;padding:4px 12px;background:linear-gradient(145deg,#122b3b,#071725);box-shadow:0 16px 28px rgba(0,4,10,.45);border-top:1px solid #8acbe7;color:#ebf8fd;animation:crew-select-open .2s ease-out both;scrollbar-width:thin;scrollbar-color:#719bad transparent}
+.crew-select__menu{position:absolute;z-index:30;top:calc(100% + 5px);right:0;left:0;display:block;max-height:min(250px,40vh);overflow-y:auto;overscroll-behavior:contain;padding:6px 0;background:#07111b;box-shadow:0 16px 28px rgba(0,4,10,.3);border:1px solid #304653;color:#ebf8fd;animation:crew-select-open .2s ease-out both;scrollbar-width:thin;scrollbar-color:#719bad transparent}
 .crew-select__menu[hidden]{display:none}
 .crew-select.opens-up .crew-select__menu{top:auto;bottom:calc(100% + 5px)}
-.crew-select__option{display:flex;align-items:center;min-height:42px;padding:8px 3px;border-bottom:1px solid rgba(174,210,225,.14);font:400 14px/1.35 Orbit Magnetik,sans-serif;cursor:pointer}
+.crew-select__option{display:flex;align-items:center;min-height:42px;padding:10px 14px;border-bottom:0;font:400 14px/1.35 Orbit Magnetik,sans-serif;cursor:pointer}
 .crew-select__option:last-child{border-bottom:0}
-.crew-select__option.is-active,.crew-select__option:hover{color:#fff;background:rgba(151,216,246,.12)}
+.crew-select__option.is-active,.crew-select__option:hover{color:#fff;background:#162a36}
 .crew-select__option[aria-selected="true"]:after{content:'';width:6px;height:11px;margin:0 5px 4px auto;border-right:1.5px solid #a6e5ff;border-bottom:1.5px solid #a6e5ff;transform:rotate(45deg)}
 .crew-select__option[aria-disabled="true"]{opacity:.45;cursor:not-allowed}
 .crew-select__error{display:block;margin-top:7px;color:#ffc0b5;font-size:12px;line-height:1.4}
@@ -29,3 +29,6 @@
 @keyframes crew-select-open{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
 @media(max-width:767px){.crew-orbit .crew-select__trigger,.crew-select__option{font-size:16px}.crew-select__option{min-height:44px}}
 @media(prefers-reduced-motion:reduce){.crew-select__menu{animation:none}.crew-select__arrow{transition:none}}
+
+.orbit-scenario-control .crew-select__menu{left:-16px;right:-16px;max-height:none;padding:8px 0;border-color:#304653;box-shadow:0 20px 45px #02070d}
+.orbit-scenario-control .crew-select__option{min-height:46px;font-size:13px;padding:11px 16px;letter-spacing:0;text-transform:none}
