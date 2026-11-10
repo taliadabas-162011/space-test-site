@@ -10,7 +10,7 @@
 // Use the same renderer and Three.js build as the crew. Call update() before
 // rendering, and dispose() when the stage is destroyed. A far plane of >= 160
 // is needed. The separate satellite load can be disabled for slow devices.
-import { Mesh, Group, BufferGeometry, BufferAttribute, ShaderMaterial, TextureLoader, Texture, PointLight }
+import { Vector3, Mesh, Group, BufferGeometry, BufferAttribute, ShaderMaterial, TextureLoader, Texture, PointLight }
   from '/space-test-site/design/vendor/three/three.module.min.js';
 
 const ASSET_ROOT = '/space-test-site/design/assets/environment';
@@ -267,6 +267,7 @@ export async function createCrewEnvironment(scene, options = {}) {
   root.add(sky, planet);
   if (sat) root.add(sat);
   scene.add(root);
+  const satelliteAnchor = new Vector3();
   let disposed = false;
   return {
     satelliteLoaded: Boolean(sat),
@@ -281,10 +282,23 @@ export async function createCrewEnvironment(scene, options = {}) {
         planet.position.x = composition.focus[0] + composition.direction[0] * 59;
         planet.position.z = composition.focus[1] + composition.direction[1] * 59;
       }
+      const planetHeight=Number.isFinite(composition?.planetHeight)?composition.planetHeight:-33;
+      planet.position.y+=(planetHeight-planet.position.y)*(composition?.reducedMotion?1:.06);
       planet.rotation.y = -.42 + time * .00045;
       if (sat) {
         sat.visible = composition?.satelliteVisible !== false;
-        sat.position.y = 7.5 + Math.sin(time * .08) * .14;
+        const scale = Number.isFinite(composition?.satelliteScale) ? composition.satelliteScale : 1;
+        sat.scale.setScalar(scale);
+        const height = Number.isFinite(composition?.satelliteHeight) ? composition.satelliteHeight : 7.5;
+        const satelliteX = Number.isFinite(composition?.satelliteX) ? composition.satelliteX : -10;
+        sat.position.x += (satelliteX - sat.position.x) * .06;
+        sat.position.y += (height + Math.sin(time * .08) * .14 - sat.position.y) * .06;
+        if (camera && composition?.satelliteAnchor) {
+          // Reserve the open space above the crew, keeping the station off readable UI.
+          const depth = satelliteAnchor.copy(sat.position).project(camera).z;
+          satelliteAnchor.set(composition.satelliteAnchor[0] * 2 - 1, 1 - composition.satelliteAnchor[1] * 2, depth).unproject(camera);
+          sat.position.lerp(satelliteAnchor, .14);
+        }
         sat.rotation.y = Math.sin(time * .04) * .025;
       }
     },

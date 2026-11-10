@@ -1,0 +1,32 @@
+import assert from 'node:assert/strict';
+import {sceneShot,createSceneDirector,placeSceneCamera} from '../design/crew-scene-director.js';
+const options={frame:{x:.5,y:.46,width:.3,height:.6},aspect:16/9,screenWidth:1280};
+const overview=sceneShot('routine',options),history=sceneShot('history',options),device=sceneShot('device',options);
+assert.equal(history.x,.5,'history does not drift to the edge');
+assert.ok(device.x<.4&&device.distance<overview.distance&&device.height>overview.height,'devices retain their close body focus');
+assert.equal(history.yaw,overview.yaw,'history keeps the overview front-facing angle');
+assert.ok(history.distance<device.distance&&history.height>device.height,'history moves closer to the helmet while devices focus on the torso');
+const director=createSceneDirector(1000);
+director.update('routine',overview,0,true);
+assert.deepEqual(director.update('history',history,10),{...history,...overview},'the move starts from the displayed camera pose');
+const middle=director.update('history',history,510);
+assert.ok(middle.distance<overview.distance&&middle.distance>history.distance,'the camera approaches continuously during the journey');
+assert.ok(middle.height>overview.height&&middle.height<history.height,'the focus rises smoothly from the overview toward the helmet');
+for(let now=510;now<1010;now+=15){const pose=director.update('history',history,now);for(const number of Object.values(pose))assert.ok(Number.isFinite(number));assert.ok(pose.distance>=history.distance)}
+assert.deepEqual(director.update('history',history,1010),history);
+const bodyOut=createSceneDirector(1000);bodyOut.update('device',device,0,true);bodyOut.update('history',history,10);const leavingBody=bodyOut.update('history',history,510);assert.ok(leavingBody.distance<device.distance&&leavingBody.distance>history.distance,'equipment to history moves cleanly into the closer helmet view');assert.ok(leavingBody.height<=Math.max(device.height,history.height),'a close endpoint does not overshoot its focus');
+director.update('device',device,1020);const interrupted=director.update('device',device,1400);
+const restarted=director.update('routine',overview,1401);
+for(const field of ['yaw','pitch','height','distance','x','y'])assert.equal(restarted[field],interrupted[field],'rapid navigation preserves the displayed pose');
+assert.deepEqual(director.update('routine',overview,1402,true),overview,'reduced motion goes directly to the destination');
+const changed={...overview,x:.6,distance:overview.distance+1};assert.deepEqual(director.update('routine',changed,1500),changed);
+const angular=createSceneDirector(1000),a={...overview,yaw:3.05},b={...overview,yaw:-3.05};angular.update('a',a,0,true);angular.update('b',b,1);assert.ok(Math.abs(angular.update('b',b,501).yaw-Math.PI)<.01,'wrap boundaries use the short arc');
+// The physical camera puts the focal point at its requested screen coordinate.
+const frame={...overview,x:.31,y:.62,yaw:.6,pitch:.13};const placement=placeSceneCamera(frame,options.aspect);
+const eye=placement.position,target=placement.target,r=eye.map((v,i)=>v-target[i]),length=Math.hypot(...r),dir=r.map(v=>v/length);
+const right=[Math.cos(frame.yaw),0,-Math.sin(frame.yaw)],up=[-Math.sin(frame.pitch)*Math.sin(frame.yaw),Math.cos(frame.pitch),-Math.sin(frame.pitch)*Math.cos(frame.yaw)];
+const q=[-target[0],frame.height-target[1],-target[2]],dot=(a,b)=>a.reduce((sum,v,i)=>sum+v*b[i],0),span=2*length*Math.tan(17*Math.PI/180);
+assert.ok(Math.abs(.5+dot(q,right)/(span*options.aspect)-frame.x)<1e-10);
+assert.ok(Math.abs(.5-dot(q,up)/span-frame.y)<1e-10);
+assert.ok(Math.abs(dot(q,dir))<1e-10);
+console.log('Continuous camera travel, controlled approach, physical framing, interrupted moves and reduced motion pass.');

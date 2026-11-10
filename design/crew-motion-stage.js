@@ -1,3 +1,5 @@
+import { createSceneDirector, sceneShot, placeSceneCamera } from './crew-scene-director.js?v=4';
+import { createSceneOrbit } from './crew-scene-orbit.js?v=2';
 import { Scene, WebGLRenderer, PerspectiveCamera, Vector3, PointLight, Plane } from '/space-test-site/design/vendor/three/three.module.min.js';
 import { GLTFLoader } from '/space-test-site/design/vendor/three/examples/jsm/loaders/GLTFLoader.js';
 import { DRACOLoader } from '/space-test-site/design/vendor/three/examples/jsm/loaders/DRACOLoader.js';
@@ -7,7 +9,7 @@ import {
 } from '/space-test-site/design/scars-camera-paths.js?v=astronaut-6';
 import { loadScarsMotion, createScarsPerformer } from '/space-test-site/design/scars-motion.js';
 import { createAstronautMotionRefinement } from '/space-test-site/design/astronaut-motion-refinement.js';
-import { createCrewEnvironment } from '/space-test-site/design/crew-environment.js?v=astronaut-5';
+import { createCrewEnvironment } from '/space-test-site/design/crew-environment.js?v=astronaut-8';
 
 const MODEL_URL = '/space-test-site/design/astronaut-preview/assets/grab3d.glb';
 const MODEL_HEIGHT = 1.9;
@@ -32,9 +34,9 @@ const angleDifference = (a, b) => ((b - a + Math.PI * 3) % TAU) - Math.PI;
 
 /** Shared astronaut stage using Scars' captured camera tracks and switch weights. */
 export async function createCrewStage(canvas, onFrame = () => {}) {
-  const renderer = new WebGLRenderer({ canvas, alpha: true, antialias: false, powerPreference: 'low-power' });
+  const renderer = new WebGLRenderer({ canvas, alpha: true, antialias: true, powerPreference: 'high-performance' });
   renderer.localClippingEnabled = true;
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.15));
+  renderer.setPixelRatio(1);
   renderer.setClearColor(0x000000, 0);
   const scene = new Scene();
   const camera = new PerspectiveCamera(34, 1, 0.05, 100);
@@ -51,15 +53,27 @@ export async function createCrewStage(canvas, onFrame = () => {}) {
   const offset = new Vector3();
   const horizontalAxis = new Vector3();
   const anatomyPoint = new Vector3();
+  const scratch = new Vector3();
   const up = new Vector3(0, 1, 0);
   let cameraRig;
   let environment;
   let frameId = 0;
-  let lastRenderAt = 0;
-  const frameInterval = 1000 / 30;
+  let nextRenderAt = 0;
+  const frameInterval = 1000 / 60;
+  let pixelRatio=1;
   let width = 0;
   let height = 0;
   let projectionOffset = NaN;
+  let sceneView = 'routine';
+  const missionPosition = new Vector3(0, 1.02, 6.1);
+  const missionTarget = new Vector3(0, 1.02, 0);
+  let missionView = false;
+  let interfaceVariant = 'orbit';
+  let missionMix = 0;
+  let sceneFrame = null;
+  let projectionVertical = NaN;
+  const sceneOrbit = createSceneOrbit();
+  const director=createSceneDirector();
   let recording = false;
   let recordViewMix = 0;
   let recordViewMove = null;
@@ -96,6 +110,9 @@ export async function createCrewStage(canvas, onFrame = () => {}) {
   addLight(0xc8e5ff, 105, 5, 4.5, 1);
   addLight(0x2696ff, 55, 0, 3, -3.5);
   addLight(0xc8e5ff, 70, 0, 4, -6);
+  const alertLight = new PointLight(0xf05232, 0, 0);
+  alertLight.position.set(-1, 2.5, 3);
+  scene.add(alertLight);
 
   function measure(root) {
     root.updateMatrixWorld(true);
@@ -164,8 +181,7 @@ export async function createCrewStage(canvas, onFrame = () => {}) {
     throw error;
   }
 
-  function dimensions() {
-    const rect = canvas.getBoundingClientRect();
+  function dimensions(rect,shot) {
     const w = Math.max(1, Math.round(rect.width));
     const h = Math.max(1, Math.round(rect.height));
     const mobile = window.innerWidth < 768;
@@ -173,15 +189,18 @@ export async function createCrewStage(canvas, onFrame = () => {}) {
       anatomyFocusMobile = mobile;
       if (anatomyFocusRegion) moveAnatomyFocus(anatomyFocusRegion);
     }
-    const nextOffset = mobile && selected !== null ? -0.12 : framing;
-    const resized = w !== width || h !== height;
-    if (!resized && Math.abs(nextOffset - projectionOffset) < 0.0001) return;
+    const nextOffset = shot ? 0 : mobile && selected !== null ? -0.12 : framing;
+    const nextVertical = 0;
+    const nextRatio=Math.min(Math.max(1,window.devicePixelRatio||1),1.75,Math.sqrt(3000000/(w*h)));
+    const resized = w !== width || h !== height || Math.abs(nextRatio-pixelRatio)>.01;
+    if (!resized && Math.abs(nextOffset - projectionOffset) < 0.0001 && Math.abs(nextVertical - projectionVertical)<.0001) return;
     width = w;
     height = h;
     projectionOffset = nextOffset;
-    if (resized) renderer.setSize(width, height, false);
+    projectionVertical = nextVertical;
+    if (resized) {pixelRatio=nextRatio;renderer.setPixelRatio(pixelRatio);renderer.setSize(width,height,false)}
     camera.aspect = width / height;
-    if (Math.abs(nextOffset) >= 0.0001) camera.setViewOffset(width, height, width * nextOffset, 0, width, height);
+    if (Math.abs(nextOffset)+Math.abs(nextVertical) >= 0.0001) camera.setViewOffset(width, height, width * nextOffset, height * nextVertical, width, height);
     else camera.clearViewOffset();
     camera.updateProjectionMatrix();
   }
@@ -365,12 +384,12 @@ export async function createCrewStage(canvas, onFrame = () => {}) {
   }
 
   function render(now) {
-    if (disposed) return;
-    if (now - lastRenderAt < frameInterval) {
+    if (disposed || document.hidden) return;
+    if (!paused && now < nextRenderAt - 1) {
       frameId = requestAnimationFrame(render);
       return;
     }
-    lastRenderAt = now;
+    nextRenderAt = nextRenderAt ? Math.max(nextRenderAt + frameInterval, now) : now + frameInterval;
     const dt = frameTime ? clamp((now - frameTime) / 1000, 0, 0.05) : 0;
     frameTime = now;
     const isReduced = reducedMotion.matches;
@@ -383,7 +402,9 @@ export async function createCrewStage(canvas, onFrame = () => {}) {
     const recordFraming = window.innerWidth >= 768 ? 0.13 * recordWeight : 0;
     const framingTarget = Math.max(recordingFraming, recordFraming) + anatomyFraming;
     framing += (framingTarget - framing) * (isReduced || paused ? 1 : 1 - Math.exp(-5 * dt));
-    dimensions();
+    const rect = canvas.getBoundingClientRect();
+    const shot=missionView?director.update(sceneView,sceneShot(sceneView,{frame:sceneFrame,aspect:rect.width/Math.max(1,rect.height),screenWidth:window.innerWidth,variant:interfaceVariant}),now,isReduced||paused):null;
+    dimensions(rect,shot);
     if (anatomyMove) {
       const t = !isReduced && anatomyMove.duration ? clamp((now - anatomyMove.start) / anatomyMove.duration, 0, 1) : 1;
       anatomyMix = anatomyMove.from + (anatomyMove.to - anatomyMove.from) * ease(t);
@@ -436,17 +457,24 @@ export async function createCrewStage(canvas, onFrame = () => {}) {
       view.position = intro.position;
       view.target = intro.target;
     }
+    missionMix += ((missionView ? 1 : 0) - missionMix) * (isReduced || paused ? 1 : 1 - Math.exp(-3 * dt));
     const overviewHeight = window.innerWidth < 768
       ? 1.04 - clamp((844 - height) * 0.0007, 0, 0.14)
       : 0.9 - clamp((720 - height) * 0.001, 0, 0.3);
-    position.set(0, overviewHeight, overviewDistance()).lerp(new Vector3(...view.position), layout);
-    target.set(0, overviewHeight, 0).lerp(new Vector3(...view.target), layout);
+    position.set(0, overviewHeight, overviewDistance()).lerp(scratch.fromArray(view.position), layout);
+    target.set(0, overviewHeight, 0).lerp(scratch.fromArray(view.target), layout);
     if (recordWeight > 0) {
       offset.copy(position).sub(target);
       target.y += (1.30 - target.y) * recordWeight;
       offset.applyAxisAngle(up, 0.18 * recordWeight);
       position.copy(target).add(offset.multiplyScalar(1 - 0.22 * recordWeight));
     }
+    const follow = isReduced || paused ? 1 : 1 - Math.exp(-3.4 * dt);
+    const mobile = window.innerWidth < 768;
+    const exploration=sceneOrbit.update(dt,isReduced||paused);
+    if(shot){const placement=placeSceneCamera(shot,width/height,exploration);missionPosition.fromArray(placement.position);missionTarget.fromArray(placement.target)}
+    alertLight.intensity += ((missionView && sceneView === 'emergency' ? 95 : 0) - alertLight.intensity) * follow;
+    if (missionMix > .001) { position.lerp(missionPosition, missionMix); target.lerp(missionTarget, missionMix); }
     updateAnatomyFocus(now, isReduced);
     if (anatomyIndex !== null && selected === anatomyIndex && anatomyMix > 0) {
       offset.copy(position).sub(target);
@@ -503,7 +531,7 @@ export async function createCrewStage(canvas, onFrame = () => {}) {
         material.depthWrite = original.depthWrite && suitOpacity > 0.99;
       }
       if (!model.pivot.visible) return;
-      const movement = model.refinement.applyFrame(isReduced ? SELECTION_FRAME : model.frame, dt);
+      const movement = model.refinement.applyFrame(isReduced ? SELECTION_FRAME : missionView ? Math.min(model.frame, SELECTION_FRAME - (1 - Math.cos(now / 3200)) * 5) : model.frame, dt);
       if (model.poseTransition) {
         if (model.poseTransition.start === null) model.poseTransition.start = now;
         const t = isReduced ? 1 : clamp((now - model.poseTransition.start) / 650, 0, 1);
@@ -523,6 +551,10 @@ export async function createCrewStage(canvas, onFrame = () => {}) {
       model.pivot.position.x += movement.x;
       model.pivot.position.y += movement.y;
       model.pivot.position.z += movement.z;
+      if (missionMix > .001 && !isReduced) {
+        model.pivot.position.y += Math.sin(now / 1900) * (shot && shot.distance<3 ? .012 : .035) * missionMix;
+        model.pivot.rotation.z = Math.sin(now / 2700) * .012 * missionMix;
+      } else model.pivot.rotation.z = 0;
       model.suitPlane.constant = model.pivot.position.y + MODEL_HEIGHT * (1.05 - 1.1 * reveal);
       if (model.anatomy) {
         model.anatomy.setOpacity(bodyOpacity);
@@ -539,9 +571,8 @@ export async function createCrewStage(canvas, onFrame = () => {}) {
     earthZ = -1 + (earthZ + 1) * layout;
     const earthLength = Math.hypot(earthX, earthZ) || 1;
     environment.update(now / 1000, { direction: [earthX / earthLength, earthZ / earthLength],
-      focus: [view.target[0] * layout, view.target[2] * layout], satelliteVisible: !(window.innerWidth < 768 && selected !== null), reducedMotion: isReduced, anatomy: anatomyMix });
+      focus: [view.target[0] * layout, view.target[2] * layout], satelliteVisible: window.innerWidth >= 768, satelliteAnchor: null, planetHeight:missionView&&sceneView==='collection'?-40:-33, satelliteHeight: missionView ? 6.9 : 7.5, satelliteX: missionView ? -5 : -10, satelliteScale: missionView ? .65 : 1, reducedMotion: isReduced, anatomy: anatomyMix });
     renderer.render(scene, camera);
-    const rect = canvas.getBoundingClientRect();
     const anchors = models.map(model => {
       const p = model.pivot.position;
       const top = screenPoint(p.x, p.y + MODEL_HEIGHT, p.z, rect);
@@ -568,11 +599,21 @@ export async function createCrewStage(canvas, onFrame = () => {}) {
   function resetPointer() { pointer.x = 0; pointer.y = 0; }
   window.addEventListener('pointermove', onPointer, { passive: true });
   window.addEventListener('blur', resetPointer);
+  function onVisibilityChange() {
+    cancelAnimationFrame(frameId);
+    if (!document.hidden && !paused && !disposed) {
+      frameTime = 0;
+      nextRenderAt = 0;
+      frameId = requestAnimationFrame(render);
+    }
+  }
+  document.addEventListener('visibilitychange', onVisibilityChange);
   function resume() {
     if (disposed || !paused) return;
     paused = false;
     frameTime = 0;
-    frameId = requestAnimationFrame(render);
+    nextRenderAt = 0;
+    if (!document.hidden) frameId = requestAnimationFrame(render);
   }
   function pause() { paused = true; cancelAnimationFrame(frameId); }
   function dispose() {
@@ -581,6 +622,7 @@ export async function createCrewStage(canvas, onFrame = () => {}) {
     disposed = true;
     window.removeEventListener('pointermove', onPointer);
     window.removeEventListener('blur', resetPointer);
+    document.removeEventListener('visibilitychange', onVisibilityChange);
     models.forEach(model => model.anatomy?.dispose());
     environment?.dispose();
     const geometries = new Set(), materials = new Set(), textures = new Set();
@@ -599,7 +641,7 @@ export async function createCrewStage(canvas, onFrame = () => {}) {
     draco.dispose();
     renderer.dispose();
   }
-  dimensions();
+  dimensions(canvas.getBoundingClientRect());
   resume();
-  return { focus, overview, setRecording, setRecordView, beginDrag, dragTo, endDrag, scrubBy, setAnatomy, focusAnatomyRegion, focusHeartDetail, pause, resume, dispose };
+  return { beginExplore() { sceneOrbit.begin(performance.now()); }, exploreTo(x, y) { sceneOrbit.move(x, y, performance.now()); }, endExplore(cancelled = false) { sceneOrbit.end(performance.now(), cancelled, reducedMotion.matches); }, rotateScene(yaw, pitch) { sceneOrbit.rotate(yaw, pitch); }, zoomScene(delta) { sceneOrbit.zoom(delta); }, resetScene() { sceneOrbit.reset(); }, focus, overview, setInterfaceVariant(value) { interfaceVariant = ['glass', 'focus'].includes(value) ? value : 'orbit'; }, setSceneFrame(value) { sceneFrame=value; }, setSceneView(value) { sceneView = value; }, setMissionView(value) { missionView = Boolean(value); }, setRecording, setRecordView, beginDrag, dragTo, endDrag, scrubBy, setAnatomy, focusAnatomyRegion, focusHeartDetail, pause, resume, dispose };
 }
