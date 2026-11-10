@@ -93,3 +93,9 @@
 @media(max-width:767px){.crew-orbit[data-ui-variant=glass] .profile-workspace .profile-page{grid-template-columns:1fr;grid-template-rows:auto auto auto;gap:28px;padding:150px 22px 28px}.crew-orbit[data-ui-variant=glass] .profile-workspace .collection-heading{min-height:88px;padding-right:92px}.crew-orbit[data-ui-variant=glass] .profile-workspace .collection-heading h1{font-size:28px}.crew-orbit[data-ui-variant=glass] .profile-workspace .profile-editor{grid-column:1;grid-row:2;align-self:start}.crew-orbit[data-ui-variant=glass] .profile-page>.profile-figure{grid-area:auto;min-height:100px}.profile-personal-values{gap:16px}.crew-orbit[data-ui-variant=glass] .profile-page .collection-label{font-size:14px}.crew-orbit[data-ui-variant=glass] .profile-page .collection-label small{display:block;margin:3px 0 0}.crew-orbit[data-ui-variant=glass] .profile-page .collection-footer{display:block}.profile-page .collection-save{margin-top:20px}.profile-name-field{margin-bottom:26px}}
 
 @media(max-width:767px){.repeat-results strong{font-size:clamp(22px,5.4vw,28px)}.repeat-results strong small{display:block;margin:0;line-height:1.5}}
+
+/* The recovery heading sits above the same three reading rows as the vital signs. */
+@media(min-width:768px){
+ .crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-page[data-care-view=routine] .mission-recovery{position:relative!important}
+ .crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-page[data-care-view=routine] .mission-recovery>.recovery-title{position:absolute;bottom:calc(100% + 12px);left:0;margin:0}
+}

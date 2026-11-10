@@ -1177,6 +1177,9 @@ hub.addEventListener('click', event => {
   if(event.target.closest('[data-repeat-next]')){if(repeatState.step===measurementGuides[repeatState.field].steps.length-1)repeatState.phase='entry';else repeatState.step++;showRepeatStep();return}
   if(event.target.closest('[data-repeat-back]')){repeatState.step=Math.max(0,repeatState.step-1);showRepeatStep();return}
   if(event.target.closest('[data-repeat-guide]')){storeRepeatDraft();repeatState.phase='guide';showRepeatStep();return}
+  // A selected radio emits no change event when a saved answer is clicked again.
+  const feeling=event.target.closest('[data-collect-form] input[name="symptoms"]');
+  if(feeling?.checked){const capture=feeling.form;syncCollectionSymptoms(capture);navigateCollection(capture,{view:['concerning','urgent'].includes(feeling.value)?'symptoms':'today'});storeCollectionDraft(capture);mission.scrollTop=0;syncMissionFrame();return}
   const collectionNav=event.target.closest('[data-collection-measure],[data-collection-view],[data-collect-symptoms]');
   if(collectionNav){const capture=collectionNav.closest('[data-collect-form]');navigateCollection(capture,{measurement:collectionNav.dataset.collectionMeasure,view:collectionNav.hasAttribute('data-collect-symptoms')?'symptoms':collectionNav.dataset.collectionView});storeCollectionDraft(capture);mission.scrollTop=0;syncMissionFrame();return}
   const guideAbout=event.target.closest('[data-guide-about]');
@@ -1456,7 +1459,7 @@ mission.addEventListener('input',event=>{if(event.target.closest('[data-repeat-f
 mission.addEventListener('change',event=>{if(event.target.closest('[data-repeat-form]'))storeRepeatDraft();
   const capture=event.target.closest('[data-collect-form]');if(!capture)return;
   clearCollectionValidation(capture,event.target);syncCollectionSymptoms(capture);syncCollectionMeasurement(capture);
-  if(event.target.name==='symptoms'){navigateCollection(capture,{view:['concerning','urgent'].includes(event.target.value)?'symptoms':'today'})}
+  if(event.target.name==='symptoms'){const view=['concerning','urgent'].includes(event.target.value)?'symptoms':'today';if(capture.elements.collectionView.value!==view)navigateCollection(capture,{view})}
   storeCollectionDraft(capture);
 });
 hub.addEventListener('submit', event => {

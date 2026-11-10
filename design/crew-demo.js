@@ -27,7 +27,8 @@
         append('temperature', Math.round((36.7 + Math.sin(daysAgo / 8) * .2) * 10) / 10, time, 'Scenario history', 'rest');
       }
       if (daysAgo % 7 === 0) {
-        append('glucose', 88 + (daysAgo % 7), time, 'Scenario history', 'fasting');
+        // Use periods independent of the weekly sampling cadence.
+        append('glucose', 88 + Math.round(6 * Math.sin(daysAgo / 13) + 3 * Math.sin(daysAgo / 4)), time, 'Scenario history', 'fasting');
         append('weight', Math.round((70 + Math.sin(daysAgo / 30) * .5) * 10) / 10, time, 'Scenario history');
       }
       if (daysAgo === 0) append('symptoms', 'none', time, 'Scenario history');
