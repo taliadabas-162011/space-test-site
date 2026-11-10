@@ -1,0 +1,58 @@
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+const vm = require('node:vm');
+const base = process.argv[2] || path.join(__dirname, '..', 'design');
+const data = new Map([
+  ['crew-health-profile-v1', JSON.stringify({ name: 'Personal profile' })],
+  ['crew-health-observations-v1', JSON.stringify({ alex: { pulse: [{ value: 51, time: '2026-11-01T10:00:00Z' }] } })],
+]);
+const before = new Map(data);
+const localStorage = { getItem(key) { return data.has(key) ? data.get(key) : null; }, setItem(key, value) { data.set(key, String(value)); } };
+const window = { location: { search: '?demo=1' }, addEventListener() {}, dispatchEvent() {} };
+const document = { documentElement: { hasAttribute() { return true; } }, addEventListener() {}, querySelectorAll() { return []; } };
+const context = vm.createContext({ window, document, localStorage, URLSearchParams, console, structuredClone, CustomEvent: class {} });
+vm.runInContext(fs.readFileSync(path.join(base, 'crew-demo.js'), 'utf8'), context);
+const sample = window.CrewDemo.makeRecords(new Date('2026-11-09T12:00:00Z'));
+for (const key of ['pulse', 'oxygen', 'sleep', 'water', 'exercise', 'mood']) assert.equal(sample.alex[key].length, 120);
+assert(sample.alex.pulse.every(row => row.source === 'Scenario history' && Date.parse(row.time) <= Date.parse('2026-11-09T12:00:00Z')));
+vm.runInContext(fs.readFileSync(path.join(base, 'crew-health.js'), 'utf8'), context);
+assert.equal(window.CrewDesign.demoMode, true);
+assert.equal(window.CrewDesign.history('alex', 'pulse').length, 120);
+const savedBeforeScenario = new Map(data);
+window.CrewDesign.setScenario('emergency');
+assert.equal(window.CrewDesign.summary('alex').symptoms, 'urgent');
+assert.equal(window.CrewDesign.summary('alex').pulse.value, 124);
+for (const [key,value] of savedBeforeScenario) assert.equal(data.get(key),value);
+window.CrewDesign.setScenario('routine');
+assert.equal(window.CrewDesign.summary('alex').pulse.value, 76);
+assert.equal(window.CrewDesign.getProfile().name, 'Personal profile');
+window.CrewDesign.saveOverview('alex', { pulse: 76 }, '', { source: 'Simulated sensor', context: 'rest' });
+assert.equal(window.CrewDesign.history('alex', 'pulse').length, 121);
+for (const [key, value] of before) assert.equal(data.get(key), value);
+console.log('Scenarios preview values without writing history, retain the original name, and preserve personal records.');
+
+const beforeCases = new Map(data);
+window.CrewDesign.setScenario('recovery');
+assert.deepEqual(Array.from(window.CrewDesign.history('alex','sleep').slice(-3),entry=>entry.value),[5.2,5.4,5.1]);
+for(const [key,value] of beforeCases)assert.equal(data.get(key),value);
+window.CrewDesign.setScenario('routine');
+window.CrewDesign.saveOverview('alex',{},'urgent',{symptomTags:['chest-pain'],source:'Manual check-in'});
+window.CrewDesign.setScenario('recovery');
+assert.equal(window.CrewDesign.summary('alex').symptoms,'urgent','a selected preview cannot hide a saved urgent report');
+assert.deepEqual(Array.from(window.CrewDesign.summary('alex').symptomTags),['chest-pain']);
+
+window.CrewDesign.setScenario('routine');
+const storageSnapshot=new Map(data),originalWrite=localStorage.setItem;
+localStorage.setItem=()=>{throw new Error('Storage unavailable')};
+const help=window.CrewDesign.requestUrgentAssistance('alex',{symptomTags:['breathing-difficulty']});
+assert.equal(help.persisted,false);
+assert.equal(window.CrewDesign.summary('alex').symptoms,'urgent');
+assert.equal(window.CrewDesign.summary('alex').symptomSource,'Unsaved help request');
+assert.deepEqual(Array.from(window.CrewDesign.summary('alex').symptomTags),['breathing-difficulty']);
+for(const [key,value] of storageSnapshot)assert.equal(data.get(key),value);
+localStorage.setItem=originalWrite;
+console.log('Urgent assistance remains available when observation storage fails.');
+window.CrewDesign.saveOverview('alex',{temperature:36.8},'',{temperatureSite:'oral',context:'rest'});
+assert.equal(window.CrewDesign.history('alex','temperature').at(-1).site,'oral');
+assert.throws(()=>window.CrewDesign.saveOverview('alex',{temperature:36.8},'',{temperatureSite:'invalid'}),/temperature site/);

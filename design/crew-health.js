@@ -1,12 +1,22 @@
 /* Data and interactions layered onto the captured Vibrant experience. */
 (() => {
-  const storageKey = 'crew-health-observations-v1';
-  const profileStorageKey = 'crew-health-profile-v1';
+  const demoMode = true; // Presentation records stay separate from the original personal record.
+  const storageKey = demoMode ? 'crew-health-demo-observations-v2' : 'crew-health-observations-v1';
+  const profileStorageKey = demoMode ? 'crew-health-demo-profile-v1' : 'crew-health-profile-v1';
+  if (demoMode) {
+    try {
+      const original = JSON.parse(localStorage.getItem('crew-health-profile-v1') || 'null');
+      const presentationProfile = JSON.parse(localStorage.getItem(profileStorageKey) || 'null');
+      if (original?.name && (!presentationProfile?.name || presentationProfile.name === 'Alex Rivera')) localStorage.setItem(profileStorageKey, JSON.stringify(original));
+      else if (localStorage.getItem(profileStorageKey) === null) localStorage.setItem(profileStorageKey, JSON.stringify({ name: 'Talia', model: 'female', age: '', bodyMass: '' }));
+      if (localStorage.getItem(storageKey) === null) localStorage.setItem(storageKey, JSON.stringify(window.CrewDemo.makeRecords()));
+    } catch (error) { console.warn('Could not prepare demo data:', error); }
+  }
   function readProfile() {
     try {
       const value = JSON.parse(localStorage.getItem(profileStorageKey) || 'null');
       if (!value || typeof value.name !== 'string' || !value.name.trim()) return null;
-      return { name: value.name.trim().slice(0, 48), model: value.model === 'female' ? 'female' : 'male', age: Number.isFinite(Number(value.age)) && Number(value.age) >= 0 && Number(value.age) <= 120 ? Number(value.age) : '', bodyMass: Number.isFinite(Number(value.bodyMass)) && Number(value.bodyMass) > 0 && Number(value.bodyMass) <= 400 ? Number(value.bodyMass) : '' };
+      return { name: value.name.trim().slice(0, 48), model: value.model === 'female' ? 'female' : 'male', age: value.age !== '' && value.age != null && Number.isFinite(Number(value.age)) && Number(value.age) >= 0 && Number(value.age) <= 120 ? Number(value.age) : '', bodyMass: Number.isFinite(Number(value.bodyMass)) && Number(value.bodyMass) > 0 && Number(value.bodyMass) <= 400 ? Number(value.bodyMass) : '' };
     } catch (_) { return null; }
   }
   let savedProfile = readProfile();
@@ -156,24 +166,44 @@
       .filter(item => ['none', 'concerning', 'urgent'].includes(item?.value) && Number.isFinite(Date.parse(item?.time)))
       .sort((a, b) => Date.parse(a.time) - Date.parse(b.time)) : [];
   }
+  const isHelpRequest=entry=>['Manual help request','Unsaved help request'].includes(entry?.source);
+  let currentScenario = 'routine';
+  let scenarioTime = Date.now();
+  const scenarios = {
+    routine: { tone: 'recorded', title: 'Routine overview', action: 'Review today’s observations or add a check-in.', values: {} },
+    recovery: { tone: 'attention', title: 'Recovery needs attention', action: 'Review the mission sleep schedule and discuss persistent fatigue with the crew medical officer.', values: { sleep: 5.1, water: 1.2, exercise: 35 } },
+    review: { tone: 'attention', title: 'Repeat & compare', action: 'Check the sensor fit, repeat the measurement under the same conditions, and follow the mission medical procedure.', values: { pulse: 96, pressure: { systolic: 142, diastolic: 92 }, oxygen: 94 } },
+    emergency: { tone: 'urgent', title: 'Urgent symptoms reported', action: 'Alert the crew and follow the mission emergency procedure now.', values: { pulse: 124, oxygen: 90 }, symptoms: 'urgent', tags: ['chest-pain','breathing-difficulty'], progression: 'worsening' },
+  };
+  function scenarioInfo() { return { key: currentScenario, startedAt: new Date(scenarioTime).toISOString(), ...structuredClone(scenarios[currentScenario]) }; }
+  function setScenario(key) {
+    if (!Object.hasOwn(scenarios, key)) return;
+    currentScenario = key;
+    scenarioTime = Date.now();
+    window.dispatchEvent(new CustomEvent('crewhealth:update'));
+  }
   function summary(personId) {
     const person = crew.find(item => item.id === personId);
     if (!person) return null;
     const reading = field => {
-      const latest = entriesFor(person.id, field).at(-1);
+      const latest = history(person.id, field).at(-1);
       const contexts = field === 'glucose' ? glucoseContexts : readingContexts;
-      return { value: latest ? latest.value : person.samples[field] ?? null, recorded: Boolean(latest), time: latest?.time || null, source: latest?.source || '',
-        context: contexts.includes(latest?.context) ? latest.context : '' };
+      return { value: latest ? latest.value : person.samples[field] ?? null, recorded: Boolean(latest), time: latest?.time || null, source: latest?.source || '', recordedAt: latest?.recordedAt || '',
+        context: contexts.includes(latest?.context) ? latest.context : '', quality: latest?.quality || '' };
     };
-    const symptoms = symptomEntries(person.id).at(-1);
+    const savedSymptoms = symptomEntries(person.id).filter(entry=>!isHelpRequest(entry)||!Number.isFinite(Date.parse(entry.endedAt))).at(-1);
+    const redTags = ['chest-pain','breathing-difficulty','fainting','new-weakness','speech-vision-change'];
+    const savedUrgent = savedSymptoms?.value === 'urgent' || (savedSymptoms?.value !== 'none' && savedSymptoms?.tags?.some(tag => redTags.includes(tag)));
+    const symptoms = !savedUrgent && scenarios[currentScenario].symptoms ? { value: 'urgent', time: new Date(scenarioTime).toISOString(), onset: new Date(scenarioTime-6*60000).toISOString(), tags: scenarios[currentScenario].tags, progression: scenarios[currentScenario].progression, source: 'Scenario preview' } : savedSymptoms;
     const report = field => {
       const list = records[person.id]?.[field];
       const latest = Array.isArray(list) ? list.filter(item => selfReports[field].includes(item?.value) && Number.isFinite(Date.parse(item?.time))).sort((a, b) => Date.parse(a.time) - Date.parse(b.time)).at(-1) : null;
+      if(scenarios[currentScenario][field]&&!(latest&&Date.parse(latest.recordedAt)>scenarioTime))return {value:scenarios[currentScenario][field],time:new Date(scenarioTime).toISOString(),source:'Scenario preview'};
       return latest ? { value: latest.value, time: latest.time } : null;
     };
     return { person, pulse: reading('pulse'), oxygen: reading('oxygen'), glucose: reading('glucose'), weight: reading('weight'), sleep: reading('sleep'), pressure: reading('pressure'),
       water: reading('water'), temperature: reading('temperature'), exercise: reading('exercise'), symptoms: symptoms?.value || '',
-      symptomTime: symptoms?.time || null, symptomNote: typeof symptoms?.note === 'string' ? symptoms.note : '',
+      symptomTime: symptoms?.time || null, symptomSource: symptoms?.source || '', symptomNote: typeof symptoms?.note === 'string' ? symptoms.note : '',
       symptomTags: Array.isArray(symptoms?.tags) ? symptoms.tags.filter(tag => Object.hasOwn(symptomOptions, tag)) : [],
       symptomOnset: symptoms?.onset && Number.isFinite(Date.parse(symptoms.onset)) ? symptoms.onset : null,
       symptomProgression: symptomProgressions.includes(symptoms?.progression) ? symptoms.progression : '',
@@ -181,11 +211,20 @@
   }
   function history(personId, field) {
     if (!crew.some(person => person.id === personId) || !metrics[field]) return [];
-    return entriesFor(personId, field).map(item => structuredClone(item));
+    const entries = entriesFor(personId, field).map(item => ({ ...structuredClone(item), source: item.source?.startsWith('Simulated') ? 'Scenario history' : item.source }));
+    if (currentScenario === 'recovery' && field === 'sleep') {
+      const localDay = time => { const d=new Date(time);return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`; };
+      for (let day=2;day>=0;day--) {
+        const when=new Date(scenarioTime);when.setDate(when.getDate()-day);
+        const key=localDay(when);for(let i=entries.length-1;i>=0;i--)if(localDay(entries[i].time)===key)entries.splice(i,1);
+        entries.push({ value: [5.1,5.4,5.2][day], time: when.toISOString(), recordedAt: when.toISOString(), source: 'Scenario preview' });
+      }
+    } else if (Object.hasOwn(scenarios[currentScenario].values, field) && !entries.some(entry=>entry.source==='Manual repeat' && Date.parse(entry.recordedAt)>scenarioTime && Date.parse(entry.time)>=scenarioTime-60000)) entries.push({ value: structuredClone(scenarios[currentScenario].values[field]), time: new Date(scenarioTime).toISOString(), recordedAt: new Date(scenarioTime).toISOString(), source: 'Scenario preview', context: field === 'glucose' ? 'fasting' : 'rest', ...(currentScenario === 'signal' ? { quality: 'unavailable' } : {}) });
+    return entries.sort((a,b)=>Date.parse(a.time)-Date.parse(b.time));
   }
   function symptomHistory(personId) {
     if (!crew.some(person => person.id === personId)) return [];
-    return symptomEntries(personId).map(item => structuredClone(item));
+    return symptomEntries(personId).map(item => ({...structuredClone(item),...(isHelpRequest(item)&&item.endedAt?{source:item.source+' · ended'}:{})}));
   }
   function selfReportHistory(personId, field) {
     if (!crew.some(person => person.id === personId) || !Object.hasOwn(selfReports, field)) return [];
@@ -203,6 +242,7 @@
   function saveOverview(personId, values, symptom, details = {}) {
     if (!crew.some(person => person.id === personId)) throw new Error('Unknown crew member');
     if (details.context && !readingContexts.includes(details.context)) throw new Error('Choose a valid reading context.');
+    if (details.temperatureSite && !['oral','ear','forehead','armpit','other'].includes(details.temperatureSite)) throw new Error('Choose a valid temperature site.');
     if (details.glucoseContext && !glucoseContexts.includes(details.glucoseContext)) throw new Error('Choose a valid glucose context.');
     if (symptom && !['none', 'concerning', 'urgent'].includes(symptom)) throw new Error('Choose a valid symptom report.');
     if (details.symptomNote && (typeof details.symptomNote !== 'string' || details.symptomNote.length > 240 || !['concerning', 'urgent'].includes(symptom))) throw new Error('Check the symptom note.');
@@ -246,12 +286,13 @@
       if (details.deviceSequence != null) entry.deviceSequence = details.deviceSequence;
       if (vitalFields.has(field) && details.context) entry.context = details.context;
       if (field === 'glucose' && details.glucoseContext) entry.context = details.glucoseContext;
+      if (field === 'temperature' && details.temperatureSite) entry.site = details.temperatureSite;
       next[personId][field].push(entry);
       count++;
     }
     if (symptom && ['none', 'concerning', 'urgent'].includes(symptom)) {
       next[personId].symptoms ||= [];
-      const entry = { value: symptom, time, recordedAt: recordedAt.toISOString() };
+      const entry = { value: symptom, time, recordedAt: recordedAt.toISOString(), source: typeof details.source === 'string' ? details.source.slice(0,80) : 'Manual check-in' };
       if (details.symptomNote?.trim()) entry.note = details.symptomNote.trim();
       if (details.symptomTags?.length) entry.tags = [...new Set(details.symptomTags)];
       if (onset) entry.onset = onset;
@@ -271,6 +312,27 @@
     records = next;
     refreshStories();
     window.dispatchEvent(new CustomEvent('crewhealth:update'));
+  }
+
+  function requestUrgentAssistance(personId,details={}) {
+    if(!crew.some(person=>person.id===personId))throw new Error('Unknown crew member');
+    const time=new Date().toISOString(),tags=(details.symptomTags||[]).filter(tag=>Object.hasOwn(symptomOptions,tag));
+    try{saveOverview(personId,{},'urgent',{symptomTags:tags,source:'Manual help request',measuredAt:time});return {persisted:true}}
+    catch(error){
+      const next=structuredClone(records);next[personId]||={};next[personId].symptoms||=[];
+      next[personId].symptoms.push({value:'urgent',time,recordedAt:time,tags,source:'Unsaved help request'});records=next;
+      window.dispatchEvent(new CustomEvent('crewhealth:update'));return {persisted:false};
+    }
+  }
+
+  function endUrgentAssistance(personId) {
+    if(!crew.some(person=>person.id===personId))throw new Error('Unknown crew member');
+    const next=structuredClone(records),time=new Date().toISOString();let ended=false;
+    for(const entry of next[personId]?.symptoms||[]){if(isHelpRequest(entry)&&!Number.isFinite(Date.parse(entry.endedAt))){entry.endedAt=time;ended=true}}
+    if(!ended)return {ended:false,persisted:true};
+    let persisted=true;try{localStorage.setItem(storageKey,JSON.stringify(next))}catch{persisted=false}
+    records=next;refreshStories();window.dispatchEvent(new CustomEvent('crewhealth:update'));
+    return {ended,persisted};
   }
 
   function installCrewSelector(scene) {
@@ -348,6 +410,6 @@
     refreshStories();
     window.dispatchEvent(new CustomEvent('crewhealth:update'));
   });
-  window.CrewDesign = { storyData, registerStories, hotspotLabel, crew, metrics, symptomOptions, summary, history, symptomHistory, selfReportHistory, selectCrew, saveOverview,
+  window.CrewDesign = { demoMode, scenarioInfo, setScenario, storyData, registerStories, hotspotLabel, crew, metrics, symptomOptions, summary, history, symptomHistory, selfReportHistory, selectCrew, saveOverview, requestUrgentAssistance, endUrgentAssistance,
     hasProfile: () => Boolean(savedProfile), getProfile: () => savedProfile ? { ...savedProfile } : null, saveProfile };
 })();
