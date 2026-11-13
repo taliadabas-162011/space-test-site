@@ -24,6 +24,18 @@
 .urgent-page .assistance-source-links{display:flex;flex-direction:column;gap:17px;margin-top:22px}.urgent-page .assistance-source-links a{font-size:14px;line-height:1.5;color:#f0c3aa;text-decoration:none}.urgent-page .assistance-source-links a:hover{text-decoration:underline}
 .crew-orbit[data-ui-variant=glass][data-ui-variant] .urgent-page .assistance-source-view>p{font-size:15px!important;line-height:1.55;max-width:none;margin:0 0 18px}
 .urgent-page .assistance-handoff-view .care-handoff{margin:0}.urgent-page .assistance-handoff-view .care-handoff textarea{height:130px;min-height:130px;resize:none;background:#12151ab0;border:1px solid #ffffff20;border-radius:18px;font-size:12px;line-height:1.5;margin:0 0 10px;padding:14px}.urgent-page .assistance-handoff-view .care-handoff>[role=status]{display:block;font-size:12px;line-height:1.5;color:#d4c3b8;margin-top:7px}.urgent-page .assistance-persistence[data-persisted=true]{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);margin:-1px!important;padding:0!important;white-space:nowrap}
+.urgent-page .assistance-voice{display:grid;gap:8px;margin:15px 0 18px;padding:13px 15px;border:1px solid #d6e4ef27;border-left:2px solid #92d7f2;border-radius:14px;background:#d6e4ef09}
+.urgent-page .assistance-voice-toggle{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;min-height:44px;padding:10px 14px;border:1px solid #b8dff047;border-radius:12px;background:#78c7e918;color:#eaf7ff;font-family:inherit;font-size:14px;font-weight:500;line-height:1.4;cursor:pointer}
+.urgent-page .assistance-voice-toggle:hover{background:#78c7e92b}.urgent-page .assistance-voice-toggle span{color:#9ee5ff;font-size:12px}
+.urgent-page .assistance-voice-toggle:focus-visible{outline:2px solid #9ee5ff;outline-offset:3px}
+.urgent-page .assistance-voice [data-assistance-voice-status]{min-height:18px;margin:0;color:#c2d2dc;font-size:11px;line-height:1.5}
+.urgent-page .assistance-voice small{color:#9fb0bc;font-size:10px;line-height:1.4}
+.urgent-page .assistance-voice{display:grid;gap:8px;margin:15px 0 18px;padding:13px 15px;border:1px solid #d6e4ef27;border-left:2px solid #92d7f2;border-radius:14px;background:#d6e4ef09}
+.urgent-page .assistance-voice-toggle{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;min-height:44px;padding:10px 14px;border:1px solid #b8dff047;border-radius:12px;background:#78c7e918;color:#eaf7ff;font-family:inherit;font-size:14px;font-weight:500;line-height:1.4;cursor:pointer}
+.urgent-page .assistance-voice-toggle:hover{background:#78c7e92b}.urgent-page .assistance-voice-toggle span{color:#9ee5ff;font-size:12px}
+.urgent-page .assistance-voice-toggle:focus-visible{outline:2px solid #9ee5ff;outline-offset:3px}
+.urgent-page .assistance-voice [data-assistance-voice-status]{min-height:18px;margin:0;color:#c2d2dc;font-size:11px;line-height:1.5}
+.urgent-page .assistance-voice small{color:#9fb0bc;font-size:10px;line-height:1.4}
 .urgent-page button:focus-visible{outline:2px solid #ffe0cf;outline-offset:4px}
 .crew-orbit[data-ui-variant=glass][data-severity=urgent]:after{border:1px solid #ff9b7eb3;box-shadow:inset 0 0 65px #c53e2545;animation:urgent-breathe 2.8s ease-in-out infinite;z-index:46;opacity:.65}
 @keyframes urgent-breathe{0%,100%{opacity:.45}50%{opacity:1}}
