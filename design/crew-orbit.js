@@ -1,7 +1,7 @@
 import {createRepeat,renderRepeat,repeatPayload} from './crew-repeat.js?v=1';
 import {renderCollection,collectionFields,collectionHasEntry,collectionPayload,syncCollectionSymptoms,syncCollectionMeasurement,navigateCollection,urgentCollectionFields,advanceMeasurementGuide,measurementGuides} from './crew-collection.js?v=10';
 import {renderAssistance,advanceAssistance,readAssistance,writeAssistance} from './crew-assistance.js?v=5';
-import {createVoiceInput} from './crew-voice-input.js?v=1';
+import {createVoiceInput} from './crew-voice-input.js?v=2';
 import {createLiquidInterface} from './crew-liquid-ui.js?v=8';
 import {responseKey,readResponse,recordResponse,handoffText} from './crew-care.js?v=3';
 import { createCrewStage } from '/space-test-site/design/crew-motion-stage.js?v=astronaut-33';

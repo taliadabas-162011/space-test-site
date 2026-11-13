@@ -28,6 +28,6 @@ export function createVoiceInput({getPrompt,onAnswer,onStatus}) {
   }catch{active=false;generation++;onStatus('Microphone unavailable. Use the answer buttons.');}
  }
  function next(){if(!active)return;phase='answer';pending=null;const prompt=getPrompt();if(!prompt?.question){say(prompt?.text||'Follow your mission medical procedure.',()=>{active=false;onStatus('Microphone off. Follow the on-screen guidance.');});return;}say(`${prompt.text} Say yes, no, or unsure.`,listen);}
- function start(){if(!Recognition){onStatus('Speech recognition is not supported here. Use the answer buttons.');return false;}active=true;generation++;next();return true;}
+ function start(){if(!Recognition){onStatus('Speech recognition is not supported here. Use the answer buttons.');return false;}active=true;generation++;onStatus('Speaking the current step. The microphone will listen when it finishes.');next();return true;}
  return {start,stop,next,get active(){return active}};
 }
