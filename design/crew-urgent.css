@@ -43,6 +43,12 @@
 @media(min-width:768px){.crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-page.urgent-page[data-care-view=emergency]{padding-top:150px}}
 @media(max-width:767px){.crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-page.urgent-page[data-care-view=emergency]{padding-top:198px}}
 
+.urgent-page .assistance-action-steps{display:grid;gap:9px;margin:0;padding-left:24px;color:#f1f6f8;line-height:1.55}
+.urgent-page .assistance-action-steps li{padding-left:5px}.urgent-page .assistance-action-steps li::marker{color:#ffb59e;font-weight:700}
+.urgent-page .assistance-topic-label{margin:0 0 8px;color:#ffc1aa;font-size:10px!important;font-weight:700;letter-spacing:.12em}
+.urgent-page .assistance-topic-icon{display:grid;place-items:center;width:48px;height:48px;margin:0 0 14px;border:1px solid #ffc1aa70;border-radius:14px;background:#ffad811a;color:#ffc1aa;font-size:27px}
+.urgent-page .assistance-reference-note{margin:16px 0 8px;color:#b9cbd5;font-size:12px!important;line-height:1.5}.urgent-page .assistance-reference-link{display:inline-block;margin:4px 0;color:#a8e4ff;font-size:12px;line-height:1.5}
+
 /* Give the assistance content its full natural height before placing readings. */
 .crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-page.urgent-page[data-assisting=true]{grid-template-rows:auto max-content auto;height:auto}
 .crew-orbit[data-ui-variant=glass][data-ui-variant] .urgent-page[data-assisting=true] .urgent-action.care-focus{height:auto;min-height:0;overflow:visible}

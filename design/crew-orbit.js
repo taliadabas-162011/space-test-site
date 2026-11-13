@@ -1,7 +1,7 @@
 import {createRepeat,renderRepeat,repeatPayload} from './crew-repeat.js?v=1';
 import {renderCollection,collectionFields,collectionHasEntry,collectionPayload,syncCollectionSymptoms,syncCollectionMeasurement,navigateCollection,urgentCollectionFields,advanceMeasurementGuide,measurementGuides} from './crew-collection.js?v=10';
-import {renderAssistance,advanceAssistance,readAssistance,writeAssistance} from './crew-assistance.js?v=5';
-import {createVoiceInput} from './crew-voice-input.js?v=2';
+import {renderAssistance,advanceAssistance,readAssistance,writeAssistance} from './crew-assistance.js?v=6';
+import {createVoiceInput} from './crew-voice-input.js?v=3';
 import {createLiquidInterface} from './crew-liquid-ui.js?v=8';
 import {responseKey,readResponse,recordResponse,handoffText} from './crew-care.js?v=3';
 import { createCrewStage } from '/space-test-site/design/crew-motion-stage.js?v=astronaut-33';
@@ -72,8 +72,8 @@ const appNav = hub.querySelector('.mission-tools');
 initializeCustomSelects(hub.querySelector('.orbit-scenario-control'));
 const mission = hub.querySelector('.orbit-mission');
 const voiceInput=createVoiceInput({
- getPrompt:()=>({question:mission.querySelector('[data-assist-question]')?.dataset.assistQuestion,text:[mission.querySelector('.assistance-view h2')?.textContent,mission.querySelector('.assistance-instruction')?.textContent].filter(Boolean).join('. ')}),
- onAnswer:answer=>{const question=mission.querySelector('[data-assist-question]')?.dataset.assistQuestion;if(question){updateAssistance(question,answer);voiceInput.next()}else voiceInput.stop()},
+ getPrompt:()=>({question:mission.querySelector('[data-assist-question]')?.dataset.assistQuestion||(mission.querySelector('[data-assist-topic]')?'topic':''),text:[mission.querySelector('.assistance-view h2')?.textContent,mission.querySelector('.assistance-instruction')?.textContent].filter(Boolean).join('. ')}),
+ onAnswer:answer=>{const question=mission.querySelector('[data-assist-question]')?.dataset.assistQuestion;if(question)updateAssistance(question,answer);else if(mission.querySelector('[data-assist-topic]')&&['chest','fracture','other'].includes(answer))showAssistanceTopic(answer);else{voiceInput.stop();return}voiceInput.next()},
  onStatus:message=>{const status=mission.querySelector('[data-assistance-mic-status]');if(status)status.textContent=message;const button=mission.querySelector('[data-assist-mic]');if(button){button.textContent=voiceInput.active?'Stop microphone':'Start microphone answers';button.setAttribute('aria-pressed',String(voiceInput.active))}}
 });
 let alertSoundEnabled = true;
@@ -890,6 +890,10 @@ function updateAssistance(question,answer) {
   mission.querySelector('.assistance-view h2')?.focus({preventScroll:true});
   resetMissionScroll();
 }
+function showAssistanceTopic(topic) {
+  if(!['chest','fracture','other'].includes(topic))return;
+  assistanceView=topic;renderMissionView();mission.querySelector('.assistance-view h2')?.focus({preventScroll:true});resetMissionScroll();
+}
 function renderMissionView(force=false) {
   const summary = CrewDesign.summary(people[0].id);
   const scenario = CrewDesign.scenarioInfo();
@@ -903,7 +907,7 @@ function renderMissionView(force=false) {
     hub.dataset.alertAcknowledged=String(Boolean(response.acknowledgedAt));
     if (key !== activeAlertKey) { activeAlertKey = key; assistanceModeKey='';assistanceView='steps';assistanceStarted=false;playAlertSound(); }
   } else { activeAlertKey = ''; alarm.stop(); }
-  if(voiceInput.active&&(state.key!=='emergency'||assistanceModeKey!==activeAlertKey||assistanceView!=='steps'))voiceInput.stop();
+  if(voiceInput.active&&(state.key!=='emergency'||assistanceModeKey!==activeAlertKey||!['steps','chest','fracture','other'].includes(assistanceView)))voiceInput.stop();
   stage?.setSceneView?.(collectionMode?'collection':state.key);
   hub.dataset.collecting=String(Boolean(collectionMode));
   if(!force&&collectionMode==='guided-repeat'&&mission.querySelector('[data-repeat-form]')){syncMissionFrame();return}
@@ -1222,6 +1226,7 @@ hub.addEventListener('click', event => {
   if(event.target.closest('[data-assist-close]')){if(voiceInput.active)voiceInput.stop();stopAssistanceVoice();setAssistanceScrollMode(false);assistanceModeKey='';assistanceView='steps';assistanceStarted=false;renderMissionView();mission.querySelector('[data-assist-open]')?.focus({preventScroll:true});resetMissionScroll();return}
   const assistView=event.target.closest('[data-assist-view]');if(assistView){if(voiceInput.active)voiceInput.stop();stopAssistanceVoice();if(assistView.dataset.assistView==='response'){setAssistanceScrollMode(false);assistanceModeKey='';assistanceView='steps';assistanceStarted=false}else{setAssistanceScrollMode(true);assistanceModeKey=activeAlertKey;assistanceView=assistView.dataset.assistView}renderMissionView();mission.querySelector('.assistance-view h2,#urgent-action-title')?.focus({preventScroll:true});resetMissionScroll();return}
   if(event.target.closest('[data-assist-reassess]')){updateAssistance();return}
+  const assistTopic=event.target.closest('[data-assist-topic]');if(assistTopic){if(voiceInput.active)voiceInput.stop();showAssistanceTopic(assistTopic.dataset.assistTopic);return}
   const observation=event.target.closest('[data-assist-question]');if(observation){if(voiceInput.active)voiceInput.stop();updateAssistance(observation.dataset.assistQuestion,observation.dataset.assistAnswer);return}
   const repeatButton=event.target.closest('[data-repeat-measurement]');if(repeatButton){startRepeat(repeatButton.dataset.repeatMeasurement);return}
   if(event.target.closest('[data-repeat-close]')){closeRepeat();return}
