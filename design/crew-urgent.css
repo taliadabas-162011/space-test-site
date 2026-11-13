@@ -30,6 +30,7 @@
 .urgent-page .assistance-voice-toggle:focus-visible{outline:2px solid #9ee5ff;outline-offset:3px}
 .urgent-page .assistance-voice [data-assistance-voice-status]{min-height:18px;margin:0;color:#c2d2dc;font-size:11px;line-height:1.5}
 .urgent-page .assistance-voice small{color:#9fb0bc;font-size:10px;line-height:1.4}
+.urgent-page[data-assisting=true] .urgent-problem .care-checkin-return{visibility:hidden}
 .urgent-page .assistance-voice{display:grid;gap:8px;margin:15px 0 18px;padding:13px 15px;border:1px solid #d6e4ef27;border-left:2px solid #92d7f2;border-radius:14px;background:#d6e4ef09}
 .urgent-page .assistance-voice-toggle{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;min-height:44px;padding:10px 14px;border:1px solid #b8dff047;border-radius:12px;background:#78c7e918;color:#eaf7ff;font-family:inherit;font-size:14px;font-weight:500;line-height:1.4;cursor:pointer}
 .urgent-page .assistance-voice-toggle:hover{background:#78c7e92b}.urgent-page .assistance-voice-toggle span{color:#9ee5ff;font-size:12px}
