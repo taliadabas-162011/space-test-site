@@ -850,6 +850,13 @@ function syncAssistanceVoiceButton() {
 function stopAssistanceVoice() {
  assistanceVoiceActive=false;window.speechSynthesis?.cancel();
 }
+function resetMissionScroll() {
+ mission.scrollTop=0;
+ requestAnimationFrame(()=>requestAnimationFrame(()=>{mission.scrollTop=0}));
+}
+function setAssistanceScrollMode(open) {
+ mission.style.overflowAnchor=open?'none':'';
+}
 function speakAssistanceStep() {
  if(!assistanceVoiceActive)return;
  const status=mission.querySelector('[data-assistance-voice-status]');
@@ -875,7 +882,7 @@ function updateAssistance(question,answer) {
   syncAssistanceVoiceButton();speakAssistanceStep();
   const status=mission.querySelector('[data-assistance-status]');if(status){status.dataset.persisted=String(persisted);status.textContent=persisted?'Observation recorded':'Observation kept for this session'}
   mission.querySelector('.assistance-view h2')?.focus({preventScroll:true});
-  mission.scrollTop=0;
+  resetMissionScroll();
 }
 function renderMissionView(force=false) {
   const summary = CrewDesign.summary(people[0].id);
@@ -1199,9 +1206,9 @@ hub.addEventListener('click', event => {
     else{alarm.stop();updateAlarmControl();assistanceVoiceActive=true;speakAssistanceStep()}
     syncAssistanceVoiceButton();return
   }
-  if(event.target.closest('[data-assist-open]')){stopAssistanceVoice();assistanceModeKey=activeAlertKey;assistanceView='steps';assistanceStarted=true;alarm.stop();updateAlarmControl();renderMissionView();mission.querySelector('.assistance-view h2')?.focus({preventScroll:true});mission.scrollTop=0;return}
-  if(event.target.closest('[data-assist-close]')){stopAssistanceVoice();assistanceModeKey='';assistanceView='steps';assistanceStarted=false;renderMissionView();mission.querySelector('[data-assist-open]')?.focus({preventScroll:true});mission.scrollTop=0;return}
-  const assistView=event.target.closest('[data-assist-view]');if(assistView){stopAssistanceVoice();if(assistView.dataset.assistView==='response'){assistanceModeKey='';assistanceView='steps';assistanceStarted=false}else{assistanceModeKey=activeAlertKey;assistanceView=assistView.dataset.assistView}renderMissionView();mission.querySelector('.assistance-view h2,#urgent-action-title')?.focus({preventScroll:true});mission.scrollTop=0;return}
+  if(event.target.closest('[data-assist-open]')){stopAssistanceVoice();setAssistanceScrollMode(true);assistanceModeKey=activeAlertKey;assistanceView='steps';assistanceStarted=true;alarm.stop();updateAlarmControl();renderMissionView();mission.querySelector('.assistance-view h2')?.focus({preventScroll:true});resetMissionScroll();return}
+  if(event.target.closest('[data-assist-close]')){stopAssistanceVoice();setAssistanceScrollMode(false);assistanceModeKey='';assistanceView='steps';assistanceStarted=false;renderMissionView();mission.querySelector('[data-assist-open]')?.focus({preventScroll:true});resetMissionScroll();return}
+  const assistView=event.target.closest('[data-assist-view]');if(assistView){stopAssistanceVoice();if(assistView.dataset.assistView==='response'){setAssistanceScrollMode(false);assistanceModeKey='';assistanceView='steps';assistanceStarted=false}else{setAssistanceScrollMode(true);assistanceModeKey=activeAlertKey;assistanceView=assistView.dataset.assistView}renderMissionView();mission.querySelector('.assistance-view h2,#urgent-action-title')?.focus({preventScroll:true});resetMissionScroll();return}
   if(event.target.closest('[data-assist-reassess]')){updateAssistance();return}
   const observation=event.target.closest('[data-assist-question]');if(observation){updateAssistance(observation.dataset.assistQuestion,observation.dataset.assistAnswer);return}
   const repeatButton=event.target.closest('[data-repeat-measurement]');if(repeatButton){startRepeat(repeatButton.dataset.repeatMeasurement);return}
