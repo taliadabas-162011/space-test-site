@@ -31,6 +31,7 @@ test('each outcome explains the observed answers and keeps reassessment secondar
 test('first-aid examples remain labeled and include their sources',()=>{
  const cpr=renderAssistance({responding:'no',breathing:'no'},'Crew');
  assert.match(cpr,/center of the chest/);assert.match(cpr,/100 to 120/);assert.match(cpr,/nasa-cpr-training\.jpg/);assert.match(cpr,/American Heart Association/);
+ assert.match(cpr,/assistance-visual-grid/);assert.equal((cpr.match(/data-assist-voice/g)||[]).length,1);
  const menu=renderAssistance({responding:'yes',breathing:'yes'},'Crew');assert.match(menu,/data-assist-topic="chest"/);assert.match(menu,/data-assist-topic="fracture"/);
- assert.match(renderAssistance({},'Crew','fracture'),/Do not straighten it/);assert.match(renderAssistance({},'Crew','chest'),/Stop activity/);
+ const fracture=renderAssistance({},'Crew','fracture');assert.match(fracture,/Do not straighten it/);assert.match(fracture,/assistance-visual-grid/);assert.equal((fracture.match(/data-assist-voice/g)||[]).length,1);assert.match(renderAssistance({},'Crew','chest'),/Stop activity/);
 });

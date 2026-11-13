@@ -89,3 +89,10 @@
 @media(min-width:768px) and (max-width:1100px){.crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-page.urgent-page[data-care-view=emergency]{padding-top:165px}}
 @media(max-width:767px){.crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-page.urgent-page[data-care-view=emergency]{padding-top:198px}}
 @media(max-width:767px){.urgent-page .assistance-visual-grid .assistance-nasa-photo img{max-height:250px}}
+
+.urgent-page .assistance-visual-side{display:grid;gap:8px;min-width:0;align-content:start}
+.urgent-page .assistance-visual-side .assistance-voice{gap:4px;margin:0;padding:6px}
+.urgent-page .assistance-visual-side .assistance-voice-toggle{min-height:38px;padding:7px 9px;font-size:12px}
+.urgent-page .assistance-visual-side [data-assistance-voice-status],.urgent-page .assistance-visual-side [data-assistance-mic-status]{min-height:0;margin:0;color:#c2d2dc;font-size:10px!important;line-height:1.35}
+.urgent-page .assistance-visual-side .assistance-nasa-photo img{max-height:280px}
+@media(max-width:767px){.urgent-page .assistance-visual-side .assistance-nasa-photo img{max-height:170px}}
