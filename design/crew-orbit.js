@@ -1,6 +1,6 @@
 import {createRepeat,renderRepeat,repeatPayload} from './crew-repeat.js?v=1';
 import {renderCollection,collectionFields,collectionHasEntry,collectionPayload,syncCollectionSymptoms,syncCollectionMeasurement,navigateCollection,urgentCollectionFields,advanceMeasurementGuide,measurementGuides} from './crew-collection.js?v=10';
-import {renderAssistance,advanceAssistance,readAssistance,writeAssistance} from './crew-assistance.js?v=6';
+import {renderAssistance,advanceAssistance,readAssistance,writeAssistance} from './crew-assistance.js?v=7';
 import {createVoiceInput} from './crew-voice-input.js?v=3';
 import {createLiquidInterface} from './crew-liquid-ui.js?v=8';
 import {responseKey,readResponse,recordResponse,handoffText} from './crew-care.js?v=3';
@@ -927,6 +927,7 @@ function renderMissionView(force=false) {
       mission.querySelector('.urgent-page')?.setAttribute('data-assisting','true');
       const focus=mission.querySelector('.care-focus'),silence=focus.querySelector('[data-alert-ack]');
       focus.innerHTML=renderAssistance(response.assistance,summary.person.name,assistanceView,handoffText(summary,scenario,response,histories),assistanceStarted?'steps':'response');const utilities=focus.querySelector('.assistance-utilities');if(silence&&utilities)utilities.append(silence);
+      mission.querySelector('.urgent-page')?.toggleAttribute('data-assistance-visual',Boolean(focus.querySelector('.assistance-visual-grid')));
       syncAssistanceVoiceButton();speakAssistanceStep();
       const mic=focus.querySelector('[data-assist-mic]');if(mic&&voiceInput.active){mic.textContent='Stop microphone';mic.setAttribute('aria-pressed','true')}
     }
