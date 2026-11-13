@@ -879,7 +879,6 @@ function updateAssistance(question,answer) {
   const key=activeAlertKey,state=question?advanceAssistance(assistanceFor(key),question,answer):{events:assistanceFor(key).events||[]};
   assistanceCache.set(key,state);let persisted=true;try{writeAssistance(key,state,localStorage)}catch{persisted=false}
   renderMissionView();
-  syncAssistanceVoiceButton();speakAssistanceStep();
   const status=mission.querySelector('[data-assistance-status]');if(status){status.dataset.persisted=String(persisted);status.textContent=persisted?'Observation recorded':'Observation kept for this session'}
   mission.querySelector('.assistance-view h2')?.focus({preventScroll:true});
   resetMissionScroll();
@@ -916,6 +915,7 @@ function renderMissionView(force=false) {
       mission.querySelector('.urgent-page')?.setAttribute('data-assisting','true');
       const focus=mission.querySelector('.care-focus'),silence=focus.querySelector('[data-alert-ack]');
       focus.innerHTML=renderAssistance(response.assistance,summary.person.name,assistanceView,handoffText(summary,scenario,response,histories),assistanceStarted?'steps':'response');const utilities=focus.querySelector('.assistance-utilities');if(silence&&utilities)utilities.append(silence);
+      syncAssistanceVoiceButton();speakAssistanceStep();
     }
   }
   const figure=mission.querySelector('[data-figure-space]');
