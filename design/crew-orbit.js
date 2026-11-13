@@ -858,8 +858,14 @@ function stopAssistanceVoice() {
  assistanceVoiceActive=false;window.speechSynthesis?.cancel();
 }
 function resetMissionScroll() {
- mission.scrollTop=0;
- requestAnimationFrame(()=>requestAnimationFrame(()=>{mission.scrollTop=0}));
+ const align=()=>{
+  const visual=mission.querySelector('.assistance-visual-grid');
+  const heading=visual?.closest('.assistance-view')?.querySelector('h2');
+  if(!heading){mission.scrollTop=0;return}
+  const top=mission.scrollTop+heading.getBoundingClientRect().top-mission.getBoundingClientRect().top-145;
+  mission.scrollTop=Math.max(0,top);
+ };
+ align();requestAnimationFrame(()=>requestAnimationFrame(align));
 }
 function setAssistanceScrollMode(open) {
  mission.style.overflowAnchor=open?'none':'';

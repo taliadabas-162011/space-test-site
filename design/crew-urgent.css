@@ -42,6 +42,14 @@
 @keyframes urgent-breathe{0%,100%{opacity:.45}50%{opacity:1}}
 @media(min-width:768px){.crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-page.urgent-page[data-care-view=emergency]{padding-top:150px}}
 @media(max-width:767px){.crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-page.urgent-page[data-care-view=emergency]{padding-top:198px}}
+.urgent-page .assistance-visual-grid .assistance-nasa-photo img{max-height:340px}
+@media(max-width:767px){.urgent-page .assistance-visual-grid .assistance-nasa-photo img{max-height:250px}}
+
+/* Prioritize the active visual guidance when screen height is limited. */
+.crew-orbit[data-ui-variant=glass][data-ui-variant] .urgent-page[data-assistance-visual] .urgent-problem,
+.crew-orbit[data-ui-variant=glass][data-ui-variant] .urgent-page[data-assistance-visual] .assistance-observed,
+.crew-orbit[data-ui-variant=glass][data-ui-variant] .urgent-page[data-assistance-visual]>.urgent-figure{display:none}
+@media(max-width:767px){.urgent-page .assistance-visual-grid .assistance-nasa-photo img{max-height:250px}}
 
 /* Keep each training image beside the instructions without covering controls. */
 .urgent-page .assistance-visual-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(130px,.85fr);gap:clamp(12px,2vw,24px);align-items:start;min-width:0;margin:0 0 18px;padding:14px;border:1px solid #d6e4ef24;border-radius:14px;background:#081522e8}
@@ -80,3 +88,4 @@
 @media(min-width:1101px){.crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-page.urgent-page[data-care-view=emergency]{padding-top:150px}}
 @media(min-width:768px) and (max-width:1100px){.crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-page.urgent-page[data-care-view=emergency]{padding-top:165px}}
 @media(max-width:767px){.crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-page.urgent-page[data-care-view=emergency]{padding-top:198px}}
+@media(max-width:767px){.urgent-page .assistance-visual-grid .assistance-nasa-photo img{max-height:250px}}
