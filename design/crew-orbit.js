@@ -872,10 +872,10 @@ function updateAssistance(question,answer) {
   const key=activeAlertKey,state=question?advanceAssistance(assistanceFor(key),question,answer):{events:assistanceFor(key).events||[]};
   assistanceCache.set(key,state);let persisted=true;try{writeAssistance(key,state,localStorage)}catch{persisted=false}
   renderMissionView();
-  mission.scrollTop=0;
   syncAssistanceVoiceButton();speakAssistanceStep();
   const status=mission.querySelector('[data-assistance-status]');if(status){status.dataset.persisted=String(persisted);status.textContent=persisted?'Observation recorded':'Observation kept for this session'}
   mission.querySelector('.assistance-view h2')?.focus({preventScroll:true});
+  mission.scrollTop=0;
 }
 function renderMissionView(force=false) {
   const summary = CrewDesign.summary(people[0].id);
@@ -1199,9 +1199,9 @@ hub.addEventListener('click', event => {
     else{alarm.stop();updateAlarmControl();assistanceVoiceActive=true;speakAssistanceStep()}
     syncAssistanceVoiceButton();return
   }
-  if(event.target.closest('[data-assist-open]')){stopAssistanceVoice();assistanceModeKey=activeAlertKey;assistanceView='steps';assistanceStarted=true;alarm.stop();updateAlarmControl();renderMissionView();mission.scrollTop=0;mission.querySelector('.assistance-view h2')?.focus({preventScroll:true});return}
-  if(event.target.closest('[data-assist-close]')){stopAssistanceVoice();assistanceModeKey='';assistanceView='steps';assistanceStarted=false;renderMissionView();mission.scrollTop=0;mission.querySelector('[data-assist-open]')?.focus({preventScroll:true});return}
-  const assistView=event.target.closest('[data-assist-view]');if(assistView){stopAssistanceVoice();if(assistView.dataset.assistView==='response'){assistanceModeKey='';assistanceView='steps';assistanceStarted=false}else{assistanceModeKey=activeAlertKey;assistanceView=assistView.dataset.assistView}renderMissionView();mission.scrollTop=0;mission.querySelector('.assistance-view h2,#urgent-action-title')?.focus({preventScroll:true});return}
+  if(event.target.closest('[data-assist-open]')){stopAssistanceVoice();assistanceModeKey=activeAlertKey;assistanceView='steps';assistanceStarted=true;alarm.stop();updateAlarmControl();renderMissionView();mission.querySelector('.assistance-view h2')?.focus({preventScroll:true});mission.scrollTop=0;return}
+  if(event.target.closest('[data-assist-close]')){stopAssistanceVoice();assistanceModeKey='';assistanceView='steps';assistanceStarted=false;renderMissionView();mission.querySelector('[data-assist-open]')?.focus({preventScroll:true});mission.scrollTop=0;return}
+  const assistView=event.target.closest('[data-assist-view]');if(assistView){stopAssistanceVoice();if(assistView.dataset.assistView==='response'){assistanceModeKey='';assistanceView='steps';assistanceStarted=false}else{assistanceModeKey=activeAlertKey;assistanceView=assistView.dataset.assistView}renderMissionView();mission.querySelector('.assistance-view h2,#urgent-action-title')?.focus({preventScroll:true});mission.scrollTop=0;return}
   if(event.target.closest('[data-assist-reassess]')){updateAssistance();return}
   const observation=event.target.closest('[data-assist-question]');if(observation){updateAssistance(observation.dataset.assistQuestion,observation.dataset.assistAnswer);return}
   const repeatButton=event.target.closest('[data-repeat-measurement]');if(repeatButton){startRepeat(repeatButton.dataset.repeatMeasurement);return}
