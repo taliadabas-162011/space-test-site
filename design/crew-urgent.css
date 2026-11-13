@@ -46,3 +46,8 @@
 @media(prefers-reduced-motion:reduce){.urgent-vital[data-urgent-signal=true]:after,.crew-orbit[data-ui-variant=glass][data-severity=urgent]:after{animation:none;opacity:.8}.urgent-page .assistance-answers>button{transition:none}}
 
 @media(max-width:767px){.urgent-vital[data-urgent-signal=true]:after{inset:-8px -4px;border-radius:15px}.crew-orbit[data-ui-variant=glass] .urgent-vital>.glass-optics{inset:-8px -4px;width:calc(100% + 8px)}}
+
+/* Keep the scrollable emergency workspace below the fixed header and scenario selector. */
+@media(min-width:1101px){.crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-page.urgent-page[data-care-view=emergency]{padding-top:150px}}
+@media(min-width:768px) and (max-width:1100px){.crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-page.urgent-page[data-care-view=emergency]{padding-top:165px}}
+@media(max-width:767px){.crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-page.urgent-page[data-care-view=emergency]{padding-top:198px}}
