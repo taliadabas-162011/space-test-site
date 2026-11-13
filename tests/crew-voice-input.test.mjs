@@ -31,3 +31,16 @@ test('spoken situation choices require confirmation',()=>{
  input.start();utterances.at(-1).onend();recognizers.at(-1).result('broken leg');assert.deepEqual(answers,[]);
  assert.match(utterances.at(-1).text,/broken bone/);utterances.at(-1).onend();recognizers.at(-1).result('confirm');assert.deepEqual(answers,['fracture']);input.stop();
 });
+
+test('spoken measurement and direction require confirmation',()=>{
+ const recognizers=[],utterances=[],answers=[];let question='topic';
+ class Recognition {constructor(){recognizers.push(this)}start(){this.onstart?.()}abort(){}result(text){this.onresult({results:[[{transcript:text}]]});this.onend()}}
+ class Utterance {constructor(text){this.text=text}}
+ globalThis.SpeechSynthesisUtterance=Utterance;
+ globalThis.window={SpeechRecognition:Recognition,SpeechSynthesisUtterance:Utterance,speechSynthesis:{cancel(){},speak(u){utterances.push(u)}}};
+ const input=createVoiceInput({getPrompt:()=>({question,text:'Choose'}),onAnswer:a=>answers.push(a),onStatus:()=>{}});
+ input.start();utterances.at(-1).onend();recognizers.at(-1).result('blood glucose');assert.deepEqual(answers,[]);
+ utterances.at(-1).onend();recognizers.at(-1).result('confirm');assert.deepEqual(answers,['glucose']);
+ question='direction';input.next();utterances.at(-1).onend();recognizers.at(-1).result('low');assert.deepEqual(answers,['glucose']);
+ utterances.at(-1).onend();recognizers.at(-1).result('confirm');assert.deepEqual(answers,['glucose','low']);input.stop();
+});

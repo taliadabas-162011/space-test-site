@@ -1,5 +1,5 @@
 // Cache only the application shell and bundled assets, never observation data.
-const CACHE = 'crew-health-static-v51';
+const CACHE = 'crew-health-static-v52';
 const ROOT = '/space-test-site/';
 const FILES = [
   "",
@@ -14,6 +14,9 @@ const FILES = [
   "design/assets/draco/draco_decoder.wasm",
   "design/assets/draco/draco_wasm_wrapper.js",
   "design/assets/environment/gateway-core.glb",
+  "design/assets/guides/nasa-heart-monitor.jpg",
+  "design/assets/guides/nasa-blood-pressure.jpg",
+  "design/assets/guides/nasa-blood-sampling.jpg",
   "design/assets/guides/nasa-cpr-training.jpg",
   "design/assets/guides/nasa-splint-training.jpg",
   "design/assets/environment/GSG_PRO_STUDIOS_METAL_001_sm-gainmap.webp",
@@ -63,6 +66,7 @@ const FILES = [
   "design/crew-repeat.js",
   "design/crew-measurement-guides.js",
   "design/crew-assistance.js",
+  "design/crew-vital-aid.js",
   "design/crew-workflow.css",
   "design/crew-urgent.css",
   "design/crew-care.css",
