@@ -1,9 +1,13 @@
 // Cache only the application shell and bundled assets, never observation data.
-const CACHE = 'crew-health-static-v52';
+const CACHE = 'crew-health-static-v53';
 const ROOT = '/space-test-site/';
 const FILES = [
   "",
   "index.html",
+  "manifest.webmanifest",
+  "design/assets/app/icon-192.png",
+  "design/assets/app/icon-512.png",
+  "design/assets/app/apple-touch-icon.png",
   "rules.js",
   "design/assets/anatomy/Plastic015A_1K-JPG_NormalGL.jpg",
   "design/assets/anatomy/brain.glb",

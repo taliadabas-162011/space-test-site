@@ -1,0 +1,15 @@
+{
+  "id": "/space-test-site/",
+  "name": "Crew Health",
+  "short_name": "Crew Health",
+  "description": "Crew health check-ins and guidance for a space mission demo.",
+  "start_url": "/space-test-site/",
+  "scope": "/space-test-site/",
+  "display": "standalone",
+  "background_color": "#030913",
+  "theme_color": "#030913",
+  "icons": [
+    { "src": "/space-test-site/design/assets/app/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/space-test-site/design/assets/app/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
