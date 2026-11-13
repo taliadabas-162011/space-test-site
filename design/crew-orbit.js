@@ -1,6 +1,7 @@
 import {createRepeat,renderRepeat,repeatPayload} from './crew-repeat.js?v=1';
 import {renderCollection,collectionFields,collectionHasEntry,collectionPayload,syncCollectionSymptoms,syncCollectionMeasurement,navigateCollection,urgentCollectionFields,advanceMeasurementGuide,measurementGuides} from './crew-collection.js?v=10';
-import {renderAssistance,advanceAssistance,readAssistance,writeAssistance} from './crew-assistance.js?v=4';
+import {renderAssistance,advanceAssistance,readAssistance,writeAssistance} from './crew-assistance.js?v=5';
+import {createVoiceInput} from './crew-voice-input.js?v=1';
 import {createLiquidInterface} from './crew-liquid-ui.js?v=8';
 import {responseKey,readResponse,recordResponse,handoffText} from './crew-care.js?v=3';
 import { createCrewStage } from '/space-test-site/design/crew-motion-stage.js?v=astronaut-33';
@@ -70,6 +71,11 @@ const sectionContent = hub.querySelector('.orbit-section-content');
 const appNav = hub.querySelector('.mission-tools');
 initializeCustomSelects(hub.querySelector('.orbit-scenario-control'));
 const mission = hub.querySelector('.orbit-mission');
+const voiceInput=createVoiceInput({
+ getPrompt:()=>({question:mission.querySelector('[data-assist-question]')?.dataset.assistQuestion,text:[mission.querySelector('.assistance-view h2')?.textContent,mission.querySelector('.assistance-instruction')?.textContent].filter(Boolean).join('. ')}),
+ onAnswer:answer=>{const question=mission.querySelector('[data-assist-question]')?.dataset.assistQuestion;if(question){updateAssistance(question,answer);voiceInput.next()}else voiceInput.stop()},
+ onStatus:message=>{const status=mission.querySelector('[data-assistance-mic-status]');if(status)status.textContent=message;const button=mission.querySelector('[data-assist-mic]');if(button){button.textContent=voiceInput.active?'Stop microphone':'Start microphone answers';button.setAttribute('aria-pressed',String(voiceInput.active))}}
+});
 let alertSoundEnabled = true;
 const alarm = createCrewAlarm(undefined, { onState: updateAlarmControl });
 let activeAlertKey = '';
@@ -405,6 +411,7 @@ function closeContextPanel(restoreFocus = true) {
   returnFocus = null;
 }
 function setContextPanel(panel, source) {
+  if(voiceInput.active)voiceInput.stop();
   leaveMission();
   if (hub.dataset.panel) {
     stage?.setRecordView?.(false);
@@ -869,7 +876,7 @@ function speakAssistanceStep() {
  const answers=[...mission.querySelectorAll('.assistance-answers button')].map(button=>button.textContent.trim());
  const prompt=answers.length?`Choose the answer that best matches what you observe: ${answers.join('. ')}.`:'Follow the on-screen guidance and your mission checklist.';
  const speech=new SpeechSynthesisUtterance(`${title}. ${instruction} ${prompt}`);
- speech.lang='en-US';speech.rate=.88;speech.pitch=1;speech.volume=1;
+ speech.lang='en-US';speech.rate=1;speech.pitch=1;speech.volume=1;
  speech.onstart=()=>{if(status&&assistanceVoiceActive)status.textContent='Speaking this step. Select an answer when ready.'};
  speech.onend=()=>{if(status&&assistanceVoiceActive)status.textContent='Step complete. Choose the answer that best matches what you observe.'};
  window.speechSynthesis.cancel();if(status)status.textContent='Preparing voice guidance…';window.speechSynthesis.speak(speech);
@@ -896,6 +903,7 @@ function renderMissionView(force=false) {
     hub.dataset.alertAcknowledged=String(Boolean(response.acknowledgedAt));
     if (key !== activeAlertKey) { activeAlertKey = key; assistanceModeKey='';assistanceView='steps';assistanceStarted=false;playAlertSound(); }
   } else { activeAlertKey = ''; alarm.stop(); }
+  if(voiceInput.active&&(state.key!=='emergency'||assistanceModeKey!==activeAlertKey||assistanceView!=='steps'))voiceInput.stop();
   stage?.setSceneView?.(collectionMode?'collection':state.key);
   hub.dataset.collecting=String(Boolean(collectionMode));
   if(!force&&collectionMode==='guided-repeat'&&mission.querySelector('[data-repeat-form]')){syncMissionFrame();return}
@@ -916,6 +924,7 @@ function renderMissionView(force=false) {
       const focus=mission.querySelector('.care-focus'),silence=focus.querySelector('[data-alert-ack]');
       focus.innerHTML=renderAssistance(response.assistance,summary.person.name,assistanceView,handoffText(summary,scenario,response,histories),assistanceStarted?'steps':'response');const utilities=focus.querySelector('.assistance-utilities');if(silence&&utilities)utilities.append(silence);
       syncAssistanceVoiceButton();speakAssistanceStep();
+      const mic=focus.querySelector('[data-assist-mic]');if(mic&&voiceInput.active){mic.textContent='Stop microphone';mic.setAttribute('aria-pressed','true')}
     }
   }
   const figure=mission.querySelector('[data-figure-space]');
@@ -923,6 +932,7 @@ function renderMissionView(force=false) {
   syncMissionFrame();
 }
 function leaveMission() {
+  if(voiceInput.active)voiceInput.stop();
   mission.hidden = true;
   hub.querySelector('[data-scene-back]').hidden = true;
   hub.dataset.workspace = 'task';
@@ -1201,16 +1211,18 @@ hub.addEventListener('click', event => {
     updateAlarmControl(); return;
   }
   if (event.target.closest('[data-alert-ack]')) { alarm.stop(); saveResponse('acknowledgedAt'); mission.querySelector('.mission-response')?.setAttribute('tabindex', '-1'); mission.querySelector('.mission-response')?.focus({ preventScroll: true }); return; }
+  if(event.target.closest('[data-assist-mic]')){if(voiceInput.active)voiceInput.stop();else{stopAssistanceVoice();syncAssistanceVoiceButton();alarm.stop();voiceInput.start()}return}
   if(event.target.closest('[data-assist-voice]')){
+    if(voiceInput.active)voiceInput.stop();
     if(assistanceVoiceActive){stopAssistanceVoice();const status=mission.querySelector('[data-assistance-voice-status]');if(status)status.textContent='Voice guidance stopped. The written instructions remain available.'}
     else{alarm.stop();updateAlarmControl();assistanceVoiceActive=true;speakAssistanceStep()}
     syncAssistanceVoiceButton();return
   }
-  if(event.target.closest('[data-assist-open]')){stopAssistanceVoice();setAssistanceScrollMode(true);assistanceModeKey=activeAlertKey;assistanceView='steps';assistanceStarted=true;alarm.stop();updateAlarmControl();renderMissionView();mission.querySelector('.assistance-view h2')?.focus({preventScroll:true});resetMissionScroll();return}
-  if(event.target.closest('[data-assist-close]')){stopAssistanceVoice();setAssistanceScrollMode(false);assistanceModeKey='';assistanceView='steps';assistanceStarted=false;renderMissionView();mission.querySelector('[data-assist-open]')?.focus({preventScroll:true});resetMissionScroll();return}
-  const assistView=event.target.closest('[data-assist-view]');if(assistView){stopAssistanceVoice();if(assistView.dataset.assistView==='response'){setAssistanceScrollMode(false);assistanceModeKey='';assistanceView='steps';assistanceStarted=false}else{setAssistanceScrollMode(true);assistanceModeKey=activeAlertKey;assistanceView=assistView.dataset.assistView}renderMissionView();mission.querySelector('.assistance-view h2,#urgent-action-title')?.focus({preventScroll:true});resetMissionScroll();return}
+  if(event.target.closest('[data-assist-open]')){if(voiceInput.active)voiceInput.stop();stopAssistanceVoice();setAssistanceScrollMode(true);assistanceModeKey=activeAlertKey;assistanceView='steps';assistanceStarted=true;alarm.stop();updateAlarmControl();renderMissionView();mission.querySelector('.assistance-view h2')?.focus({preventScroll:true});resetMissionScroll();return}
+  if(event.target.closest('[data-assist-close]')){if(voiceInput.active)voiceInput.stop();stopAssistanceVoice();setAssistanceScrollMode(false);assistanceModeKey='';assistanceView='steps';assistanceStarted=false;renderMissionView();mission.querySelector('[data-assist-open]')?.focus({preventScroll:true});resetMissionScroll();return}
+  const assistView=event.target.closest('[data-assist-view]');if(assistView){if(voiceInput.active)voiceInput.stop();stopAssistanceVoice();if(assistView.dataset.assistView==='response'){setAssistanceScrollMode(false);assistanceModeKey='';assistanceView='steps';assistanceStarted=false}else{setAssistanceScrollMode(true);assistanceModeKey=activeAlertKey;assistanceView=assistView.dataset.assistView}renderMissionView();mission.querySelector('.assistance-view h2,#urgent-action-title')?.focus({preventScroll:true});resetMissionScroll();return}
   if(event.target.closest('[data-assist-reassess]')){updateAssistance();return}
-  const observation=event.target.closest('[data-assist-question]');if(observation){updateAssistance(observation.dataset.assistQuestion,observation.dataset.assistAnswer);return}
+  const observation=event.target.closest('[data-assist-question]');if(observation){if(voiceInput.active)voiceInput.stop();updateAssistance(observation.dataset.assistQuestion,observation.dataset.assistAnswer);return}
   const repeatButton=event.target.closest('[data-repeat-measurement]');if(repeatButton){startRepeat(repeatButton.dataset.repeatMeasurement);return}
   if(event.target.closest('[data-repeat-close]')){closeRepeat();return}
   if(event.target.closest('[data-repeat-urgent]')){urgentReturnView='repeat';storeRepeatDraft();CrewDesign.requestUrgentAssistance(people[0].id);showMission();return}
