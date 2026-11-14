@@ -190,7 +190,7 @@ export function renderAnatomyUI(summary, active = 'circulation', histories = {},
     <button class="crew-anatomy-exit" type="button" data-anatomy-exit>← Back to suit</button>
     <div class="crew-anatomy-connector" aria-hidden="true"></div>
     <div class="crew-anatomy-content"><nav class="crew-anatomy-sections" aria-label="Health sections">${navigation}</nav>${panels}</div>
-    <div class="crew-anatomy-hotspots">${heartHotspot}</div>
+    <div class="crew-anatomy-hotspots">${heartHotspot}<button type="button" class="crew-anatomy-hotspot crew-anatomy-hotspot--head" aria-label="Explore recovery" aria-pressed="${active === 'recovery'}" data-anatomy-category="recovery"><span class="crew-anatomy-hotspot-ring" aria-hidden="true"></span><span class="crew-anatomy-hotspot-label"><span>Recovery</span></span></button><button type="button" class="crew-anatomy-hotspot crew-anatomy-hotspot--abdomen" aria-label="Explore daily health" aria-pressed="${active === 'daily'}" data-anatomy-category="daily"><span class="crew-anatomy-hotspot-ring" aria-hidden="true"></span><span class="crew-anatomy-hotspot-label"><span>Daily health</span></span></button></div>
   </div>`;
 }
 

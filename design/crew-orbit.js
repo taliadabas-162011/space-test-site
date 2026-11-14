@@ -7,7 +7,7 @@ import {createLiquidInterface} from './crew-liquid-ui.js?v=8';
 import {responseKey,readResponse,recordResponse,handoffText} from './crew-care.js?v=3';
 import { createCrewStage } from '/space-test-site/design/crew-motion-stage.js?v=astronaut-33';
 import { renderObservationCheckin, renderObservationIdentity, renderObservationOverview, renderObservationProfile, renderObservationMobile, updateObservationCheckin } from '/space-test-site/design/crew-observation-ui.js?v=astronaut-9';
-import { renderAnatomyUI, setAnatomyCategory, setAnatomyMetric } from '/space-test-site/design/crew-anatomy-ui.js?v=astronaut-3';
+import { renderAnatomyUI, setAnatomyCategory, setAnatomyMetric } from '/space-test-site/design/crew-anatomy-ui.js?v=astronaut-4';
 import { renderEmergencyGuide } from '/space-test-site/design/crew-guidance.js?v=astronaut-3';
 import { initializeCustomSelects, syncCustomSelects, focusCustomSelect } from '/space-test-site/design/crew-select.js?v=astronaut-10';
 import { renderHealthTimeline } from '/space-test-site/design/crew-timeline-ui.js?v=astronaut-6';
@@ -16,7 +16,7 @@ import { connectCrewSensor } from '/space-test-site/design/crew-device.js?v=astr
 import { initializeCustomDateTimes, syncCustomDateTimes } from '/space-test-site/design/crew-datetime.js?v=3';
 import { compareHistory } from '/space-test-site/design/crew-insights.js?v=1';
 
-import { renderMission, missionState } from './crew-mission-ui.js?v=9';
+import { renderMission, missionState } from './crew-mission-ui.js?v=10';
 import { createCrewAlarm } from './crew-alarm.js?v=2';
 import { renderHistoryScene, initializeHistoryChart, updateHistoryScene } from './crew-history-scene.js?v=8';
 import { renderDeviceScene } from './crew-device-scene.js?v=2';
@@ -36,7 +36,7 @@ hub.innerHTML = `<div class="orbit-background" aria-hidden="true"></div><canvas 
   <div class="orbit-mobile-summary"></div>
   <nav class="orbit-mobile-crew" aria-label="Choose a crew member">${people.map((person, index) => `<button type="button" data-select="${index}">${person.name.split(' ')[0]} <span aria-hidden="true">↗</span></button>`).join('')}</nav>
   <div class="orbit-profile" hidden><button class="orbit-back" type="button" data-all>← Overview</button><button class="orbit-profile-edit" type="button" data-edit-profile>Edit profile <span aria-hidden="true">↗</span></button><div class="orbit-profile-identity"><div class="orbit-profile-name"></div></div><p class="orbit-anatomy-error" role="alert" hidden></p><button class="orbit-figure-hit" type="button" data-figure-anatomy aria-label="Explore this astronaut’s anatomy" disabled></button><div class="orbit-scanline" aria-hidden="true"></div><div class="orbit-profile-readings" role="region" aria-label="Health readings" tabindex="0"></div><form class="orbit-form" hidden></form><div class="orbit-anatomy-root" hidden></div><p class="orbit-gesture">Drag to explore the scene</p><nav class="orbit-switch" aria-label="Astronaut"><span class="orbit-position"></span></nav></div>
-  <section class="orbit-onboarding profile-workspace" hidden aria-labelledby="profile-setup-title"><form novalidate class="collection-page profile-page" data-profile-form><header class="collection-heading"><div><h1 tabindex="-1" id="profile-setup-title">Your profile</h1><p>Your details stay on this device.</p></div></header><div class="collection-editor profile-editor"><div class="profile-name-field"><label class="collection-label" for="profile-name">Full name <small>Required</small></label><div class="collection-value profile-name-value"><input id="profile-name" name="name" maxlength="48" autocomplete="name" required placeholder="Your name"></div></div><div class="profile-personal-values"><div><label class="collection-label" for="profile-age">Age <small>Optional</small></label><div class="collection-value"><input id="profile-age" name="age" aria-label="Age in years" type="number" min="0" max="120" step="1" inputmode="numeric" placeholder="—"><span>years</span></div></div><div><label class="collection-label" for="profile-mass">Body mass <small>Optional</small></label><div class="collection-value"><input id="profile-mass" name="bodyMass" type="number" min="0.1" max="400" step="0.1" inputmode="decimal" placeholder="—"><span>kg</span></div></div></div><p id="profile-error" class="orbit-profile-error collection-error" role="alert"></p></div><div class="mission-figure-space collection-figure profile-figure" data-figure-space></div><footer class="collection-footer"><div class="collection-save"><button type="button" data-cancel-profile hidden>Cancel</button><button type="submit">Save profile</button></div></footer></form></section>
+  <section class="orbit-onboarding profile-workspace" hidden aria-labelledby="profile-setup-title"><form novalidate class="collection-page profile-page" data-profile-form><header class="collection-heading"><div><h1 tabindex="-1" id="profile-setup-title">Your profile</h1><p>Your details stay on this device.</p></div></header><div class="collection-editor profile-editor"><div class="profile-name-field"><label class="collection-label" for="profile-name">Full name <small>Required</small></label><div class="collection-value profile-name-value"><input id="profile-name" name="name" maxlength="48" autocomplete="name" required placeholder="Your name"></div></div><div class="profile-personal-values"><div><label class="collection-label" for="profile-age">Age <small>Optional</small></label><div class="collection-value"><input id="profile-age" name="age" aria-label="Age in years" type="number" min="0" max="120" step="1" inputmode="numeric" placeholder="—"><span>years</span></div></div><div><label class="collection-label" for="profile-mass">Body mass <small>Optional</small></label><div class="collection-value"><input id="profile-mass" name="bodyMass" type="number" min="0.1" max="400" step="0.1" inputmode="decimal" placeholder="—"><span>kg</span></div></div></div><div class="profile-anatomy-field"><label class="collection-label" for="profile-model">Anatomy model <small>Required</small></label><select id="profile-model" name="model" required><option value="">Choose an anatomy model</option><option value="female">Feminine anatomy</option><option value="male">Masculine anatomy</option></select><small>Choose the model shown when you explore anatomy.</small></div><p id="profile-error" class="orbit-profile-error collection-error" role="alert"></p></div><div class="mission-figure-space collection-figure profile-figure" data-figure-space></div><footer class="collection-footer"><div class="collection-save"><button type="button" data-cancel-profile hidden>Cancel</button><button type="submit">Save profile</button></div></footer></form></section>
   <section class="orbit-section-panel" hidden role="region" aria-label="Dashboard section"><button class="orbit-section-close" type="button" data-section-close>Close <span aria-hidden="true">×</span></button><div class="orbit-section-content"></div></section>
   <div class="orbit-emergency" role="region" aria-label="Emergency guidance" hidden></div>
   <div class="orbit-timeline" role="region" aria-label="Observation history" hidden></div>
@@ -92,6 +92,8 @@ let stage;
 let selected = null;
 let recording = false;
 let anatomyMode = false;
+let anatomyFromOverview = false;
+let showOverviewReadings = false;
 let anatomyCategory = 'circulation';
 let anatomyMetric = 'pulse';
 let anatomyHeartFocused = false;
@@ -929,7 +931,7 @@ function renderMissionView(force=false) {
     mission.innerHTML=renderCollection({summary,fields:collectionDraftFields(),purpose:collectionMode,symptomOptions:CrewDesign.symptomOptions,observedAt,urgent:state.key==='emergency',urgentPreview:summary.symptomSource==='Scenario preview'});
     initializeCustomSelects(mission);initializeCustomDateTimes(mission);syncCollectionSymptoms(mission.querySelector('[data-collect-form]'));syncCollectionMeasurement(mission.querySelector('[data-collect-form]'));
   }else{
-    mission.innerHTML=renderMission({summary,histories,scenario,connected:deviceConnections.size,response,draft:checkinDraft,urgentReturn:urgentReturnView});
+    mission.innerHTML=renderMission({summary,histories,scenario,connected:deviceConnections.size,response,draft:checkinDraft,urgentReturn:urgentReturnView,showReadings:showOverviewReadings});
     if(state.key==='emergency'&&assistanceModeKey===activeAlertKey){
       mission.querySelector('.urgent-page')?.setAttribute('data-assisting','true');
       const focus=mission.querySelector('.care-focus'),silence=focus.querySelector('[data-alert-ack]');
@@ -1106,6 +1108,7 @@ function openOnboarding(edit = false) {
   profileForm.elements.name.value = existing?.name || '';
   profileForm.elements.age.value = existing?.age ?? '';
   profileForm.elements.bodyMass.value = existing?.bodyMass ?? '';
+  profileForm.elements.model.value = existing?.model || '';
   syncCustomSelects(profileForm);
   profileForm.querySelector('.orbit-profile-error').textContent = '';
   hub.querySelector('#profile-setup-title').textContent = edit ? 'Your profile' : 'Create your profile';
@@ -1128,7 +1131,7 @@ profileForm.addEventListener('submit', event => {
 
   try {
     const prior = CrewDesign.getProfile();
-    CrewDesign.saveProfile(profileForm.elements.name.value, CrewDesign.getProfile()?.model || 'male', profileForm.elements.age.value, profileForm.elements.bodyMass.value);
+    CrewDesign.saveProfile(profileForm.elements.name.value, profileForm.elements.model.value, profileForm.elements.age.value, profileForm.elements.bodyMass.value);
     const mass = profileForm.elements.bodyMass.value;
     if (mass && Number(mass) > 0 && String(prior?.bodyMass ?? '') !== String(mass)) CrewDesign.saveOverview(people[0].id, { weight: mass }, '', { source: 'Profile body mass' });
     onboarding.hidden = true;
@@ -1276,6 +1279,8 @@ hub.addEventListener('click', event => {
   if (historyField) { if(historyMetric===historyField.dataset.historySceneField)return; historyMetric = historyField.dataset.historySceneField; historyScenePosition = null; renderHistorySceneView(); timeline.querySelector(`[data-history-scene-field="${historyMetric}"]`)?.focus({ preventScroll: true }); return; }
   const historyDays = event.target.closest('[data-history-scene-days]');
   if (historyDays) { if(historyTrendDays===Number(historyDays.dataset.historySceneDays))return; historyTrendDays = Number(historyDays.dataset.historySceneDays); historyScenePosition = null; renderHistorySceneView(); timeline.querySelector(`[data-history-scene-days="${historyTrendDays}"]`)?.focus({ preventScroll: true }); return; }
+  if(event.target.closest('[data-toggle-overview-readings]')){showOverviewReadings=!showOverviewReadings;renderMissionView();return}
+  if(event.target.closest('[data-reveal-anatomy]')){anatomyFromOverview=true;showPerson(0);enterAnatomy();return}
   const task = event.target.closest('[data-mission-action]');
   if (task) {
     if (task.dataset.missionAction === 'overview') { showMission(); return; }
@@ -1424,7 +1429,7 @@ hub.addEventListener('click', event => {
     else showMission();
   }
   if (event.target.closest('button[data-figure-anatomy]') && !suppressFigureClick) enterAnatomy();
-  if (event.target.closest('[data-anatomy-exit]')) exitAnatomy();
+  if (event.target.closest('[data-anatomy-exit]')) { if(anatomyFromOverview){anatomyFromOverview=false;showMission();} else exitAnatomy(); }
   const category = event.target.closest('[data-anatomy-category]');
   if (category) {
     anatomyCategory = category.dataset.anatomyCategory;

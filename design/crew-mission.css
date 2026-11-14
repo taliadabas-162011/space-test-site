@@ -183,3 +183,15 @@
 
 
 @media(max-width:767px){.crew-orbit .orbit-mission{scrollbar-width:thin;scrollbar-color:#47606e transparent}.crew-orbit[data-panel="history"] .history-scene h2{font-size:20px}}
+
+/* Simple overview actions retain the existing glass treatment. */
+.crew-orbit .mission-constellation[hidden]{display:none!important}
+.crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-main-actions{display:flex;flex-wrap:wrap;gap:10px;pointer-events:auto}
+.crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-main-actions button{min-height:48px;padding:12px 18px;border:1px solid #91b7cf85;border-radius:16px;background:#1c344bcc;color:#f2f9ff;font:600 14px Orbit Magnetik,sans-serif;cursor:pointer;backdrop-filter:blur(14px)}
+.crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-main-actions button:hover,.crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-main-actions button:focus-visible{background:#355671;border-color:#c0e7f8}
+.mission-model-label{color:#b9d9e9!important;margin:8px 0!important}
+.profile-anatomy-field{margin-top:22px;max-width:400px}.profile-anatomy-field>small{display:block;margin-top:8px;color:#b9cfdd;line-height:1.4}.profile-anatomy-field select{width:100%;margin-top:8px;padding:12px;border:1px solid #91b7cf85;border-radius:10px;background:#162d42;color:#fff;font-size:15px}
+@media(max-width:767px){.crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-main-actions{display:grid;grid-template-columns:1fr;width:100%}.crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-main-actions button{width:100%;text-align:left}}
+@media(min-width:768px){.crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-intro>p.mission-model-label{grid-row:3!important;margin:0!important}.crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-intro>p:not(.mission-model-label){grid-row:4!important}}
+@media(min-width:768px) and (max-width:1100px){.crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-intro>button{grid-row:5!important}}
+.crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-main-actions button.mission-checkin{color:#f2f9ff!important;background:#1c344b!important}
