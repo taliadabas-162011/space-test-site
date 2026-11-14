@@ -65,7 +65,7 @@ export function renderHistoryScene({ summary = {}, histories = {}, reports = {},
   const selectedIndex = position == null || !Number.isFinite(Number(position)) ? points.length - 1 : Math.max(0, Math.min(points.length - 1, Math.round(Number(position))));
   const selected = points[selectedIndex], latest = points.at(-1);
   const contextText = [context === null ? '' : CONTEXT[context] || 'Context not recorded',field==='temperature'?(site?`${site.charAt(0).toUpperCase()+site.slice(1)} temperature`:'Site not recorded'):''].filter(Boolean).join(' · ');
-  const nav = Object.entries(FIELDS).map(([key, [name]]) => `<button type="button" data-history-scene-field="${key}" aria-pressed="${key === field}">${name}</button>`).join('');
+  const nav = Object.entries(FIELDS).filter(([key]) => key !== 'weight').map(([key, [name]]) => `<button type="button" data-history-scene-field="${key}" aria-pressed="${key === field}">${name}</button>`).join('');
   const range = [30, 90, 120, 365].map(n => `<button type="button" data-history-scene-days="${n}" aria-pressed="${n === days}">${n} days</button>`).join('');
   const valueText = p => `${display(field, p.value)}${unit ? ` ${unit}` : ''}`;
   const details = p => field === 'symptoms' ? [p.tags.join(', '), p.onset == null ? '' : `Began ${date(p.onset, true)}`, p.progression ? title(p.progression) : '', p.note].filter(Boolean).join(' · ') : '';

@@ -44,7 +44,7 @@ test('empty or invalid values never become fabricated zero readings', () => {
 
 test('body mass is selectable and preserves recorded kilograms', () => {
   const html = renderHistoryScene({ histories: { weight: [entry(2, 72.5)] }, field: 'weight', now });
-  assert.match(html, /data-history-scene-field="weight" aria-pressed="true"/);
+  assert.doesNotMatch(html, /data-history-scene-field="weight"/);
   assert.match(html, /72\.5 kg/);
 });
 

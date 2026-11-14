@@ -1,6 +1,6 @@
 import { assessReadings } from './crew-reading-feedback.js?v=2';
 import {createRepeat,renderRepeat,repeatPayload} from './crew-repeat.js?v=1';
-import {renderCollection,collectionFields,collectionHasEntry,collectionPayload,syncCollectionSymptoms,syncCollectionMeasurement,navigateCollection,urgentCollectionFields,advanceMeasurementGuide,measurementGuides} from './crew-collection.js?v=11';
+import {renderCollection,collectionFields,collectionHasEntry,collectionPayload,syncCollectionSymptoms,syncCollectionMeasurement,navigateCollection,urgentCollectionFields,advanceMeasurementGuide,measurementGuides} from './crew-collection.js?v=12';
 import {renderAssistance,advanceAssistance,readAssistance,writeAssistance} from './crew-assistance.js?v=9';
 import {createVoiceInput} from './crew-voice-input.js?v=4';
 import {isVitalView} from './crew-vital-aid.js?v=1';
@@ -19,7 +19,7 @@ import { compareHistory } from '/space-test-site/design/crew-insights.js?v=1';
 
 import { renderMission, missionState } from './crew-mission-ui.js?v=14';
 import { createCrewAlarm } from './crew-alarm.js?v=2';
-import { renderHistoryScene, initializeHistoryChart, updateHistoryScene, demoHeartRateHistory } from './crew-history-scene.js?v=9';
+import { renderHistoryScene, initializeHistoryChart, updateHistoryScene, demoHeartRateHistory } from './crew-history-scene.js?v=10';
 import { renderDeviceScene } from './crew-device-scene.js?v=2';
 
 const { CrewDesign } = window;

@@ -1,5 +1,5 @@
 // Cache only the application shell and bundled assets, never observation data.
-const CACHE = 'crew-health-static-v64';
+const CACHE = 'crew-health-static-v65';
 const ROOT = '/space-test-site/';
 const FILES = [
   "",
@@ -25,6 +25,9 @@ const FILES = [
   "design/assets/guides/nasa-heart-monitor.jpg",
   "design/assets/guides/nasa-blood-pressure.jpg",
   "design/assets/guides/nasa-blood-sampling.jpg",
+  "design/assets/guides/nasa-exercise.jpg",
+  "design/assets/guides/nasa-drink.jpg",
+  "design/assets/guides/nasa-sleep.jpg",
   "design/assets/guides/nasa-cpr-training.jpg",
   "design/assets/guides/nasa-splint-training.jpg",
   "design/assets/environment/GSG_PRO_STUDIOS_METAL_001_sm-gainmap.webp",
