@@ -16,7 +16,7 @@ import { connectCrewSensor } from '/space-test-site/design/crew-device.js?v=astr
 import { initializeCustomDateTimes, syncCustomDateTimes } from '/space-test-site/design/crew-datetime.js?v=3';
 import { compareHistory } from '/space-test-site/design/crew-insights.js?v=1';
 
-import { renderMission, missionState } from './crew-mission-ui.js?v=12';
+import { renderMission, missionState } from './crew-mission-ui.js?v=13';
 import { createCrewAlarm } from './crew-alarm.js?v=2';
 import { renderHistoryScene, initializeHistoryChart, updateHistoryScene, demoHeartRateHistory } from './crew-history-scene.js?v=9';
 import { renderDeviceScene } from './crew-device-scene.js?v=2';
@@ -1830,3 +1830,4 @@ let displayedDay=localDateKey(new Date());
 setInterval(()=>{const day=localDateKey(new Date());if(day!==displayedDay){displayedDay=day;CrewDesign.refreshPresentation()}},60000);
 
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){const day=localDateKey(new Date());if(day!==displayedDay){displayedDay=day;CrewDesign.refreshPresentation()}}});
+
