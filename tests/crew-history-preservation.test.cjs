@@ -39,3 +39,8 @@ test('existing flat glucose samples are refreshed while an entered 88 remains un
  const history=api.history('alex','glucose');assert(new Set(history.filter(row=>row.source==='Scenario history').map(row=>row.value)).size>1);
  assert.equal(JSON.stringify(history.filter(row=>row.source==='Manual check-in')),JSON.stringify([personal]));
 });
+test('manual sleep diary stores subjective quality, duration and calculated efficiency without a sensor',()=>{
+ const {api,data}=app();api.saveOverview('alex',{sleep:7},'',{sleepTimeInBed:'8',sleepTimeAsleep:'7',sleepLatency:'20',sleepAwakenings:'2',sleepDayImpact:'some',sleepQuality:'mixed'});
+ const saved=JSON.parse(data.get('crew-health-demo-observations-v2')).alex;assert.equal(saved.sleepAssessment.at(-1).efficiency,87.5);assert.equal(saved.sleepAssessment.at(-1).sleepAwakenings,2);assert.equal(saved.sleepQuality.at(-1).value,'mixed');assert.equal(saved.sleep.at(-1).value,7);
+ const before=new Map(data);assert.throws(()=>api.saveOverview('alex',{sleep:9},'',{sleepTimeInBed:'8',sleepTimeAsleep:'9'}));for(const [key,value] of before)assert.equal(data.get(key),value);
+});

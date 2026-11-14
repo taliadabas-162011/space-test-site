@@ -1,10 +1,11 @@
+import {initializeQuestionnaires,setQuestionnairePage} from './crew-questionnaire.js?v=1';
 import { assessReadings } from './crew-reading-feedback.js?v=2';
 import {createRepeat,renderRepeat,repeatPayload} from './crew-repeat.js?v=1';
-import {renderCollection,syncSimpleCalculations,setMoodPage,collectionFields,collectionHasEntry,collectionPayload,syncCollectionSymptoms,syncCollectionMeasurement,navigateCollection,urgentCollectionFields,advanceMeasurementGuide,measurementGuides} from './crew-collection.js?v=19';
+import {renderCollection,syncSimpleCalculations,collectionFields,collectionHasEntry,collectionPayload,syncCollectionSymptoms,syncCollectionMeasurement,navigateCollection,urgentCollectionFields,advanceMeasurementGuide,measurementGuides} from './crew-collection.js?v=questionnaires-1';
 import {renderAssistance,advanceAssistance,readAssistance,writeAssistance} from './crew-assistance.js?v=9';
 import {createVoiceInput} from './crew-voice-input.js?v=4';
 import {isVitalView} from './crew-vital-aid.js?v=1';
-import {createLiquidInterface} from './crew-liquid-ui.js?v=8';
+import {createLiquidInterface} from './crew-liquid-ui.js?v=questionnaires-1';
 import {responseKey,readResponse,recordResponse,handoffText} from './crew-care.js?v=3';
 import { createCrewStage } from '/space-test-site/design/crew-motion-stage.js?v=astronaut-34';
 import { renderObservationCheckin, renderObservationIdentity, renderObservationOverview, renderObservationProfile, renderObservationMobile, updateObservationCheckin } from '/space-test-site/design/crew-observation-ui.js?v=astronaut-9';
@@ -934,7 +935,7 @@ function renderMissionView(force=false) {
   }else if(collectionMode){
     const now=new Date(),observedAt=`${localDateKey(now)}T${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
     mission.innerHTML=renderCollection({summary,fields:collectionDraftFields(),purpose:collectionMode,symptomOptions:CrewDesign.symptomOptions,observedAt,urgent:state.key==='emergency',urgentPreview:summary.symptomSource==='Scenario preview'});
-    initializeCustomSelects(mission);initializeCustomDateTimes(mission);syncCollectionSymptoms(mission.querySelector('[data-collect-form]'));syncCollectionMeasurement(mission.querySelector('[data-collect-form]'));syncSimpleCalculations(mission.querySelector('[data-collect-form]'));
+    initializeCustomSelects(mission);initializeCustomDateTimes(mission);initializeQuestionnaires(mission.querySelector('[data-collect-form]'),()=>storeCollectionDraft(mission.querySelector('[data-collect-form]')));syncCollectionSymptoms(mission.querySelector('[data-collect-form]'));syncCollectionMeasurement(mission.querySelector('[data-collect-form]'));syncSimpleCalculations(mission.querySelector('[data-collect-form]'));
   }else{
     mission.innerHTML=renderMission({summary,histories,scenario,connected:deviceConnections.size,response,draft:checkinDraft,urgentReturn:urgentReturnView});
     if(state.key==='emergency'&&assistanceModeKey===activeAlertKey){
@@ -1255,7 +1256,6 @@ hub.addEventListener('click', event => {
   // A selected radio emits no change event when a saved answer is clicked again.
   const feeling=event.target.closest('[data-collect-form] input[name="symptoms"]');
   if(feeling?.checked){const capture=feeling.form;syncCollectionSymptoms(capture);navigateCollection(capture,{view:'symptoms'});storeCollectionDraft(capture);mission.scrollTop=0;syncMissionFrame();return}
-  const moodPager=event.target.closest('[data-mood-back],[data-mood-next]');if(moodPager){const capture=moodPager.closest('[data-collect-form]');setMoodPage(capture,Number(capture.elements.moodPage.value)+(moodPager.hasAttribute('data-mood-next')?1:-1));storeCollectionDraft(capture);return}
   const collectionNav=event.target.closest('[data-collection-measure],[data-collection-view],[data-collect-symptoms]');
   if(collectionNav){const capture=collectionNav.closest('[data-collect-form]');navigateCollection(capture,{measurement:collectionNav.dataset.collectionMeasure,view:collectionNav.hasAttribute('data-collect-symptoms')?'symptoms':collectionNav.dataset.collectionView});storeCollectionDraft(capture);mission.scrollTop=0;syncMissionFrame();return}
   const guideAbout=event.target.closest('[data-guide-about]');
@@ -1559,7 +1559,7 @@ hub.addEventListener('submit', event => {
 
   const capture=event.target.closest('[data-collect-form]');
   if(capture){
-    event.preventDefault();const invalid=[...capture.elements].find(input=>input.willValidate&&!input.validity.valid);if(invalid){const metric=invalid.closest('[data-collection-metric]');if(metric)navigateCollection(capture,{measurement:metric.dataset.collectionMetric});const guide=metric?.querySelector('[data-measure-guide]');if(guide)guide.open=false;invalid.setAttribute('aria-invalid','true');invalid.setAttribute('aria-describedby','collection-error');const trigger=invalid.closest('.crew-select')?.querySelector('.crew-select__trigger');trigger?.setAttribute('aria-invalid','true');trigger?.setAttribute('aria-describedby','collection-error');capture.querySelector('.collection-error').textContent=invalid.name==='context'?'Choose the measurement conditions.':invalid.validationMessage;if(invalid.tagName==='SELECT')focusCustomSelect(invalid,{preventScroll:true});else invalid.focus({preventScroll:true});return}
+    event.preventDefault();const invalid=[...capture.elements].find(input=>input.willValidate&&!input.validity.valid);if(invalid){const metric=invalid.closest('[data-collection-metric]');if(metric)navigateCollection(capture,{measurement:metric.dataset.collectionMetric});const question=invalid.closest('[data-questionnaire-item]');if(question)setQuestionnairePage(capture,question.closest('[data-questionnaire]').dataset.questionnaire,Number(question.dataset.questionnaireItem));const guide=metric?.querySelector('[data-measure-guide]');if(guide)guide.open=false;invalid.setAttribute('aria-invalid','true');invalid.setAttribute('aria-describedby','collection-error');const trigger=invalid.closest('.crew-select')?.querySelector('.crew-select__trigger');trigger?.setAttribute('aria-invalid','true');trigger?.setAttribute('aria-describedby','collection-error');capture.querySelector('.collection-error').textContent=invalid.name==='context'?'Choose the measurement conditions.':invalid.validationMessage;if(invalid.tagName==='SELECT')focusCustomSelect(invalid,{preventScroll:true});else invalid.focus({preventScroll:true});return}
     const payload=collectionPayload(collectionFields(capture));
     const bed=Number(payload.details.sleepTimeInBed),asleep=Number(payload.details.sleepTimeAsleep);
     if(payload.details.sleepTimeInBed && payload.details.sleepTimeAsleep!=='' && asleep>bed){navigateCollection(capture,{view:'sleepQuality'});capture.querySelector('.collection-error').textContent='Time asleep must not exceed time in bed.';return}

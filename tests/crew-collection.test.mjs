@@ -41,11 +41,11 @@ test('sleep check keeps separate sleep indicators without inventing a quality ra
  assert.equal(p.details.sleepTimeInBed,'8');assert.equal(p.details.sleepTimeAsleep,'7');assert.equal(p.details.sleepAwakenings,'2');assert.equal(p.details.sleepQuality,'');
 });
 
-test('sleep quality is device-only and does not accept invented manual sleep results',()=>{
+test('sleep quality offers a manual diary and preserves subjective quality separately',()=>{
  const html=renderCollection({...options,fields:[{name:'collectionView',value:'sleepQuality'}]});
- assert.match(html,/Sleep data unavailable/);
- assert.doesNotMatch(html,/name="sleepTimeInBed"/);
- assert.doesNotMatch(html,/name="sleepQuality"/);
+ assert.doesNotMatch(html,/Sleep data unavailable/);
+ assert.match(html,/name="sleepTimeInBed"/);
+ assert.match(html,/name="sleepQuality"/);
 });
 
 test('mood questionnaire contains ten questions and keeps answers and note',()=>{

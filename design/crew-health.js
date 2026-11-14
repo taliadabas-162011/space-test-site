@@ -315,17 +315,20 @@
     const sleepFields = ['sleepTimeInBed','sleepTimeAsleep','sleepLatency','sleepAwakenings'];
     const sleepCheck = {};
     for (const field of sleepFields) {
-      if (details[field] == null || details[field] === '') continue;
+      if (details[field] == null || typeof details[field]==='string'&&details[field].trim()==='') continue;
+      if(typeof details[field]==='boolean'||!['number','string'].includes(typeof details[field])||String(details[field]).trim()==='')throw new Error('Check the sleep details.');
       const n = Number(details[field]);
       const max = field === 'sleepTimeInBed' || field === 'sleepTimeAsleep' ? 24 : field === 'sleepLatency' ? 1440 : 100;
       if (!Number.isFinite(n) || n < 0 || n > max || (field === 'sleepTimeInBed' && n === 0) || (['sleepLatency','sleepAwakenings'].includes(field) && !Number.isInteger(n))) throw new Error('Check the sleep details.');
       sleepCheck[field] = n;
     }
     if (sleepCheck.sleepTimeInBed != null && sleepCheck.sleepTimeAsleep != null && sleepCheck.sleepTimeAsleep > sleepCheck.sleepTimeInBed) throw new Error('Time asleep must not exceed time in bed.');
+    if(sleepCheck.sleepTimeInBed!=null&&sleepCheck.sleepLatency!=null&&(sleepCheck.sleepTimeAsleep??0)+sleepCheck.sleepLatency/60>sleepCheck.sleepTimeInBed+1e-7)throw new Error('Time asleep plus time falling asleep must fit within your time in bed.');
     if (details.sleepDayImpact) {
       if (!['none','some','much'].includes(details.sleepDayImpact)) throw new Error('Choose a valid daytime impact.');
       sleepCheck.sleepDayImpact = details.sleepDayImpact;
     }
+    if (sleepCheck.sleepTimeInBed>0&&sleepCheck.sleepTimeAsleep!=null)sleepCheck.efficiency=Math.round(sleepCheck.sleepTimeAsleep/sleepCheck.sleepTimeInBed*1000)/10;
     if (Object.keys(sleepCheck).length) {
       next[personId].sleepAssessment ||= [];
       next[personId].sleepAssessment.push({ ...sleepCheck, time, recordedAt: recordedAt.toISOString(), source: 'Manual check-in' });
