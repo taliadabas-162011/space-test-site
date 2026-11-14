@@ -28,7 +28,7 @@ export function urgentCollectionFields(fields,summary){
 export function renderCollection({summary,fields=[],purpose='daily',symptomOptions,observedAt,urgent=false,urgentPreview=false}){
  const symptoms=['concerning','urgent'].includes(value(fields,'symptoms'));
  const region=value(fields,'symptomRegion')||Object.keys(symptomRegions).find(key=>symptomRegions[key].some(tag=>checked(fields,'symptomTags',tag)))||'General';
- const metrics=['oxygen','pressure','pulse','temperature','glucose','weight'];
+ const metrics=['oxygen','pressure','pulse','temperature','glucose'];
  const selectedMetric=metrics.includes(value(fields,'measurementField'))?value(fields,'measurementField'):'oxygen';
  const view=(['today','measurements','symptoms'].includes(value(fields,'collectionView'))?value(fields,'collectionView'):purpose==='full'?'measurements':'today');
  const feeling=`<fieldset class="collection-feeling"><legend>How do you feel?</legend>${choices('symptoms',[['none','Well'],['concerning','Something changed'],...(value(fields,'symptoms')==='urgent'?[['urgent','Urgent']]:[])],fields)}<button class="collection-edit-symptoms" data-collect-symptoms type="button"${symptoms?'':' hidden'}>Review symptoms →</button></fieldset>`;
