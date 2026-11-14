@@ -55,3 +55,25 @@ test('mood questionnaire contains ten questions and keeps answers and note',()=>
  const p=collectionPayload([{name:'moodQ1',value:'4',checked:true},{name:'moodQ10',value:'2',checked:true},{name:'moodNote',value:'A note'}]);
  assert.equal(p.details.mood,'low');assert.equal(p.details.moodQuestionnaire.answers.q10,'2');assert.equal(p.details.moodQuestionnaire.note,'A note');
 });
+
+test('symptom entry starts Well and its guide has a single return path to the existing fields',()=>{
+ const html=renderCollection({...options,fields:[{name:'collectionView',value:'symptoms'}]});
+ assert.match(html,/class="collection-symptom-stage" data-collection-metric="symptoms"/);
+ assert.match(html,/name="symptoms" value="none" checked/);
+ assert.match(html,/<div data-symptom-details hidden>/);
+ assert.match(html,/Back to symptoms/);
+});
+test('Well hides symptom details without erasing a draft; Something changed restores them',async()=>{
+ const {syncCollectionSymptoms}=await import('../design/crew-collection.js');
+ const Original=globalThis.FormData;let feeling='none';const details={hidden:false},selected={textContent:''},urgent={hidden:false},group={dataset:{symptomRegion:'General'},hidden:false};
+ globalThis.FormData=class{get(name){return name==='symptoms'?feeling:name==='symptomRegion'?'General':null}getAll(){return ['fainting']}};
+ const input={checked:true,parentElement:{lastElementChild:{textContent:'Fainting'}},closest:()=>group};
+ const form={querySelector:selector=>({'[data-symptom-details]':details,'[data-selected-symptoms]':selected,'[data-symptom-urgent]':urgent})[selector]||null,querySelectorAll:selector=>selector==='[data-symptom-region]'?[group]:[input]};
+ try{syncCollectionSymptoms(form);assert(details.hidden);assert(urgent.hidden);assert(input.checked);feeling='concerning';syncCollectionSymptoms(form);assert.equal(details.hidden,false);assert.equal(urgent.hidden,false);assert(input.checked)}finally{globalThis.FormData=Original}
+});
+test('finishing a symptoms guide closes it and returns focus without scrolling away from the form',async()=>{
+ const {advanceMeasurementGuide}=await import('../design/crew-collection.js');let focusOptions;
+ const steps=[{hidden:true},{hidden:false}],guide={open:true,dataset:{measureGuide:'symptoms',about:'false'},querySelectorAll:()=>steps,closest:()=>({querySelector:()=>({focus:options=>focusOptions=options})})};
+ const button={closest:()=>guide,hasAttribute:name=>name==='data-guide-next'};
+ advanceMeasurementGuide(button);assert.equal(guide.open,false);assert.deepEqual(focusOptions,{preventScroll:true});
+});

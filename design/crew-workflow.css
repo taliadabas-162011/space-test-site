@@ -109,3 +109,25 @@
 .glucose-a1c-info{margin-top:18px;color:#c9dbe6;line-height:1.5}.glucose-a1c-info summary{cursor:pointer}.glucose-a1c-info a{color:#a8dcf5}
 .water-entry{display:flex;flex-wrap:wrap;align-items:end;gap:12px}.water-unit,.sleep-impact,.sleep-check-grid label{display:grid;gap:7px;color:#c9dce9;font-size:13px}.water-unit select,.sleep-impact select,.sleep-check-grid input{min-width:0;padding:12px;border:1px solid #9bbcd080;border-radius:12px;background:#19334b;color:#fff;font:inherit}.water-unit select option,.sleep-impact select option{background:#102338}.water-conversion,[data-sleep-efficiency],.sleep-check-note{color:#c5dce9;font-size:13px;line-height:1.5}.sleep-check-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;max-width:540px;margin:16px 0}.sleep-check-grid input{width:100%}.sleep-impact{max-width:260px;margin:14px 0 20px}@media(max-width:480px){.sleep-check-grid{grid-template-columns:1fr}}
 .sleep-device-status{max-width:520px;padding:18px;border:1px solid #a4c4d766;border-radius:16px;background:#183149cc;color:#edf7fc;line-height:1.5}.sleep-device-status p,.sleep-device-note{color:#c4d8e5;line-height:1.5}.sleep-device-status button{padding:10px 14px;border:1px solid #98c7df88;border-radius:12px;background:#284964;color:#fff;cursor:pointer}.sleep-device-note{max-width:520px;font-size:13px}
+/* Symptoms guidance takes the place of the form, retaining the same draft fields. */
+.collection-symptom-stage{min-width:0}
+.collection-symptom-stage>.collection-guide{margin:0 0 22px}
+.collection-symptom-stage:has(>.collection-guide[open])>.collection-symptom-form{display:none}
+.collection-symptom-stage>.collection-guide[open]{margin:0}
+.collection-symptom-stage>.collection-guide .measurement-visual{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(160px,auto) auto auto;min-height:280px;gap:18px;align-items:start}
+.collection-symptom-stage .measurement-steps{grid-column:1;align-self:start;padding-top:8px}
+.collection-symptom-stage .measurement-steps p{max-width:45ch}
+.collection-page .collection-symptom-form .collection-feeling{margin-bottom:26px}
+.collection-symptom-stage [data-symptom-details][hidden]{display:none!important}
+.collection-symptom-form{animation:collection-enter .25s ease-out}
+@media(max-width:767px){.collection-symptom-stage>.collection-guide .measurement-visual{min-height:270px;grid-template-rows:minmax(145px,auto) auto auto}.collection-symptom-detail{display:block}.collection-symptom-detail .collection-note{margin-top:20px}}
+@media(prefers-reduced-motion:reduce){.collection-symptom-form{animation:none}}
+.collection-page:has(.collection-symptom-stage>.collection-guide[open]) .collection-footer,.collection-page [data-collection-screen=symptoms]:has(.collection-guide[open]) .collection-screen-title>button{visibility:hidden;pointer-events:none}
+.collection-symptom-stage>.collection-guide .measurement-visual{grid-template-rows:auto auto auto;min-height:0!important;gap:24px;max-width:650px}
+@media(min-width:1100px){
+ [data-collection-screen=symptoms]{position:relative}
+ .collection-symptom-stage>.collection-guide:not([open]){margin:0}
+ .collection-symptom-stage>.collection-guide:not([open])>summary{position:absolute;top:0;right:100px}
+}
+
+.collection-symptom-stage .measurement-source{min-height:0}

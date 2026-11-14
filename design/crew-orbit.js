@@ -1,9 +1,9 @@
 import {createSceneNavigation} from './crew-navigation.js?v=2';
-import {navigateImmunity,syncImmunity} from './crew-immunity.js?v=3';
+import {navigateImmunity,syncImmunity} from './crew-immunity.js?v=5';
 import {initializeQuestionnaires,setQuestionnairePage} from './crew-questionnaire.js?v=3';
 import { assessReadings } from './crew-reading-feedback.js?v=2';
-import {createRepeat,renderRepeat,repeatPayload} from './crew-repeat.js?v=1';
-import {renderCollection,syncSimpleCalculations,collectionFields,collectionHasEntry,collectionPayload,syncCollectionSymptoms,syncCollectionMeasurement,navigateCollection,urgentCollectionFields,advanceMeasurementGuide,measurementGuides} from './crew-collection.js?v=checkin-3';
+import {createRepeat,renderRepeat,repeatPayload} from './crew-repeat.js?v=3';
+import {renderCollection,syncSimpleCalculations,collectionFields,collectionHasEntry,collectionPayload,syncCollectionSymptoms,syncCollectionMeasurement,navigateCollection,urgentCollectionFields,advanceMeasurementGuide,measurementGuides} from './crew-collection.js?v=checkin-5';
 import {renderAssistance,advanceAssistance,readAssistance,writeAssistance} from './crew-assistance.js?v=14';
 import {assistanceNarration,createVoicePlayer} from './crew-assistance-audio.js?v=5';
 import {voiceIcon} from './crew-voice-controls.js?v=3';
@@ -1303,7 +1303,7 @@ hub.addEventListener('click', event => {
   if(event.target.closest('[data-repeat-guide]')){storeRepeatDraft();repeatState.phase='guide';showRepeatStep();return}
   // A selected radio emits no change event when a saved answer is clicked again.
   const feeling=event.target.closest('[data-collect-form] input[name="symptoms"]');
-  if(feeling?.checked){const capture=feeling.form;syncCollectionSymptoms(capture);navigateCollection(capture,{view:'symptoms'});storeCollectionDraft(capture);mission.scrollTop=0;syncMissionFrame();return}
+  if(feeling?.checked){const capture=feeling.form;syncCollectionSymptoms(capture);if(capture.dataset.view!=='symptoms'){navigateCollection(capture,{view:'symptoms'});mission.scrollTop=0}storeCollectionDraft(capture);syncMissionFrame();return}
   const immunityControl=event.target.closest('[data-immunity-open],[data-immunity-close],[data-immunity-next],[data-immunity-back]');
   if(immunityControl){const capture=immunityControl.closest('[data-collect-form]'),guide=immunityControl.closest('[data-immunity-guide]');if(immunityControl.hasAttribute('data-immunity-open'))navigateImmunity(capture,immunityControl.dataset.immunityOpen);else if(immunityControl.hasAttribute('data-immunity-close')||immunityControl.hasAttribute('data-immunity-next')&&Number(guide.dataset.step)===3){const sample=guide?.dataset.immunityGuide;navigateImmunity(capture,null);if(sample)focusCustomSelect(capture.elements[sample+'ResultType'],{preventScroll:true})}else navigateImmunity(capture,guide.dataset.immunityGuide,Number(guide.dataset.step)+(immunityControl.hasAttribute('data-immunity-next')?1:-1));return}
   const collectionNav=event.target.closest('[data-collection-measure],[data-collection-view],[data-collect-symptoms]');

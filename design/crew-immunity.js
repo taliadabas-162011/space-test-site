@@ -1,4 +1,4 @@
-import {measurementGuides} from './crew-measurement-guides.js?v=immunity-2';
+import {measurementGuides} from './crew-measurement-guides.js?v=symptoms-2';
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
 const visuals={saliva:['saliva-prepare.png','saliva-collect.png','saliva-seal.png','saliva-lab.png'],urine:['urine-plan.svg','urine-collect.svg','urine-transfer.svg','urine-report.svg']};
 export const immunityResultTypes=[['not-detected','Not detected'],['detected','Detected'],['below-limit','Detected below quantification limit'],['inconclusive','Inconclusive'],['numeric','Numeric value']];

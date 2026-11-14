@@ -1,5 +1,5 @@
-import {collectionMetrics,renderCollectionMetric,collectionPayload} from './crew-collection.js?v=checkin-2';
-import {measurementGuides,guideVisual} from './crew-measurement-guides.js?v=2';
+import {collectionMetrics,renderCollectionMetric,collectionPayload} from './crew-collection.js?v=checkin-5';
+import {measurementGuides,guideVisual} from './crew-measurement-guides.js?v=symptoms-2';
 import {readingStatus} from './crew-care.js?v=3';
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
 export const repeatFields=['oxygen','pressure','pulse','temperature','glucose','weight'];
