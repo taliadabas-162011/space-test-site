@@ -24,19 +24,7 @@
 .urgent-page .assistance-source-links{display:flex;flex-direction:column;gap:17px;margin-top:22px}.urgent-page .assistance-source-links a{font-size:14px;line-height:1.5;color:#f0c3aa;text-decoration:none}.urgent-page .assistance-source-links a:hover{text-decoration:underline}
 .crew-orbit[data-ui-variant=glass][data-ui-variant] .urgent-page .assistance-source-view>p{font-size:15px!important;line-height:1.55;max-width:none;margin:0 0 18px}
 .urgent-page .assistance-handoff-view .care-handoff{margin:0}.urgent-page .assistance-handoff-view .care-handoff textarea{height:130px;min-height:130px;resize:none;background:#12151ab0;border:1px solid #ffffff20;border-radius:18px;font-size:12px;line-height:1.5;margin:0 0 10px;padding:14px}.urgent-page .assistance-handoff-view .care-handoff>[role=status]{display:block;font-size:12px;line-height:1.5;color:#d4c3b8;margin-top:7px}.urgent-page .assistance-persistence[data-persisted=true]{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);margin:-1px!important;padding:0!important;white-space:nowrap}
-.urgent-page .assistance-voice{display:grid;gap:8px;margin:15px 0 18px;padding:13px 15px;border:1px solid #d6e4ef27;border-left:2px solid #92d7f2;border-radius:14px;background:#d6e4ef09}
-.urgent-page .assistance-voice-toggle{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;min-height:44px;padding:10px 14px;border:1px solid #b8dff047;border-radius:12px;background:#78c7e918;color:#eaf7ff;font-family:inherit;font-size:14px;font-weight:500;line-height:1.4;cursor:pointer}
-.urgent-page .assistance-voice-toggle:hover{background:#78c7e92b}.urgent-page .assistance-voice-toggle span{color:#9ee5ff;font-size:12px}
-.urgent-page .assistance-voice-toggle:focus-visible{outline:2px solid #9ee5ff;outline-offset:3px}
-.urgent-page .assistance-voice [data-assistance-voice-status]{min-height:18px;margin:0;color:#c2d2dc;font-size:11px;line-height:1.5}
-.urgent-page .assistance-voice small{color:#9fb0bc;font-size:10px;line-height:1.4}
 .urgent-page[data-assisting=true] .urgent-problem .care-checkin-return{visibility:hidden}
-.urgent-page .assistance-voice{display:grid;gap:8px;margin:15px 0 18px;padding:13px 15px;border:1px solid #d6e4ef27;border-left:2px solid #92d7f2;border-radius:14px;background:#d6e4ef09}
-.urgent-page .assistance-voice-toggle{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;min-height:44px;padding:10px 14px;border:1px solid #b8dff047;border-radius:12px;background:#78c7e918;color:#eaf7ff;font-family:inherit;font-size:14px;font-weight:500;line-height:1.4;cursor:pointer}
-.urgent-page .assistance-voice-toggle:hover{background:#78c7e92b}.urgent-page .assistance-voice-toggle span{color:#9ee5ff;font-size:12px}
-.urgent-page .assistance-voice-toggle:focus-visible{outline:2px solid #9ee5ff;outline-offset:3px}
-.urgent-page .assistance-voice [data-assistance-voice-status]{min-height:18px;margin:0;color:#c2d2dc;font-size:11px;line-height:1.5}
-.urgent-page .assistance-voice small{color:#9fb0bc;font-size:10px;line-height:1.4}
 .urgent-page button:focus-visible{outline:2px solid #ffe0cf;outline-offset:4px}
 .crew-orbit[data-ui-variant=glass][data-severity=urgent]:after{border:1px solid #ff9b7eb3;box-shadow:inset 0 0 65px #c53e2545;animation:urgent-breathe 2.8s ease-in-out infinite;z-index:46;opacity:.65}
 @keyframes urgent-breathe{0%,100%{opacity:.45}50%{opacity:1}}
@@ -52,13 +40,13 @@
 @media(max-width:767px){.urgent-page .assistance-visual-grid .assistance-nasa-photo img{max-height:250px}}
 
 /* Keep each training image beside the instructions without covering controls. */
-.urgent-page .assistance-visual-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(130px,.85fr);gap:clamp(12px,2vw,24px);align-items:start;min-width:0;margin:0 0 18px;padding:14px;border:1px solid #d6e4ef24;border-radius:14px;background:#081522e8}
+.urgent-page .assistance-visual-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(220px,.85fr);gap:clamp(28px,4vw,64px);align-items:start;min-width:0;margin:0 0 22px;padding:0;border:0;background:none}
 .urgent-page .assistance-visual-grid .assistance-instruction{min-width:0;margin:0!important;overflow-wrap:anywhere}
-.urgent-page .assistance-visual-grid .assistance-nasa-photo{min-width:0;margin:0;padding:8px;overflow:hidden}
-.urgent-page .assistance-visual-grid .assistance-nasa-photo img{width:100%;max-height:340px;object-fit:contain}
+.urgent-page .assistance-visual-grid .assistance-nasa-photo{min-width:0;margin:0;padding:0;overflow:visible}
+.urgent-page .assistance-visual-grid .assistance-nasa-photo img{width:100%;max-height:360px;object-fit:contain;border-radius:10px;background:none}
 .urgent-page .assistance-visual-grid figcaption{overflow-wrap:anywhere}
 @media(min-width:768px){.crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-page.urgent-page[data-care-view=emergency][data-assistance-visual] .urgent-action.care-focus{grid-column:1/-1;grid-row:2}.crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-page.urgent-page[data-care-view=emergency][data-assistance-visual]>.urgent-figure{display:none}}
-@media(max-width:440px){.urgent-page .assistance-visual-grid{grid-template-columns:minmax(0,1fr) minmax(100px,.72fr);gap:8px;padding:9px}.urgent-page .assistance-visual-grid .assistance-nasa-photo{padding:5px}.urgent-page .assistance-visual-grid figcaption{font-size:10px;line-height:1.4}}
+@media(max-width:440px){.urgent-page .assistance-visual-grid{grid-template-columns:minmax(0,1fr);gap:20px;padding:0}.urgent-page .assistance-visual-grid .assistance-nasa-photo{padding:0}.urgent-page .assistance-visual-grid figcaption{font-size:10px;line-height:1.4}}
 
 .urgent-page .assistance-action-steps{display:grid;gap:9px;margin:0;padding-left:24px;color:#f1f6f8;line-height:1.55}
 .urgent-page .assistance-action-steps li{padding-left:5px}.urgent-page .assistance-action-steps li::marker{color:#ffb59e;font-weight:700}
@@ -72,10 +60,8 @@
 .crew-orbit[data-ui-variant=glass][data-ui-variant] .urgent-page[data-assisting=true] .urgent-readings{position:static;grid-row:3;align-self:start;margin-top:20px}
 .urgent-page .assistance-answers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;clear:both}
 .urgent-page .assistance-answers>button{width:100%;min-width:0!important;min-height:54px}
-.urgent-page .assistance-mic-toggle{width:100%;min-height:46px;border:1px solid #a4d5eb70;border-radius:12px;background:#29445d;color:#f3fbff;cursor:pointer}
-.urgent-page .assistance-voice [data-assistance-mic-status]{margin:0;color:#d9eaf4;font-size:12px;line-height:1.5}
-.assistance-nasa-photo{margin:24px 0;padding:12px;border:1px solid #d6e4ef35;border-radius:14px;background:#081522}
-.assistance-nasa-photo img{display:block;width:100%;height:auto;max-height:360px;object-fit:contain;border-radius:8px;background:#050c14}
+.assistance-nasa-photo{margin:0;padding:0;border:0;background:none}
+.assistance-nasa-photo img{display:block;width:100%;height:auto;max-height:360px;object-fit:contain;border-radius:10px;background:none}
 .assistance-nasa-photo figcaption{margin-top:10px;color:#cedee8;font-size:12px;line-height:1.5}.assistance-nasa-photo a{color:#a8e4ff}
 @media(max-width:480px){.urgent-page .assistance-answers{grid-template-columns:1fr}.urgent-page .assistance-answers>button{min-height:48px}}
 @media(min-width:768px) and (max-width:1100px){.crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-page.urgent-page[data-care-view=emergency]{padding-top:145px;column-gap:5%;grid-template-columns:minmax(210px,.8fr) minmax(0,1.2fr)}}
@@ -91,9 +77,60 @@
 @media(max-width:767px){.urgent-page .assistance-visual-grid .assistance-nasa-photo img{max-height:250px}}
 
 .urgent-page .assistance-visual-side{display:grid;gap:8px;min-width:0;align-content:start}
-.urgent-page .assistance-visual-side .assistance-voice{gap:4px;margin:0;padding:6px}
-.urgent-page .assistance-visual-side .assistance-voice-toggle{min-height:38px;padding:7px 9px;font-size:12px}
-.urgent-page .assistance-visual-side [data-assistance-voice-status],.urgent-page .assistance-visual-side [data-assistance-mic-status]{min-height:0;margin:0!important;color:#c2d2dc;font-size:10px!important;line-height:1.35}
-.urgent-page .assistance-visual-side [data-assistance-mic-status]:empty{display:none}
 .urgent-page .assistance-visual-side .assistance-nasa-photo img{max-height:280px}
 @media(max-width:767px){.urgent-page .assistance-visual-side .assistance-nasa-photo img{max-height:170px}}
+
+/* Audio is a small glass tool beside the task, not another panel to enter. */
+.urgent-page .assistance-voice{margin:18px 0 20px;min-width:0}
+.urgent-page .assistance-audio-controls{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.crew-orbit[data-ui-variant=glass] .urgent-page .assistance-audio-controls>button,.crew-orbit[data-ui-variant=glass] .urgent-page .assistance-voice-confirm>button{position:relative;isolation:isolate;overflow:hidden;display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:44px;padding:10px 17px;border:1px solid #f5decc55;border-radius:24px;background:#fff0dd0c;color:#f3eee9;font:inherit;font-size:14px;line-height:1.4;cursor:pointer;box-shadow:var(--liquid-shadow);transition:background .2s,transform .2s}
+.urgent-page .assistance-audio-controls button>.glass-optics,.urgent-page .assistance-voice-confirm button>.glass-optics{z-index:-1;opacity:.85}
+.urgent-page .assistance-audio-controls button:hover,.urgent-page .assistance-voice-confirm button:hover{background:#ffe4c620!important}
+.urgent-page .assistance-audio-controls button:active,.urgent-page .assistance-voice-confirm button:active{transform:scale(.97)}
+.urgent-page .assistance-audio-controls svg{display:block;width:19px;height:19px;flex:none}
+.crew-orbit[data-ui-variant=glass] .urgent-page .assistance-audio-controls>.assistance-replay{width:44px;padding:10px;flex:none}
+.crew-orbit[data-ui-variant=glass] .urgent-page .assistance-mic-toggle[aria-pressed=true],.crew-orbit[data-ui-variant=glass] .urgent-page .assistance-voice-toggle[aria-pressed=true]{background:#ffbd9129;border-color:#ffd8b89c;color:#fff4e8}
+.urgent-page .assistance-voice .assistance-audio-status{margin:9px 0 0;font-size:12px!important;line-height:1.5;color:#c8c2be;min-height:18px}
+.urgent-page .assistance-audio-status:empty{display:none}
+.urgent-page .assistance-voice .assistance-mic-privacy{display:block;max-width:51ch;margin-top:10px;color:#bcbab9;font-size:11px;line-height:1.5}
+.urgent-page .assistance-mic-feedback{margin:14px 0 0;animation:voice-arrive .22s ease-out}
+.urgent-page .assistance-mic-feedback p{margin:0;color:#ffe7d6;font-size:15px!important;line-height:1.5}
+.urgent-page .assistance-mic-feedback[data-listening=true] p:before{content:'';display:inline-block;width:7px;height:7px;margin-right:8px;border-radius:50%;background:#f6bd9e;box-shadow:0 0 12px #ffc49d99;animation:urgent-breathe 2s ease-in-out infinite}
+.urgent-page .assistance-voice-confirm{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+.crew-orbit[data-ui-variant=glass] .urgent-page .assistance-voice-confirm>[data-assist-confirm]{background:#ffe2c927;color:#fff4e8}
+.urgent-page .assistance-visual-side .assistance-voice{margin:0 0 8px}
+.urgent-page .assistance-action-steps li{transition:color .2s,background .2s;scroll-margin-top:180px}
+.urgent-page .assistance-action-steps li[data-speaking]{color:#ffe0c7;background:none}
+.urgent-page .assistance-voice [hidden]{display:none!important}
+@keyframes voice-arrive{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:767px){.urgent-page .assistance-visual-grid{grid-template-columns:minmax(0,1fr);padding:0;border:0;background:none;gap:18px}.urgent-page .assistance-visual-side{grid-template-columns:minmax(0,1fr)}.urgent-page .assistance-visual-grid .assistance-nasa-photo{max-width:320px;padding:0;border:0;background:none}.urgent-page .assistance-visual-side .assistance-nasa-photo img{max-height:200px}.urgent-page .assistance-voice .assistance-mic-privacy{font-size:11px}}
+@media(prefers-reduced-motion:reduce){.urgent-page .assistance-mic-feedback{animation:none}.urgent-page .assistance-mic-feedback p:before{animation:none}.urgent-page .assistance-audio-controls>button,.urgent-page .assistance-voice-confirm>button,.urgent-page .assistance-action-steps li{transition:none}}
+@media(prefers-reduced-transparency:reduce){.crew-orbit[data-ui-variant=glass] .urgent-page .assistance-audio-controls>button,.crew-orbit[data-ui-variant=glass] .urgent-page .assistance-voice-confirm>button{background:#181c22}}
+.urgent-page .assistance-audio-label{font-size:13px;line-height:1.4;color:#d1c9c3;margin-right:2px}
+.crew-orbit[data-ui-variant=glass] .urgent-page .assistance-audio-controls>button{width:44px;padding:10px;flex:none}
+.urgent-page .voice-control-sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.crew-orbit[data-ui-variant=glass][data-ui-variant] .urgent-page .assistance-keyboard-hint{margin:10px 0 0!important;font-size:13px!important;line-height:1.6;color:#ded5cd;max-width:none}
+.urgent-page .assistance-keyboard-hint kbd{font:inherit;font-size:12px;color:#fff0e2}
+.urgent-page .assistance-voice .assistance-mic-privacy{margin-top:3px}
+.urgent-page .voice-touch{display:none}
+@media(pointer:coarse){.urgent-page .voice-touch{display:inline}.urgent-page .voice-keyboard{display:none}}
+
+.urgent-page .assistance-procedure-main{min-width:0}
+.urgent-page .assistance-procedure-main>.assistance-voice{margin:0 0 24px}
+.crew-orbit[data-ui-variant=glass][data-ui-variant] .urgent-page .assistance-condition{max-width:none;margin:-6px 0 28px!important;color:#e4d1c4;font-size:17px!important;line-height:1.5}
+.crew-orbit[data-ui-variant=glass][data-ui-variant] .urgent-page[data-assistance-visual] .assistance-instruction{font-size:17px!important;line-height:1.6}
+.urgent-page .assistance-visual-grid .assistance-action-steps{gap:20px}
+.urgent-page .assistance-visual-grid .assistance-nasa-photo figcaption{font-size:11px;line-height:1.5;color:#c5c0bd}
+.urgent-page .assistance-nasa-photo figcaption a{color:#e8cbbb}
+@media(max-width:767px){.crew-orbit[data-ui-variant=glass][data-ui-variant] .urgent-page[data-assistance-visual] .assistance-instruction{font-size:16px!important}.urgent-page .assistance-visual-grid .assistance-nasa-photo{max-width:360px}.urgent-page .assistance-visual-grid .assistance-nasa-photo img{max-height:240px}}
+/* A single reading surface protects the procedure from a busy scene. Photos stay unframed. */
+.crew-orbit[data-ui-variant=glass] .urgent-page .assistance-visual-grid .assistance-procedure-main{position:relative;isolation:isolate;overflow:hidden;padding:24px 26px;border:1px solid #f5dfcc36;border-radius:28px;background:#0b0e14b8;box-shadow:var(--liquid-shadow);backdrop-filter:blur(7px)}
+.urgent-page .assistance-procedure-main>.glass-optics{z-index:-1;opacity:.7}
+.crew-orbit[data-ui-variant=glass][data-ui-variant] .urgent-page .assistance-action-steps{margin:0!important;padding-left:20px;list-style:decimal}
+.crew-orbit[data-ui-variant=glass][data-ui-variant] .urgent-page .assistance-action-steps li{margin:0!important;padding-left:3px;list-style:decimal}
+.urgent-page .assistance-visual-grid .assistance-action-steps{gap:18px}
+.urgent-page .assistance-procedure-main>.assistance-voice{margin-bottom:20px}
+@media(max-width:767px){.crew-orbit[data-ui-variant=glass] .urgent-page .assistance-visual-grid .assistance-procedure-main{padding:21px 20px;border-radius:24px}}
+@media(prefers-reduced-transparency:reduce){.crew-orbit[data-ui-variant=glass] .urgent-page .assistance-visual-grid .assistance-procedure-main{background:#11151c;backdrop-filter:none}}
+/* During CPR, keep attention on resuscitation rather than the scenario's earlier vitals. */
+.crew-orbit[data-ui-variant=glass][data-ui-variant] .urgent-page:has([data-outcome=resuscitation]) .urgent-readings{display:none}

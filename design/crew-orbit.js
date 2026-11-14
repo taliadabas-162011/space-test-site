@@ -4,10 +4,12 @@ import {initializeQuestionnaires,setQuestionnairePage} from './crew-questionnair
 import { assessReadings } from './crew-reading-feedback.js?v=2';
 import {createRepeat,renderRepeat,repeatPayload} from './crew-repeat.js?v=1';
 import {renderCollection,syncSimpleCalculations,collectionFields,collectionHasEntry,collectionPayload,syncCollectionSymptoms,syncCollectionMeasurement,navigateCollection,urgentCollectionFields,advanceMeasurementGuide,measurementGuides} from './crew-collection.js?v=checkin-3';
-import {renderAssistance,advanceAssistance,readAssistance,writeAssistance} from './crew-assistance.js?v=9';
-import {createVoiceInput} from './crew-voice-input.js?v=4';
-import {isVitalView} from './crew-vital-aid.js?v=1';
-import {createLiquidInterface} from './crew-liquid-ui.js?v=anatomy-3';
+import {renderAssistance,advanceAssistance,readAssistance,writeAssistance} from './crew-assistance.js?v=14';
+import {assistanceNarration,createVoicePlayer} from './crew-assistance-audio.js?v=5';
+import {voiceIcon} from './crew-voice-controls.js?v=3';
+import {createVoiceInput,handleVoiceShortcut} from './crew-voice-input.js?v=9';
+import {isVitalView} from './crew-vital-aid.js?v=4';
+import {createLiquidInterface} from './crew-liquid-ui.js?v=voice-5';
 import {responseKey,readResponse,recordResponse,handoffText} from './crew-care.js?v=3';
 import { createCrewStage } from '/space-test-site/design/crew-motion-stage.js?v=anatomy-exit-4';
 import { renderObservationCheckin, renderObservationIdentity, renderObservationOverview, renderObservationProfile, renderObservationMobile, updateObservationCheckin } from '/space-test-site/design/crew-observation-ui.js?v=astronaut-9';
@@ -76,10 +78,28 @@ const sectionContent = hub.querySelector('.orbit-section-content');
 const appNav = hub.querySelector('.mission-tools');
 initializeCustomSelects(hub.querySelector('.orbit-scenario-control'));
 const mission = hub.querySelector('.orbit-mission');
+const assistancePlayer=createVoicePlayer({onState:syncAssistanceVoiceButton});
+const currentNarration=()=>assistanceNarration(assistanceFor(activeAlertKey),assistanceView);
 const voiceInput=createVoiceInput({
- getPrompt:()=>({question:mission.querySelector('[data-assist-question]')?.dataset.assistQuestion||(mission.querySelector('[data-assist-direction]')?'direction':mission.querySelector('.assistance-topics [data-assist-topic]')?'topic':''),text:[mission.querySelector('.assistance-view h2')?.textContent,mission.querySelector('.assistance-instruction')?.textContent].filter(Boolean).join('. ')}),
- onAnswer:answer=>{const question=mission.querySelector('[data-assist-question]')?.dataset.assistQuestion,metric=mission.querySelector('.vital-choice')?.dataset.vitalMetric;if(question)updateAssistance(question,answer);else if(metric&&['low','high','unsure'].includes(answer))showAssistanceTopic(`${metric}-${answer}`);else if(mission.querySelector('.assistance-topics [data-assist-topic]')&&(['chest','fracture','other'].includes(answer)||isVitalView(answer)))showAssistanceTopic(answer);else{voiceInput.stop();return}voiceInput.next()},
- onStatus:message=>{const status=mission.querySelector('[data-assistance-mic-status]');if(status)status.textContent=message;const button=mission.querySelector('[data-assist-mic]');if(button){button.textContent=voiceInput.active?'Stop microphone':'Start microphone answers';button.setAttribute('aria-pressed',String(voiceInput.active))}}
+ getPrompt:()=>currentNarration(),
+ speak:text=>assistancePlayer.play([{text}],{purpose:'answer'}),
+ stopSpeaking:()=>assistancePlayer.stop(),
+ onAnswer:answer=>{
+  const question=mission.querySelector('[data-assist-question]')?.dataset.assistQuestion,metric=mission.querySelector('.vital-choice')?.dataset.vitalMetric;
+  if(question)updateAssistance(question,answer);
+  else if(metric&&['low','high','unsure'].includes(answer))showAssistanceTopic(`${metric}-${answer}`);
+  else if(mission.querySelector('.assistance-topics [data-assist-topic]')&&(['chest','fracture','other'].includes(answer)||isVitalView(answer)))showAssistanceTopic(answer);
+  else{voiceInput.stop();return}
+  const plan=currentNarration();
+  assistancePlayer.play(plan.segments,{key:plan.key}).then(complete=>{if(complete&&voiceInput.active)voiceInput.next()});
+ },
+ onStatus:(message,state)=>{
+  const status=mission.querySelector('[data-assistance-mic-status]');if(status)status.textContent=message;
+  const feedback=mission.querySelector('[data-mic-feedback]');if(feedback){feedback.hidden=!message;feedback.dataset.listening=String(state.active&&state.phase==='answer')}
+  const hint=mission.querySelector('[data-voice-hint]');if(hint)hint.hidden=state.active;
+  const confirmation=mission.querySelector('[data-voice-confirm]');if(confirmation)confirmation.hidden=!(state.active&&state.pending);
+  const button=mission.querySelector('[data-assist-mic]');if(button){button.querySelector('[data-mic-label]').textContent=state.active?'Stop voice answers':'Start voice answers';button.setAttribute('aria-label',state.active?'Stop voice answers':'Start voice answers');button.setAttribute('aria-pressed',String(state.active))}
+ }
 });
 let alertSoundEnabled = true;
 const alarm = createCrewAlarm(undefined, { onState: updateAlarmControl });
@@ -862,12 +882,21 @@ function storeCollectionDraft(capture) {
   try{sessionStorage.setItem(draftStorageKey,JSON.stringify(collectionDraft));status.textContent=checkinDraft?'Draft saved':''}catch{status.textContent=checkinDraft?'Draft kept in this session':''}
 }
 function syncAssistanceVoiceButton() {
- const button=mission.querySelector('[data-assist-voice]');if(!button)return;
- button.setAttribute('aria-pressed',String(assistanceVoiceActive));
- button.innerHTML=assistanceVoiceActive?'<span aria-hidden="true">■</span> Stop voice guidance':'<span aria-hidden="true">▶</span> Play spoken instructions';
+ const state=assistancePlayer.state,button=mission.querySelector('[data-assist-voice]');if(!button)return;
+ const own=state.purpose==='guidance',playing=['playing','loading'].includes(state.mode),paused=state.mode==='paused';
+ button.setAttribute('aria-pressed',String(playing));
+ const label=playing?'Pause spoken guidance':paused?'Continue spoken guidance':'Repeat spoken guidance';button.querySelector('[data-voice-label]').textContent=label;button.setAttribute('aria-label',label);
+ button.querySelector('[data-voice-icon]').innerHTML=voiceIcon(playing?'pause':'play');
+ const mic=mission.querySelector('[data-assist-mic]');
+ if(mic&&!voiceInput.supported){mic.hidden=true;const hint=mission.querySelector('[data-voice-hint]');if(hint)hint.textContent='Voice answers need Google Chrome here. You can also use the answer buttons.'}
+ const replay=mission.querySelector('[data-assist-replay]');if(replay)replay.hidden=!own||state.mode==='idle';
+ const status=mission.querySelector('[data-assistance-voice-status]');
+ if(status)status.textContent=state.mode==='error'?'Audio unavailable. Follow the written instructions.':!own||state.mode==='idle'?'':state.mode==='loading'?'Preparing audio…':state.mode==='paused'?'Audio paused':state.mode==='complete'?'Instructions complete':state.total>1?`Instruction ${state.index+1} of ${state.total}`:'Listening to guidance';
+ if(status)status.hidden=!status.textContent;
+ mission.querySelectorAll('.assistance-action-steps li').forEach((step,index)=>{const active=own&&state.mode==='playing'&&index===state.index;step.toggleAttribute('data-speaking',active)});
 }
 function stopAssistanceVoice() {
- assistanceVoiceActive=false;window.speechSynthesis?.cancel();
+ assistanceVoiceActive=false;assistancePlayer.stop();
 }
 function resetMissionScroll() {
  const align=()=>{
@@ -883,21 +912,10 @@ function setAssistanceScrollMode(open) {
  mission.style.overflowAnchor=open?'none':'';
 }
 function speakAssistanceStep() {
- if(!assistanceVoiceActive)return;
- const status=mission.querySelector('[data-assistance-voice-status]');
- if(!('speechSynthesis' in window)||typeof SpeechSynthesisUtterance==='undefined'){
-  if(status)status.textContent='Voice playback is unavailable in this browser. Follow the on-screen instructions.';
-  assistanceVoiceActive=false;syncAssistanceVoiceButton();return;
- }
- const title=mission.querySelector('.assistance-view h2')?.textContent?.trim()||'';
- const instruction=mission.querySelector('.assistance-instruction,.assistance-source-view>p')?.textContent?.trim()||'';
- const answers=[...mission.querySelectorAll('.assistance-answers button')].map(button=>button.textContent.trim());
- const prompt=answers.length?`Choose the answer that best matches what you observe: ${answers.join('. ')}.`:'Follow the on-screen guidance and your mission checklist.';
- const speech=new SpeechSynthesisUtterance(`${title}. ${instruction} ${prompt}`);
- speech.lang='en-US';speech.rate=1;speech.pitch=1;speech.volume=1;
- speech.onstart=()=>{if(status&&assistanceVoiceActive)status.textContent='Speaking this step. Select an answer when ready.'};
- speech.onend=()=>{if(status&&assistanceVoiceActive)status.textContent='Step complete. Choose the answer that best matches what you observe.'};
- window.speechSynthesis.cancel();if(status)status.textContent='Preparing voice guidance…';window.speechSynthesis.speak(speech);
+ const plan=currentNarration();
+ if(!assistanceVoiceActive){if(assistancePlayer.state.purpose==='guidance'&&assistancePlayer.state.key!==plan.key)assistancePlayer.stop();return}
+ if(assistancePlayer.state.key!==plan.key)assistancePlayer.play(plan.segments,{key:plan.key});
+ syncAssistanceVoiceButton();
 }
 function updateAssistance(question,answer) {
   assistanceView='steps';assistanceStarted=true;
@@ -925,6 +943,7 @@ function renderMissionView(force=false) {
     hub.dataset.alertAcknowledged=String(Boolean(response.acknowledgedAt));
     if (key !== activeAlertKey) { activeAlertKey = key; assistanceModeKey='';assistanceView='steps';assistanceStarted=false;playAlertSound(); }
   } else { activeAlertKey = ''; alarm.stop(); }
+  if(state.key!=='emergency'||collectionMode||assistanceModeKey!==activeAlertKey)stopAssistanceVoice();
   if(voiceInput.active&&(state.key!=='emergency'||assistanceModeKey!==activeAlertKey||(!['steps','chest','fracture','other'].includes(assistanceView)&&!isVitalView(assistanceView))))voiceInput.stop();
   if(collectionMode)setActiveDashboard('checkin');
   stage?.setSceneView?.(collectionMode?'collection':state.key);
@@ -948,7 +967,7 @@ function renderMissionView(force=false) {
       focus.innerHTML=renderAssistance(response.assistance,summary.person.name,assistanceView,handoffText(summary,scenario,response,histories),assistanceStarted?'steps':'response');const utilities=focus.querySelector('.assistance-utilities');if(silence&&utilities)utilities.append(silence);
       mission.querySelector('.urgent-page')?.toggleAttribute('data-assistance-visual',Boolean(focus.querySelector('.assistance-visual-grid')));
       syncAssistanceVoiceButton();speakAssistanceStep();
-      const mic=focus.querySelector('[data-assist-mic]');if(mic&&voiceInput.active){mic.textContent='Stop microphone';mic.setAttribute('aria-pressed','true')}
+      const mic=focus.querySelector('[data-assist-mic]');if(mic&&voiceInput.active){mic.querySelector('[data-mic-label]').textContent='Stop voice answers';mic.setAttribute('aria-label','Stop voice answers');mic.setAttribute('aria-pressed','true')}
     }
   }
   const figure=mission.querySelector('[data-figure-space]');
@@ -956,6 +975,7 @@ function renderMissionView(force=false) {
   syncMissionFrame();
 }
 function leaveMission() {
+  stopAssistanceVoice();
   if(voiceInput.active)voiceInput.stop();
   mission.hidden = true;
   hub.querySelector('[data-scene-back]').hidden = true;
@@ -1241,22 +1261,34 @@ hub.addEventListener('wheel', event => {
   stage.scrubBy(event.deltaY * (event.deltaMode === 1 ? 16 : 1));
   event.preventDefault();
 }, { passive: false });
+function startVoiceAnswers(){
+ stopAssistanceVoice();alarm.stop();updateAlarmControl();voiceInput.start();
+}
+hub.addEventListener('keydown',event=>handleVoiceShortcut(event,{
+ available:voiceInput.supported&&!mission.hidden&&Boolean(mission.querySelector('[data-assist-mic]')),
+ active:voiceInput.active,start:startVoiceAnswers,stop:()=>voiceInput.stop()
+}));
 hub.addEventListener('click', event => {
   if (event.target.closest('[data-alert-sound]')) {
     const urgent = hub.dataset.severity === 'urgent' && hub.dataset.alertAcknowledged !== 'true';
-    if (urgent && alarm.state !== 'playing') { alertSoundEnabled = true; playAlertSound(); }
-    else { alertSoundEnabled = !alertSoundEnabled; if (!alertSoundEnabled) alarm.stop(); }
+    if (urgent && alarm.state !== 'playing') { if(voiceInput.active)voiceInput.stop();stopAssistanceVoice();alertSoundEnabled = true; playAlertSound(); }
+    else { alertSoundEnabled = !alertSoundEnabled; if (!alertSoundEnabled) {if(voiceInput.active)voiceInput.stop();stopAssistanceVoice();alarm.stop();} }
     updateAlarmControl(); return;
   }
   if (event.target.closest('[data-alert-ack]')) { alarm.stop(); saveResponse('acknowledgedAt'); mission.querySelector('.mission-response')?.setAttribute('tabindex', '-1'); mission.querySelector('.mission-response')?.focus({ preventScroll: true }); return; }
-  if(event.target.closest('[data-assist-mic]')){if(voiceInput.active)voiceInput.stop();else{stopAssistanceVoice();syncAssistanceVoiceButton();alarm.stop();voiceInput.start()}return}
+  if(event.target.closest('[data-assist-confirm]')){voiceInput.confirm();return}
+  if(event.target.closest('[data-assist-retry]')){voiceInput.retry();return}
+  if(event.target.closest('[data-assist-mic]')){if(voiceInput.active)voiceInput.stop();else startVoiceAnswers();return}
+  if(event.target.closest('[data-assist-replay]')){if(voiceInput.active)voiceInput.stop('Voice answers paused.',{keepAudio:true});assistancePlayer.replay();return}
   if(event.target.closest('[data-assist-voice]')){
-    if(voiceInput.active)voiceInput.stop();
-    if(assistanceVoiceActive){stopAssistanceVoice();const status=mission.querySelector('[data-assistance-voice-status]');if(status)status.textContent='Voice guidance stopped. The written instructions remain available.'}
-    else{alarm.stop();updateAlarmControl();assistanceVoiceActive=true;speakAssistanceStep()}
-    syncAssistanceVoiceButton();return
+    if(voiceInput.active)voiceInput.stop('Voice answers paused.',{keepAudio:true});
+    const state=assistancePlayer.state;
+    if(state.mode==='playing'||state.mode==='loading'){assistanceVoiceActive=false;assistancePlayer.pause()}
+    else if(state.mode==='paused'){assistanceVoiceActive=true;assistancePlayer.resume()}
+    else{alarm.stop();updateAlarmControl();assistanceVoiceActive=true;const plan=currentNarration();assistancePlayer.play(plan.segments,{key:plan.key})}
+    return
   }
-  if(event.target.closest('[data-assist-open]')){if(voiceInput.active)voiceInput.stop();stopAssistanceVoice();setAssistanceScrollMode(true);assistanceModeKey=activeAlertKey;assistanceView='steps';assistanceStarted=true;alarm.stop();updateAlarmControl();renderMissionView();mission.querySelector('.assistance-view h2')?.focus({preventScroll:true});resetMissionScroll();return}
+  if(event.target.closest('[data-assist-open]')){if(voiceInput.active)voiceInput.stop();stopAssistanceVoice();assistanceVoiceActive=alertSoundEnabled;setAssistanceScrollMode(true);assistanceModeKey=activeAlertKey;assistanceView='steps';assistanceStarted=true;alarm.stop();updateAlarmControl();renderMissionView();mission.querySelector('.assistance-view h2')?.focus({preventScroll:true});resetMissionScroll();return}
   if(event.target.closest('[data-assist-close]')){if(voiceInput.active)voiceInput.stop();stopAssistanceVoice();setAssistanceScrollMode(false);assistanceModeKey='';assistanceView='steps';assistanceStarted=false;renderMissionView();mission.querySelector('[data-assist-open]')?.focus({preventScroll:true});resetMissionScroll();return}
   const assistView=event.target.closest('[data-assist-view]');if(assistView){if(voiceInput.active)voiceInput.stop();stopAssistanceVoice();if(assistView.dataset.assistView==='response'){setAssistanceScrollMode(false);assistanceModeKey='';assistanceView='steps';assistanceStarted=false}else{setAssistanceScrollMode(true);assistanceModeKey=activeAlertKey;assistanceView=assistView.dataset.assistView}renderMissionView();mission.querySelector('.assistance-view h2,#urgent-action-title')?.focus({preventScroll:true});resetMissionScroll();return}
   if(event.target.closest('[data-assist-reassess]')){updateAssistance();return}

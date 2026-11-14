@@ -1,0 +1,319 @@
+{
+  "model": "Kokoro-82M v1.0",
+  "voice": "af_heart",
+  "speed": 0.95,
+  "clips": [
+    {
+      "text": "Call nearby crew. Ask a crewmate to contact the medical officer.",
+      "file": "voice/9b090bee.mp3"
+    },
+    {
+      "text": "Call their name and gently tap their shoulder. Are they responding?",
+      "file": "voice/2e393a7.mp3"
+    },
+    {
+      "text": "Check for normal breathing for no more than 10 seconds. Gasping is not normal breathing. Are they breathing normally?",
+      "file": "voice/4e2b47a5.mp3"
+    },
+    {
+      "text": "They are responding and breathing normally. Choose the symptom or measurement you need help with.",
+      "file": "voice/b27914f5.mp3"
+    },
+    {
+      "text": "Get breathing assistance now. Follow the onboard airway procedure. Watch for changes in breathing or response.",
+      "file": "voice/f87b072c.mp3"
+    },
+    {
+      "text": "Stay with them. Follow the onboard procedure. Watch their breathing. Recheck if it changes.",
+      "file": "voice/47917b85.mp3"
+    },
+    {
+      "text": "If they are unresponsive and not breathing normally, start CPR using your mission training. Place the heel of one hand in the center of the chest. Put the other hand on top.",
+      "file": "voice/4df4db0c.mp3"
+    },
+    {
+      "text": "Push hard and fast, 100 to 120 times per minute. Push 5 to 6 centimeters deep. Let the chest rise after each push.",
+      "file": "voice/4cf5369.mp3"
+    },
+    {
+      "text": "Have a crew member bring the AED. Turn it on and follow its prompts.",
+      "file": "voice/cccc0194.mp3"
+    },
+    {
+      "text": "In microgravity, use your vehicle-specific resuscitation checklist and trained restraint method.",
+      "file": "voice/f3bcdba5.mp3"
+    },
+    {
+      "text": "Stop activity.",
+      "file": "voice/90458650.mp3"
+    },
+    {
+      "text": "Help them rest in a comfortable position.",
+      "file": "voice/806cb0e9.mp3"
+    },
+    {
+      "text": "Contact the medical officer now.",
+      "file": "voice/baae75a9.mp3"
+    },
+    {
+      "text": "Watch their breathing and response.",
+      "file": "voice/1ee92bc8.mp3"
+    },
+    {
+      "text": "If they become unresponsive and are not breathing normally, start CPR.",
+      "file": "voice/3c38d319.mp3"
+    },
+    {
+      "text": "Keep the injured limb still.",
+      "file": "voice/62284fb2.mp3"
+    },
+    {
+      "text": "Support it in the position found.",
+      "file": "voice/723e78c4.mp3"
+    },
+    {
+      "text": "Do not straighten it.",
+      "file": "voice/f47b63ef.mp3"
+    },
+    {
+      "text": "Ask the medical officer for help.",
+      "file": "voice/c8fa955c.mp3"
+    },
+    {
+      "text": "Apply a splint only as trained and directed by the mission procedure.",
+      "file": "voice/abf964e3.mp3"
+    },
+    {
+      "text": "Keep the person safe and still.",
+      "file": "voice/9feb52d8.mp3"
+    },
+    {
+      "text": "Describe what happened to the medical officer.",
+      "file": "voice/cb6dcb5c.mp3"
+    },
+    {
+      "text": "Follow the onboard procedure.",
+      "file": "voice/1c24fd.mp3"
+    },
+    {
+      "text": "Watch for changes in breathing or response.",
+      "file": "voice/8355ed33.mp3"
+    },
+    {
+      "text": "Heart rate: high or low? Choose low, high, or unsure. Severe symptoms need urgent crew help.",
+      "file": "voice/54d92bde.mp3"
+    },
+    {
+      "text": "Stop activity. Stay secured in a safe position.",
+      "file": "voice/7f1c184c.mp3"
+    },
+    {
+      "text": "If fainting, chest pain, confusion, or severe breathing trouble occurs, get urgent crew help.",
+      "file": "voice/2bfded2f.mp3"
+    },
+    {
+      "text": "If safe, recheck the rate with the assigned monitor.",
+      "file": "voice/f8b0bc7c.mp3"
+    },
+    {
+      "text": "Report the result and symptoms to the medical officer. Follow mission limits.",
+      "file": "voice/4faab9d8.mp3"
+    },
+    {
+      "text": "Stop activity. Rest and stay safely secured.",
+      "file": "voice/43099b19.mp3"
+    },
+    {
+      "text": "Chest pain, fainting, confusion, or severe breathing trouble? Get urgent crew help.",
+      "file": "voice/2dfc8a9a.mp3"
+    },
+    {
+      "text": "If safe, recheck the resting rate with the assigned monitor.",
+      "file": "voice/ed6c3c0a.mp3"
+    },
+    {
+      "text": "Report the result, activity, and symptoms to the medical officer.",
+      "file": "voice/bcfeaab0.mp3"
+    },
+    {
+      "text": "Stop activity and stay safely secured.",
+      "file": "voice/61e583f9.mp3"
+    },
+    {
+      "text": "Severe symptoms, fainting, confusion, chest pain, or breathing trouble? Get urgent crew help.",
+      "file": "voice/fc383424.mp3"
+    },
+    {
+      "text": "If safe, repeat the reading using the assigned device.",
+      "file": "voice/ed2d220c.mp3"
+    },
+    {
+      "text": "Tell the medical officer the reading, time, and symptoms.",
+      "file": "voice/5ef890d5.mp3"
+    },
+    {
+      "text": "Blood glucose: high or low? Choose low, high, or unsure. Severe symptoms need urgent crew help.",
+      "file": "voice/3c77ebc2.mp3"
+    },
+    {
+      "text": "Unconscious, seizing, or unable to swallow? Give nothing by mouth. Get urgent help; use prescribed glucagon if trained and available.",
+      "file": "voice/a7d43bfb.mp3"
+    },
+    {
+      "text": "Awake, able to swallow, and below 70 mg/dL? Take 15 grams of fast-acting carbohydrate.",
+      "file": "voice/2b1ea144.mp3"
+    },
+    {
+      "text": "Recheck in 15 minutes. Still below 70? Repeat. Tell the medical officer.",
+      "file": "voice/2477d819.mp3"
+    },
+    {
+      "text": "If unresponsive and not breathing normally, begin CPR using mission training.",
+      "file": "voice/1ddb7ec5.mp3"
+    },
+    {
+      "text": "Vomiting, deep breathing, fruity breath, or confusion? Get urgent crew help.",
+      "file": "voice/5bf3295c.mp3"
+    },
+    {
+      "text": "If safe, repeat the reading and tell the medical officer.",
+      "file": "voice/f524b823.mp3"
+    },
+    {
+      "text": "If you have diabetes and are ill or at 250 mg/dL or above, check ketones if available and directed by your plan.",
+      "file": "voice/be962cff.mp3"
+    },
+    {
+      "text": "Do not change insulin or medication without your prescribed plan or medical direction.",
+      "file": "voice/7bbf44fb.mp3"
+    },
+    {
+      "text": "Blood pressure: high or low? Choose low, high, or unsure. Severe symptoms need urgent crew help.",
+      "file": "voice/cdd9c41f.mp3"
+    },
+    {
+      "text": "Stop activity. Stay safely secured and ask a crewmate to stay nearby.",
+      "file": "voice/4c7a2392.mp3"
+    },
+    {
+      "text": "Fainting, confusion, chest pain, or severe breathing trouble? Get urgent crew help.",
+      "file": "voice/6353278.mp3"
+    },
+    {
+      "text": "If safe, repeat the reading with the assigned cuff and mission procedure.",
+      "file": "voice/4f9f4e3e.mp3"
+    },
+    {
+      "text": "Report both readings and symptoms to the medical officer.",
+      "file": "voice/b1ad19e1.mp3"
+    },
+    {
+      "text": "Chest pain, breathing trouble, weakness, or speech or vision changes? Get urgent help. Do not wait for a repeat.",
+      "file": "voice/6f0dcad0.mp3"
+    },
+    {
+      "text": "Otherwise, repeat the reading after at least one minute using the assigned cuff.",
+      "file": "voice/88188976.mp3"
+    },
+    {
+      "text": "Still above 180 systolic or 120 diastolic? Contact the medical officer immediately.",
+      "file": "voice/32b83dfc.mp3"
+    },
+    {
+      "text": "Follow mission limits. Do not change medication without medical direction.",
+      "file": "voice/e9f26415.mp3"
+    },
+    {
+      "text": "Temperature: high or low? Choose low, high, or unsure. Severe symptoms need urgent crew help.",
+      "file": "voice/1d14e2f8.mp3"
+    },
+    {
+      "text": "Below 35 \u00b0C, or cold with confusion? Get urgent crew help.",
+      "file": "voice/98553ce0.mp3"
+    },
+    {
+      "text": "Move the person gently to a warm cabin. Remove wet clothing if safe.",
+      "file": "voice/f6eabf67.mp3"
+    },
+    {
+      "text": "Cover the chest, neck, and head with dry layers. Do not rub or use direct high heat.",
+      "file": "voice/48518a93.mp3"
+    },
+    {
+      "text": "If unresponsive and not breathing normally, follow mission CPR training.",
+      "file": "voice/bf82c8ff.mp3"
+    },
+    {
+      "text": "Confused, faint, seizing, or very hot after exertion? Get urgent help and start cooling now.",
+      "file": "voice/43fced24.mp3"
+    },
+    {
+      "text": "Stop activity. Move to a cooler cabin area. Remove excess clothing if safe.",
+      "file": "voice/3ce8ad10.mp3"
+    },
+    {
+      "text": "Use cool wet cloths if allowed by the mission procedure.",
+      "file": "voice/1702d4e0.mp3"
+    },
+    {
+      "text": "Recheck with the assigned thermometer and tell the medical officer.",
+      "file": "voice/dd73552d.mp3"
+    },
+    {
+      "text": "I heard yes. Say confirm, or say retry.",
+      "file": "voice/9ca053a.mp3"
+    },
+    {
+      "text": "I heard no. Say confirm, or say retry.",
+      "file": "voice/16fca88e.mp3"
+    },
+    {
+      "text": "I heard unsure. Say confirm, or say retry.",
+      "file": "voice/47c8c0d3.mp3"
+    },
+    {
+      "text": "I heard heart rate. Say confirm, or say retry.",
+      "file": "voice/27365073.mp3"
+    },
+    {
+      "text": "I heard blood glucose. Say confirm, or say retry.",
+      "file": "voice/4dff6fc1.mp3"
+    },
+    {
+      "text": "I heard temperature. Say confirm, or say retry.",
+      "file": "voice/1d3b1ca7.mp3"
+    },
+    {
+      "text": "I heard blood pressure. Say confirm, or say retry.",
+      "file": "voice/969cbfea.mp3"
+    },
+    {
+      "text": "I heard chest pain. Say confirm, or say retry.",
+      "file": "voice/9bd7915a.mp3"
+    },
+    {
+      "text": "I heard broken bone. Say confirm, or say retry.",
+      "file": "voice/2b71fc20.mp3"
+    },
+    {
+      "text": "I heard other. Say confirm, or say retry.",
+      "file": "voice/83d4f68f.mp3"
+    },
+    {
+      "text": "I heard low. Say confirm, or say retry.",
+      "file": "voice/810386ef.mp3"
+    },
+    {
+      "text": "I heard high. Say confirm, or say retry.",
+      "file": "voice/e617a685.mp3"
+    },
+    {
+      "text": "Please try again, or use the answer buttons.",
+      "file": "voice/97e05bd0.mp3"
+    },
+    {
+      "text": "Say confirm, or say retry.",
+      "file": "voice/5ecc7172.mp3"
+    }
+  ]
+}
