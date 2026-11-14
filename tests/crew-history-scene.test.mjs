@@ -79,3 +79,12 @@ test('temperature histories separate oral and other measurement sites',()=>{
  const series=historySeries({histories,field:'temperature',now});assert.equal(series.site,'oral');assert.deepEqual(series.points.map(p=>p.value),[36.6,36.8]);
  assert.match(renderHistoryScene({histories,field:'temperature',now}),/Oral temperature/);
 });
+
+test('heart-rate chart selects a comparable series when latest context has only one point',()=>{
+ const now=Date.now(), histories={pulse:[
+  {value:70,time:new Date(now-3000).toISOString(),context:'rest',source:'Scenario history'},
+  {value:74,time:new Date(now-2000).toISOString(),context:'rest',source:'Scenario history'},
+  {value:119,time:new Date(now-1000).toISOString(),context:'other',source:'Personal'}]};
+ const result=historySeries({histories,field:'pulse',now});
+ assert.equal(result.context,'rest');assert.deepEqual(result.points.map(p=>p.value),[70,74]);
+});

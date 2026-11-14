@@ -39,7 +39,13 @@ export function historySeries({ histories = {}, reports = {}, field = 'pulse', d
     }
     return [{ time, value, values, context: Object.hasOwn(CONTEXT, entry.context) ? entry.context : '', site: ['oral','ear','forehead','armpit','other'].includes(entry.site)?entry.site:'', note: typeof entry.note === 'string' ? entry.note : '', tags: Array.isArray(entry.tags) ? entry.tags.filter(tag => typeof tag === 'string') : [], onset: Number.isFinite(stamp(entry.onset)) ? stamp(entry.onset) : null, progression: typeof entry.progression === 'string' ? entry.progression : '', source: typeof entry.source === 'string' && entry.source.trim() ? entry.source.trim() : 'Recorded' }];
   }).sort((a, b) => a.time - b.time);
-  const context = CONTEXTUAL.has(field) && points.length ? points.at(-1).context : null;
+  let context = CONTEXTUAL.has(field) && points.length ? points.at(-1).context : null;
+  // Prefer the largest comparable heart-rate series when the latest context has only one observation.
+  if (field === 'pulse' && context !== null && points.filter(point => point.context === context).length < 2) {
+    const counts = new Map(); for (const point of points) counts.set(point.context, (counts.get(point.context) || 0) + 1);
+    const best = [...counts.entries()].sort((a,b) => b[1] - a[1])[0];
+    if (best && best[1] > 1) context = best[0];
+  }
   if (context !== null) points = points.filter(point => point.context === context);
   const site=field==='temperature'&&points.length?points.at(-1).site:null;if(site!==null)points=points.filter(point=>point.site===site);
   return { points, context, site, field, days: Number(days), now };

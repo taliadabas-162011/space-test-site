@@ -14,7 +14,7 @@
       if (daysAgo) when.setHours(9, 0, 0, 0);
       else when.setHours(0, 0, 0, 0);
       const time = when.toISOString();
-      const pulse = 65 + Math.round(2 * Math.sin(daysAgo / 5)) + (daysAgo < 5 ? 11 : 0);
+      const pulse = 76 + Math.round(4 * Math.sin(daysAgo / 5) + 2 * Math.sin(daysAgo / 2.3));
       append('pulse', pulse, time, 'Scenario history', 'rest');
       append('oxygen', 97 + (daysAgo % 5 === 0 ? 1 : 0), time, 'Scenario history', 'rest');
       append('sleep', Math.round((7.4 + Math.sin(daysAgo / 6) * .6) * 10) / 10, time, 'Scenario history');
@@ -51,3 +51,4 @@
   }
   window.CrewDemo = { makeRecords, refreshRecords };
 })();
+
