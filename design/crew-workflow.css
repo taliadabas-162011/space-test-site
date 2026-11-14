@@ -131,3 +131,5 @@
 }
 
 .collection-symptom-stage .measurement-source{min-height:0}
+
+.collection-space-context{box-sizing:border-box;max-width:38rem;min-width:0;margin:0 0 22px;padding:14px 17px;border:1px solid rgba(184,220,244,.28);border-radius:17px;background:rgba(120,164,199,.12);backdrop-filter:blur(12px);color:#e8f3fc;overflow-wrap:anywhere}.collection-space-context strong{display:block;font-size:13px;line-height:1.4;color:#c9e7fa}.collection-space-context p{margin:6px 0;font-size:14px;line-height:1.5}.collection-space-context a{display:inline-block;color:#b6e3ff;font-size:12px;line-height:1.5}
