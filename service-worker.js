@@ -1,5 +1,5 @@
 // Cache only the application shell and bundled assets, never observation data.
-const CACHE = 'crew-health-static-v74';
+const CACHE = 'crew-health-static-v75';
 const ROOT = '/space-test-site/';
 const FILES = [
   "",
@@ -74,9 +74,23 @@ const FILES = [
   "design/assets/guides/glucose-sequence-v2.png",
   "design/assets/guides/glucose-lancing-v4.png",
 
-  "design/crew-collection.js",
   "design/crew-questionnaire.js",
+  "design/crew-immunity.js",
   "design/crew-checkin-focus.css",
+  "design/immunity-assets/saliva-prepare.png",
+  "design/immunity-assets/saliva-collect.png",
+  "design/immunity-assets/saliva-seal.png",
+  "design/immunity-assets/saliva-lab.png",
+  "design/immunity-assets/urine-plan.svg",
+  "design/immunity-assets/urine-collect.svg",
+  "design/immunity-assets/urine-transfer.svg",
+  "design/immunity-assets/urine-report.svg",
+  "design/immunity-assets/saliva-kit.jpg",
+  "design/immunity-assets/saliva-containers.jpg",
+  "design/immunity-assets/urine-bag.jpg",
+  "design/immunity-assets/urine-syringes.jpg",
+  "design/immunity-assets/urine-containment.jpg",
+  "design/crew-collection.js",
   "design/crew-repeat.js",
   "design/crew-measurement-guides.js",
   "design/crew-assistance.js",

@@ -17,3 +17,19 @@ test('sleep efficiency preserves zero sleep and rejects blank, impossible or inv
  const payload=collectionPayload([{name:'sleepTimeInBed',value:'8'},{name:'sleepTimeAsleep',value:'7'},{name:'sleepQuality',value:'mixed'}]);assert.equal(payload.values.sleep,'7');assert.equal(payload.details.sleepQuality,'mixed');assert.equal(payload.details.sleepTimeInBed,'8');
  assert.equal(collectionHasEntry([{name:'moodStep',value:'2'},{name:'sleepQualityStep',value:'4'}]),false);
 });
+test('immunity has two illustrated guides, safely renders saved reports and never fabricates results',()=>{
+ const summary={person:{name:'Crew'},immunityChecks:[{sample:'saliva',result:'<script>bad</script>',unit:'copies/mL',time:'2026-11-14T10:00:00Z'}]};
+ const html=renderCollection({summary,symptomOptions:{},fields:[{name:'collectionView',value:'immunity'}],observedAt:'2026-11-14T11:00'});
+ assert.match(html,/data-collection-view="immunity"/);assert.match(html,/data-immunity-guide="saliva"/);assert.match(html,/data-immunity-guide="urine"/);assert.match(html,/EBV DNA/);assert.match(html,/CMV DNA/);assert.match(html,/&lt;script&gt;bad&lt;\/script&gt;/);assert.doesNotMatch(html,/<script>bad/);assert.deepEqual(collectionPayload([]).details.immunityTests,{saliva:{result:'',unit:''},urine:{result:'',unit:''}});
+});
+test('each immunity guide step has its own action visual and identifies illustration provenance',async()=>{
+ const {renderImmunity}=await import('../design/crew-immunity.js');const html=renderImmunity([]);
+ const sources=[...html.matchAll(/<img src="([^"]+)"/g)].map(m=>m[1]);assert.equal(sources.length,8);assert.equal(new Set(sources).size,8);assert.match(html,/SARSTEDT collection illustration/);assert.match(html,/Collection overview based on NASA hardware/);assert.doesNotMatch(html,/<details class="collection-guide"/);
+});
+test('immunity has a fixed unit and switching to qualitative does not submit an old numeric draft',async()=>{
+ const {immunityPayload,renderImmunity}=await import('../design/crew-immunity.js');
+ assert.deepEqual(immunityPayload([{name:'salivaResultType',value:'not-detected'},{name:'salivaResult',value:'999'},{name:'salivaUnit',value:'IU/mL'}]).saliva,{result:'Not detected',unit:''});
+ assert.deepEqual(immunityPayload([{name:'urineResultType',value:'numeric'},{name:'urineResult',value:'0'},{name:'urineUnit',value:'arbitrary'}]).urine,{result:'0',unit:'copies/mL'});
+ const html=renderImmunity([]);assert.match(html,/select name="salivaResultType"/);assert.match(html,/select name="urineResultType"/);assert.doesNotMatch(html,/name="(?:saliva|urine)Unit"/);assert.match(html,/min="0" step="any"/);
+ assert.equal(collectionHasEntry([{name:'salivaResultType',value:'inconclusive'}]),true);
+});

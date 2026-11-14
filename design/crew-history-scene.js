@@ -11,6 +11,7 @@ const FIELDS = {
   water: ['Water intake', 'L'], exercise: ['Exercise', 'min'], weight: ['Body mass', 'kg'],
   mood: ['Mood', '', ['low', 'neutral', 'good']], sleepQuality: ['Sleep quality', '', ['poor', 'mixed', 'restful']],
   symptoms: ['Symptoms', '', ['none', 'concerning', 'urgent']],
+  saliva: ['Saliva · EBV DNA', 'copies/mL'], urine: ['Urine · CMV DNA', 'copies/mL'],
 };
 const CONTEXT = { rest: 'At rest', 'after-activity': 'After activity', fasting: 'Fasting', 'after-meal': 'After a meal', other: 'Other context' };
 const CONTEXTUAL = new Set(['pulse', 'pressure', 'oxygen', 'glucose', 'temperature']);
@@ -28,7 +29,8 @@ export function historySeries({ histories = {}, reports = {}, field = 'pulse', d
   if (![30, 90, 120, 365].includes(Number(days))) days = 120;
   now = Number.isFinite(stamp(now)) ? stamp(now) : Date.now();
   const categories = FIELDS[field][2];
-  const entries = categories ? (reports?.[field] ?? histories?.[field]) : histories?.[field];
+  const laboratory=['saliva','urine'].includes(field);
+  const entries = laboratory ? (reports.immunity||[]).filter(row=>row.sample===field&&row.unit==='copies/mL'&&/^(?:\d+\.?\d*|\.\d+)(?:e[-+]?\d+)?$/i.test(row.result)).map(row=>({...row,value:row.result})) : categories ? (reports?.[field] ?? histories?.[field]) : histories?.[field];
   let points = (Array.isArray(entries) ? entries : []).flatMap(entry => {
     const time = stamp(entry?.time);
     if (!Number.isFinite(time) || time < now - Number(days) * DAY || time > now || entry.recorded === false) return [];
@@ -64,29 +66,33 @@ export function renderHistoryScene({ summary = {}, histories = {}, reports = {},
   const { points, context, site } = series, [label, unit, categories] = FIELDS[field];
   const selectedIndex = position == null || !Number.isFinite(Number(position)) ? points.length - 1 : Math.max(0, Math.min(points.length - 1, Math.round(Number(position))));
   const selected = points[selectedIndex], latest = points.at(-1);
+  const laboratory=['saliva','urine'].includes(field);
+  const labReports=laboratory?(reports.immunity||[]).filter(row=>row.sample===field&&Number.isFinite(stamp(row.time))&&stamp(row.time)>=now-days*DAY&&stamp(row.time)<=now).sort((a,b)=>stamp(a.time)-stamp(b.time)):[];
+  const lastReport=labReports.at(-1);
+  const labText=lastReport?`Latest report: ${esc(lastReport.result)} ${esc(lastReport.unit||'')} · ${esc(date(stamp(lastReport.time)))}. `:'';
   const contextText = [context === null ? '' : CONTEXT[context] || 'Context not recorded',field==='temperature'?(site?`${site.charAt(0).toUpperCase()+site.slice(1)} temperature`:'Site not recorded'):''].filter(Boolean).join(' · ');
   const nav = Object.entries(FIELDS).filter(([key]) => key !== 'weight').map(([key, [name]]) => `<button type="button" data-history-scene-field="${key}" aria-pressed="${key === field}">${name}</button>`).join('');
   const range = [30, 90, 120, 365].map(n => `<button type="button" data-history-scene-days="${n}" aria-pressed="${n === days}">${n} days</button>`).join('');
   const valueText = p => `${display(field, p.value)}${unit ? ` ${unit}` : ''}`;
   const details = p => field === 'symptoms' ? [p.tags.join(', '), p.onset == null ? '' : `Began ${date(p.onset, true)}`, p.progression ? title(p.progression) : '', p.note].filter(Boolean).join(' · ') : '';
-  let chart = '<p class="history-scene-empty">No recorded readings in this period.</p>';
+  let chart = `<p class="history-scene-empty">${laboratory?'No numeric reports in copies/mL in this period.':'No recorded readings in this period.'}</p>`;
   if (points.length) {
     const values = points.flatMap(p => p.values), min = categories ? 0 : Math.min(...values), max = categories ? categories.length - 1 : Math.max(...values);
     const pad = min === max ? Math.max(Math.abs(min) * 0.1, 1) : (max - min) * 0.12;
-    const low = categories ? min : min - pad, high = categories ? max : max + pad;
+    const low = categories ? min : laboratory ? Math.max(0,min-pad) : min - pad, high = categories ? max : max + pad;
     const x = p => 7 + (p.time - (now - days * DAY)) / (days * DAY) * 91;
     const y = value => 88 - (value - low) / (high - low) * 78;
-    const lines = Array.from({ length: field === 'pressure' ? 2 : 1 }, (_, i) => `<polyline class="history-scene-line${i ? ' history-scene-line-secondary' : ''}" points="${points.map(p => `${x(p).toFixed(2)},${y(p.values[i]).toFixed(2)}`).join(' ')}" />`).join('');
+    const lines = laboratory ? '' : Array.from({ length: field === 'pressure' ? 2 : 1 }, (_, i) => `<polyline class="history-scene-line${i ? ' history-scene-line-secondary' : ''}" points="${points.map(p => `${x(p).toFixed(2)},${y(p.values[i]).toFixed(2)}`).join(' ')}" />`).join('');
     const dots = points.map((p, i) => p.values.map((value, valueIndex) => `<span class="history-scene-point${valueIndex ? ' history-scene-point-secondary' : ''}${i === selectedIndex ? ' is-selected' : ''}" style="left:${x(p).toFixed(2)}%;top:${y(value).toFixed(2)}%" data-history-dot="${i}" aria-hidden="true"></span>`).join('')).join('');
     const readings = points.map(p => `${date(p.time, true)} · ${p.source}${contextText ? ` · ${contextText}` : ''} · ${valueText(p)}${details(p) ? ` · ${details(p)}` : ''}`);
     const grid = [0, 1, 2].map(i => `<line x1="7" x2="98" y1="${10 + i * 39}" y2="${10 + i * 39}" />`).join('');
     const ticks = categories ? [...categories].reverse().map(title) : [high, (high + low) / 2, low].map(n => Number(n.toFixed(1)).toString());
     const axis = ticks.map(tick => `<span>${esc(tick)}</span>`).join('');
     const dates = [now - days * DAY, now - days * DAY / 2, now].map(t => `<span>${esc(date(t))}</span>`).join('');
-    chart = `<div class="history-scene-plot"><div class="history-scene-y"><span class="history-scene-unit">${esc(unit)}</span>${axis}</div><div class="history-scene-chart" tabindex="0" role="group" aria-label="${esc(`${label} over ${days} days`)}" aria-describedby="history-scene-help history-scene-readout" data-history-chart data-selected="${selectedIndex}"><svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><g class="history-scene-grid">${grid}</g>${lines}</svg><div class="history-scene-crosshair" aria-hidden="true"></div><div class="history-scene-tooltip" aria-hidden="true"><strong></strong><span></span></div>${dots}${points.map((p, i) => `<span hidden data-history-reading data-x="${x(p)}" data-value="${esc(valueText(p))}" data-date="${esc(date(p.time, true))}" data-reading="${esc(readings[i])}"></span>`).join('')}</div></div><div class="history-scene-dates">${dates}</div>${field === 'pressure' ? '<p class="history-scene-legend"><span>Systolic</span><span>Diastolic</span></p>' : ''}`;
+    chart = `<div class="history-scene-plot"><div class="history-scene-y"><span class="history-scene-unit">${esc(unit)}</span>${axis}</div><div class="history-scene-chart${laboratory?' is-laboratory':''}" tabindex="0" role="group" aria-label="${esc(`${label} over ${days} days`)}" aria-describedby="history-scene-help history-scene-readout" data-history-chart data-selected="${selectedIndex}"><svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><g class="history-scene-grid">${grid}</g>${lines}</svg><div class="history-scene-crosshair" aria-hidden="true"></div><div class="history-scene-tooltip" aria-hidden="true"><strong></strong><span></span></div>${dots}${points.map((p, i) => `<span hidden data-history-reading data-x="${x(p)}" data-value="${esc(valueText(p))}" data-date="${esc(date(p.time, true))}" data-reading="${esc(readings[i])}"></span>`).join('')}</div></div><div class="history-scene-dates">${dates}</div>${field === 'pressure' ? '<p class="history-scene-legend"><span>Systolic</span><span>Diastolic</span></p>' : ''}`;
   }
   const inspect = selected ? `${date(selected.time, true)} · ${selected.source}${contextText ? ` · ${contextText}` : ''} · ${valueText(selected)}${details(selected) ? ` · ${details(selected)}` : ''}` : 'No reading selected';
-  return `<section class="history-scene" aria-labelledby="history-scene-title"><header class="history-scene-header"><div><h2 id="history-scene-title">History</h2></div><div class="history-scene-current"><span>Latest</span><strong>${latest ? esc(display(field, latest.value)) : '—'} <small>${esc(unit)}</small></strong><span>${latest ? esc(date(latest.time, true)) : 'No recorded reading'}</span></div></header><div class="history-scene-layout"><nav class="history-scene-nav" aria-label="Health measurements">${nav}</nav><figure class="history-scene-figure"><figcaption><div><h3>${label}</h3>${latest&&['oxygen','pressure','pulse','temperature','glucose','weight'].includes(field)?`<button type="button" class="history-repeat" data-repeat-measurement="${field}">Repeat measurement →</button>`:''}</div><p>${field === 'pulse' ? 'Demo data · not from Bluetooth · ' : ''}${esc(contextText || 'Recorded observations')}${field === 'pressure' ? ' · Systolic / diastolic' : ''}</p></figcaption><div data-history-visual>${chart}</div><div class="history-scene-controls"><div class="history-scene-ranges" role="group" aria-label="History period">${range}</div><div class="history-scene-inspect"><p id="history-scene-help">Hover or drag to inspect · click to pin<span class="history-scene-sr-only">. Use arrow keys, Home or End to navigate; Escape unpins and hides the marker.</span></p><output id="history-scene-readout" class="orbit-chart-readout" aria-live="polite">${esc(inspect)}</output></div></div></figure></div></section>`;
+  return `<section class="history-scene" aria-labelledby="history-scene-title"><header class="history-scene-header"><div><h2 id="history-scene-title">History</h2></div><div class="history-scene-current"><span>${laboratory?'Latest numeric':'Latest'}</span><strong>${latest ? esc(display(field, latest.value)) : '—'} <small>${esc(unit)}</small></strong><span>${latest ? esc(date(latest.time, true)) : 'No recorded reading'}</span></div></header><div class="history-scene-layout"><nav class="history-scene-nav" aria-label="Health measurements">${nav}</nav><figure class="history-scene-figure"><figcaption><div><h3>${label}</h3>${latest&&['oxygen','pressure','pulse','temperature','glucose','weight'].includes(field)?`<button type="button" class="history-repeat" data-repeat-measurement="${field}">Repeat measurement →</button>`:''}</div><p>${field === 'pulse' ? 'Demo data · not from Bluetooth · ' : ''}${laboratory?labText+'Individual reports · compare only the same lab and assay.':esc(contextText || 'Recorded observations')}${field === 'pressure' ? ' · Systolic / diastolic' : ''}</p></figcaption><div data-history-visual>${chart}</div><div class="history-scene-controls"><div class="history-scene-ranges" role="group" aria-label="History period">${range}</div><div class="history-scene-inspect"><p id="history-scene-help">Hover or drag to inspect · click to pin<span class="history-scene-sr-only">. Use arrow keys, Home or End to navigate; Escape unpins and hides the marker.</span></p><output id="history-scene-readout" class="orbit-chart-readout" aria-live="polite">${esc(inspect)}</output></div></div></figure></div></section>`;
 }
 
 /** Return the closest point to a plot x-coordinate, with ties favoring the earlier point. */

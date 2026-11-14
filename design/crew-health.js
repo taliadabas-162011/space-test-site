@@ -63,7 +63,7 @@
     Genetics_Testing_Suite: { title: 'Genetics', fields: [], context: 'Genetic records have not been added to this prototype.' },
     Oxidative_Stress: { title: 'Activity & recovery', fields: ['exercise'], video: 'OxidativeStressV03.mp4', context: 'A consistent activity record can help give other observations context.' },
     Nutrition: { title: 'Hydration', fields: ['water'], context: 'Review water intake alongside activity and the rest of a daily check-in.' },
-    Autoimmunity: { title: 'Immune health', fields: [], context: 'Immune measurements have not been added to this prototype.' },
+    Autoimmunity: { title: 'Immune health', fields: [], context: 'Record laboratory reports in Daily check-in → Immunity.' },
   };
   const hotspotNames = {
     Neural_Zoomer: 'Rest & recovery', Neurotransmitters: 'Mind & wellbeing',
@@ -206,7 +206,7 @@
       symptomTags: Array.isArray(symptoms?.tags) ? symptoms.tags.filter(tag => Object.hasOwn(symptomOptions, tag)) : [],
       symptomOnset: symptoms?.onset && Number.isFinite(Date.parse(symptoms.onset)) ? symptoms.onset : null,
       symptomProgression: symptomProgressions.includes(symptoms?.progression) ? symptoms.progression : '',
-      mood: report('mood'), sleepQuality: report('sleepQuality') };
+      immunityChecks: immunityHistory(person.id), mood: report('mood'), sleepQuality: report('sleepQuality') };
   }
   function history(personId, field) {
     if (!crew.some(person => person.id === personId) || !metrics[field]) return [];
@@ -217,6 +217,11 @@
   function symptomHistory(personId) {
     if (!crew.some(person => person.id === personId)) return [];
     return symptomEntries(personId).map(item => ({...structuredClone(item),...(isHelpRequest(item)&&item.endedAt?{source:item.source+' · ended'}:{})}));
+  }
+  function immunityHistory(personId) {
+    if(!crew.some(person=>person.id===personId))return [];
+    const reports=records[personId]?.immunityChecks;
+    return (Array.isArray(reports)?reports:[]).filter(row=>['saliva','urine'].includes(row?.sample)&&typeof row.result==='string'&&Number.isFinite(Date.parse(row.time))).slice().sort((a,b)=>Date.parse(a.time)-Date.parse(b.time)).map(row=>structuredClone(row));
   }
   function selfReportHistory(personId, field) {
     if (!crew.some(person => person.id === personId) || !Object.hasOwn(selfReports, field)) return [];
@@ -297,6 +302,17 @@
       next[personId][field] ||= [];
       next[personId][field].push({ value: details[field], time, recordedAt: recordedAt.toISOString() });
       count++;
+    }
+    if(details.immunityTests){
+      if(typeof details.immunityTests!=='object'||Array.isArray(details.immunityTests))throw new Error('Check the immunity results.');
+      for(const [sample,report] of Object.entries(details.immunityTests)){
+        if(!['saliva','urine'].includes(sample)||!report||typeof report.result!=='string'||typeof report.unit!=='string'||report.result.length>120)throw new Error('Check the immunity results.');
+        const result=report.result.trim(),unit=report.unit.trim();if(!result){if(unit)throw new Error('Enter the laboratory result.');continue}
+        const numeric=/^(?:\d+\.?\d*|\.\d+)(?:e[-+]?\d+)?$/i.test(result);
+        if(numeric){if(!Number.isFinite(Number(result))||Number(result)<0||unit!=='copies/mL')throw new Error('Enter a non-negative laboratory value reported in copies/mL.');}
+        else if(!['Not detected','Detected','Detected below quantification limit','Inconclusive'].includes(result)||unit)throw new Error('Select a laboratory result or enter a numeric value in copies/mL.');
+        next[personId].immunityChecks||=[];next[personId].immunityChecks.push({sample,test:sample==='saliva'?'EBV DNA':'CMV DNA',result,unit,time,recordedAt:recordedAt.toISOString(),source:'Manual laboratory report'});count++;
+      }
     }
     if (details.moodQuestionnaire) {
       const { answers = {}, note = '' } = details.moodQuestionnaire;
@@ -439,6 +455,6 @@
     window.dispatchEvent(new CustomEvent('crewhealth:update'));
   });
   function refreshPresentation(){if(demoMode)records=window.CrewDemo.refreshRecords(records);refreshStories();window.dispatchEvent(new CustomEvent('crewhealth:update'));}
-  window.CrewDesign = { refreshPresentation, demoMode, scenarioInfo, setScenario, storyData, registerStories, hotspotLabel, crew, metrics, symptomOptions, summary, history, symptomHistory, selfReportHistory, selectCrew, saveOverview, requestUrgentAssistance, endUrgentAssistance,
+  window.CrewDesign = { refreshPresentation, demoMode, scenarioInfo, setScenario, storyData, registerStories, hotspotLabel, crew, metrics, symptomOptions, summary, history, immunityHistory, symptomHistory, selfReportHistory, selectCrew, saveOverview, requestUrgentAssistance, endUrgentAssistance,
     hasProfile: () => Boolean(savedProfile), getProfile: () => savedProfile ? { ...savedProfile } : null, saveProfile };
 })();

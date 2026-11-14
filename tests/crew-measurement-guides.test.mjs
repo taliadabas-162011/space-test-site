@@ -5,8 +5,8 @@ import {measurementGuides,guideVisual,renderMeasurementGuide} from '../design/cr
 test('glucose teaches preparation, lancing, sample application and reading with matching imagery',()=>{
  const guide=measurementGuides.glucose;assert.equal(guide.steps.length,4);
  assert.match(guide.steps[1][0],/lancing pen/);assert.match(guide.steps[1][1],/soft fingertip pad/);assert.match(guide.steps[2][0],/blood drop/);
- assert.deepEqual(guideVisual('glucose',0),{image:'glucose-sequence-v2.png',frames:3,frame:0});
- assert.deepEqual(guideVisual('glucose',1),{image:'glucose-lancing-v4.png',frames:1,frame:0});
+ assert.deepEqual(guideVisual('glucose',0),{image:'glucose-sequence-v2.png',frames:3,frame:0,url:'/space-test-site/design/assets/guides/glucose-sequence-v2.png'});
+ assert.deepEqual(guideVisual('glucose',1),{image:'glucose-lancing-v4.png',frames:1,frame:0,url:'/space-test-site/design/assets/guides/glucose-lancing-v4.png'});
  assert.equal(guideVisual('glucose',2).frame,1);assert.equal(guideVisual('glucose',3).frame,2);
  const html=renderMeasurementGuide('glucose',{label:'Blood glucose'});assert.match(html,/1 \/ 4/);assert.match(html,/data-guide-skip/);assert(!html.includes('value="96"'));
 });

@@ -88,3 +88,17 @@ test('heart-rate chart selects a comparable series when latest context has only 
  const result=historySeries({histories,field:'pulse',now});
  assert.equal(result.context,'rest');assert.deepEqual(result.points.map(p=>p.value),[70,74]);
 });
+test('immune plots separate samples, retain numeric zero and never turn qualitative or incompatible reports into points',()=>{
+ const reports={immunity:[
+  {...entry(5,'unused'),sample:'saliva',result:'120',unit:'copies/mL'},
+  {...entry(4,'unused'),sample:'saliva',result:'Not detected',unit:''},
+  {...entry(3,'unused'),sample:'saliva',result:'900',unit:'IU/mL'},
+  {...entry(2,'unused'),sample:'saliva',result:'0',unit:'copies/mL'},
+  {...entry(1,'unused'),sample:'urine',result:'45',unit:'copies/mL'},
+  {...entry(0,'unused'),sample:'saliva',result:'Inconclusive',unit:''},
+  {...entry(-1,'unused'),sample:'saliva',result:'999',unit:'copies/mL'},
+ ]};
+ assert.deepEqual(historySeries({reports,field:'saliva',now}).points.map(p=>p.value),[120,0]);
+ assert.deepEqual(historySeries({reports,field:'urine',now}).points.map(p=>p.value),[45]);
+ const html=renderHistoryScene({reports,field:'saliva',now});assert.match(html,/Latest report: Inconclusive/);assert.match(html,/copies\/mL/);assert.doesNotMatch(html,/<polyline/);assert.match(html,/is-laboratory/);assert.equal((html.match(/data-history-reading /g)||[]).length,2);
+});
