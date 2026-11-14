@@ -1,3 +1,10 @@
+export function demoHeartRateHistory(now = Date.now()) {
+  return Array.from({length:365}, (_, index) => {
+    const time = new Date(now - (364-index)*86400000).toISOString();
+    const value = 74 + Math.round(4*Math.sin(index/8) + 3*Math.sin(index/3.3));
+    return {time, value, context:'rest', source:'Demo heart-rate history'};
+  });
+}
 const FIELDS = {
   pulse: ['Heart rate', 'bpm'], pressure: ['Blood pressure', 'mmHg'], oxygen: ['Oxygen saturation', '%'],
   glucose: ['Blood glucose', 'mg/dL'], temperature: ['Temperature', '°C'], sleep: ['Sleep', 'hrs'],
@@ -18,7 +25,7 @@ const display = (field, value) => field === 'symptoms' ? ({ none: 'No symptoms',
 /** Return only valid, recorded observations from one comparable context. */
 export function historySeries({ histories = {}, reports = {}, field = 'pulse', days = 120, now = Date.now() } = {}) {
   if (!Object.hasOwn(FIELDS, field)) field = 'pulse';
-  if (![30, 90, 120].includes(Number(days))) days = 120;
+  if (![30, 90, 120, 365].includes(Number(days))) days = 120;
   now = Number.isFinite(stamp(now)) ? stamp(now) : Date.now();
   const categories = FIELDS[field][2];
   const entries = categories ? (reports?.[field] ?? histories?.[field]) : histories?.[field];
@@ -59,7 +66,7 @@ export function renderHistoryScene({ summary = {}, histories = {}, reports = {},
   const selected = points[selectedIndex], latest = points.at(-1);
   const contextText = [context === null ? '' : CONTEXT[context] || 'Context not recorded',field==='temperature'?(site?`${site.charAt(0).toUpperCase()+site.slice(1)} temperature`:'Site not recorded'):''].filter(Boolean).join(' · ');
   const nav = Object.entries(FIELDS).map(([key, [name]]) => `<button type="button" data-history-scene-field="${key}" aria-pressed="${key === field}">${name}</button>`).join('');
-  const range = [30, 90, 120].map(n => `<button type="button" data-history-scene-days="${n}" aria-pressed="${n === days}">${n} days</button>`).join('');
+  const range = [30, 90, 120, 365].map(n => `<button type="button" data-history-scene-days="${n}" aria-pressed="${n === days}">${n} days</button>`).join('');
   const valueText = p => `${display(field, p.value)}${unit ? ` ${unit}` : ''}`;
   const details = p => field === 'symptoms' ? [p.tags.join(', '), p.onset == null ? '' : `Began ${date(p.onset, true)}`, p.progression ? title(p.progression) : '', p.note].filter(Boolean).join(' · ') : '';
   let chart = '<p class="history-scene-empty">No recorded readings in this period.</p>';
@@ -79,7 +86,7 @@ export function renderHistoryScene({ summary = {}, histories = {}, reports = {},
     chart = `<div class="history-scene-plot"><div class="history-scene-y"><span class="history-scene-unit">${esc(unit)}</span>${axis}</div><div class="history-scene-chart" tabindex="0" role="group" aria-label="${esc(`${label} over ${days} days`)}" aria-describedby="history-scene-help history-scene-readout" data-history-chart data-selected="${selectedIndex}"><svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><g class="history-scene-grid">${grid}</g>${lines}</svg><div class="history-scene-crosshair" aria-hidden="true"></div><div class="history-scene-tooltip" aria-hidden="true"><strong></strong><span></span></div>${dots}${points.map((p, i) => `<span hidden data-history-reading data-x="${x(p)}" data-value="${esc(valueText(p))}" data-date="${esc(date(p.time, true))}" data-reading="${esc(readings[i])}"></span>`).join('')}</div></div><div class="history-scene-dates">${dates}</div>${field === 'pressure' ? '<p class="history-scene-legend"><span>Systolic</span><span>Diastolic</span></p>' : ''}`;
   }
   const inspect = selected ? `${date(selected.time, true)} · ${selected.source}${contextText ? ` · ${contextText}` : ''} · ${valueText(selected)}${details(selected) ? ` · ${details(selected)}` : ''}` : 'No reading selected';
-  return `<section class="history-scene" aria-labelledby="history-scene-title"><header class="history-scene-header"><div><h2 id="history-scene-title">History</h2></div><div class="history-scene-current"><span>Latest</span><strong>${latest ? esc(display(field, latest.value)) : '—'} <small>${esc(unit)}</small></strong><span>${latest ? esc(date(latest.time, true)) : 'No recorded reading'}</span></div></header><div class="history-scene-layout"><nav class="history-scene-nav" aria-label="Health measurements">${nav}</nav><figure class="history-scene-figure"><figcaption><div><h3>${label}</h3>${latest&&['oxygen','pressure','pulse','temperature','glucose','weight'].includes(field)?`<button type="button" class="history-repeat" data-repeat-measurement="${field}">Repeat measurement →</button>`:''}</div><p>${esc(contextText || 'Recorded observations')}${field === 'pressure' ? ' · Systolic / diastolic' : ''}</p></figcaption><div data-history-visual>${chart}</div><div class="history-scene-controls"><div class="history-scene-ranges" role="group" aria-label="History period">${range}</div><div class="history-scene-inspect"><p id="history-scene-help">Hover or drag to inspect · click to pin<span class="history-scene-sr-only">. Use arrow keys, Home or End to navigate; Escape unpins and hides the marker.</span></p><output id="history-scene-readout" class="orbit-chart-readout" aria-live="polite">${esc(inspect)}</output></div></div></figure></div></section>`;
+  return `<section class="history-scene" aria-labelledby="history-scene-title"><header class="history-scene-header"><div><h2 id="history-scene-title">History</h2></div><div class="history-scene-current"><span>Latest</span><strong>${latest ? esc(display(field, latest.value)) : '—'} <small>${esc(unit)}</small></strong><span>${latest ? esc(date(latest.time, true)) : 'No recorded reading'}</span></div></header><div class="history-scene-layout"><nav class="history-scene-nav" aria-label="Health measurements">${nav}</nav><figure class="history-scene-figure"><figcaption><div><h3>${label}</h3>${latest&&['oxygen','pressure','pulse','temperature','glucose','weight'].includes(field)?`<button type="button" class="history-repeat" data-repeat-measurement="${field}">Repeat measurement →</button>`:''}</div><p>${field === 'pulse' ? 'Demo data · not from Bluetooth · ' : ''}${esc(contextText || 'Recorded observations')}${field === 'pressure' ? ' · Systolic / diastolic' : ''}</p></figcaption><div data-history-visual>${chart}</div><div class="history-scene-controls"><div class="history-scene-ranges" role="group" aria-label="History period">${range}</div><div class="history-scene-inspect"><p id="history-scene-help">Hover or drag to inspect · click to pin<span class="history-scene-sr-only">. Use arrow keys, Home or End to navigate; Escape unpins and hides the marker.</span></p><output id="history-scene-readout" class="orbit-chart-readout" aria-live="polite">${esc(inspect)}</output></div></div></figure></div></section>`;
 }
 
 /** Return the closest point to a plot x-coordinate, with ties favoring the earlier point. */
