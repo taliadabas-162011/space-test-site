@@ -1,6 +1,6 @@
 import { assessReadings } from './crew-reading-feedback.js?v=2';
 import {createRepeat,renderRepeat,repeatPayload} from './crew-repeat.js?v=1';
-import {renderCollection,collectionFields,collectionHasEntry,collectionPayload,syncCollectionSymptoms,syncCollectionMeasurement,navigateCollection,urgentCollectionFields,advanceMeasurementGuide,measurementGuides} from './crew-collection.js?v=13';
+import {renderCollection,collectionFields,collectionHasEntry,collectionPayload,syncCollectionSymptoms,syncCollectionMeasurement,navigateCollection,urgentCollectionFields,advanceMeasurementGuide,measurementGuides} from './crew-collection.js?v=14';
 import {renderAssistance,advanceAssistance,readAssistance,writeAssistance} from './crew-assistance.js?v=9';
 import {createVoiceInput} from './crew-voice-input.js?v=4';
 import {isVitalView} from './crew-vital-aid.js?v=1';
@@ -1259,7 +1259,7 @@ hub.addEventListener('click', event => {
   if(collectionNav){const capture=collectionNav.closest('[data-collect-form]');navigateCollection(capture,{measurement:collectionNav.dataset.collectionMeasure,view:collectionNav.hasAttribute('data-collect-symptoms')?'symptoms':collectionNav.dataset.collectionView});storeCollectionDraft(capture);mission.scrollTop=0;syncMissionFrame();return}
   const guideAbout=event.target.closest('[data-guide-about]');
   if(guideAbout){const guide=guideAbout.closest('[data-measure-guide]');const visual=guide.querySelector('.measurement-visual');visual.style.minHeight=`${visual.offsetHeight}px`;guide.dataset.about=String(guide.dataset.about!=='true');guide.querySelector('.measurement-source').hidden=guide.dataset.about!=='true';guide.querySelector(guide.dataset.about==='true'?'.measurement-source h3':'[data-guide-step]:not([hidden]) h3')?.focus({preventScroll:true});return}
-  const skipGuide=event.target.closest('[data-guide-skip]');if(skipGuide){const guide=skipGuide.closest('[data-measure-guide]');guide.open=false;guide.dataset.about='false';guide.closest('[data-collection-metric]').querySelector('input')?.focus({preventScroll:true});return}
+  const skipGuide=event.target.closest('[data-guide-skip]');if(skipGuide){const guide=skipGuide.closest('[data-measure-guide]');guide.open=false;guide.dataset.about='false';guide.closest('[data-collection-metric]')?.querySelector('input')?.focus({preventScroll:true});return}
   const guideButton=event.target.closest('[data-guide-next],[data-guide-back]');if(guideButton){advanceMeasurementGuide(guideButton);return}
   if(event.target.closest('[data-collect-close]')){collectionMode='';const destination=checkinReturn||{section:'mission'};checkinReturn=null;restoreContext(destination);return}
   if(event.target.closest('[data-urgent-response]')){const capture=mission.querySelector('[data-collect-form]');if(capture)storeCollectionDraft(capture);showMission();return}

@@ -103,3 +103,7 @@
 .collection-measurement,.collection-metric,.measurement-visual,.measurement-steps{min-width:0}
 .collection-navigation{min-width:0}.collection-measurement-nav{max-height:min(56vh,520px);overflow-y:auto;overscroll-behavior:contain}
 @media(max-width:767px){.collection-measurement-nav{max-height:none;overflow:visible}.measurement-visual{grid-template-columns:minmax(0,1fr);min-height:0}.measurement-frame{max-width:260px;margin:0}.measurement-steps p{overflow-wrap:anywhere}}
+/* Selection belongs to the button, so it stays with the item while the list scrolls. */
+.crew-orbit[data-ui-variant=glass] .collection-navigation>.liquid-selection{display:none!important}
+.crew-orbit[data-ui-variant=glass][data-ui-variant] .collection-navigation button[aria-current]{background:#d7eaff18!important;box-shadow:inset 0 0 0 1px #b7d9ec80!important;border-radius:18px!important}
+.glucose-a1c-info{margin-top:18px;color:#c9dbe6;line-height:1.5}.glucose-a1c-info summary{cursor:pointer}.glucose-a1c-info a{color:#a8dcf5}
