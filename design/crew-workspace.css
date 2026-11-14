@@ -45,3 +45,4 @@
   .crew-orbit[data-recording="true"] .orbit-canvas{top:95px;left:52%;width:48%;height:20dvh}
   .crew-orbit[data-recording="true"] .orbit-form{top:calc(105px + 20dvh)}
 }
+.reading-feedback-list{display:grid;gap:12px;margin:18px 0}.reading-feedback-card{padding:16px;border:1px solid;border-radius:14px;background:#11283bd9;line-height:1.5}.reading-feedback-card p{margin:8px 0 0;color:#e5eff6}.reading-feedback-card[data-level=green]{border-color:#69d6a0;background:#123c30}.reading-feedback-card[data-level=yellow]{border-color:#f1cb6e;background:#483919}.reading-feedback-card[data-level=red],.reading-urgent-result{border:1px solid #ff9992;border-radius:12px;background:#552b30;color:#fff;padding:14px}.reading-urgent-result{line-height:1.5}
