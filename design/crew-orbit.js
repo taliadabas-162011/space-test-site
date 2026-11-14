@@ -1,6 +1,6 @@
 import { assessReadings } from './crew-reading-feedback.js?v=2';
 import {createRepeat,renderRepeat,repeatPayload} from './crew-repeat.js?v=1';
-import {renderCollection,collectionFields,collectionHasEntry,collectionPayload,syncCollectionSymptoms,syncCollectionMeasurement,navigateCollection,urgentCollectionFields,advanceMeasurementGuide,measurementGuides} from './crew-collection.js?v=12';
+import {renderCollection,collectionFields,collectionHasEntry,collectionPayload,syncCollectionSymptoms,syncCollectionMeasurement,navigateCollection,urgentCollectionFields,advanceMeasurementGuide,measurementGuides} from './crew-collection.js?v=13';
 import {renderAssistance,advanceAssistance,readAssistance,writeAssistance} from './crew-assistance.js?v=9';
 import {createVoiceInput} from './crew-voice-input.js?v=4';
 import {isVitalView} from './crew-vital-aid.js?v=1';
@@ -1254,7 +1254,7 @@ hub.addEventListener('click', event => {
   if(event.target.closest('[data-repeat-guide]')){storeRepeatDraft();repeatState.phase='guide';showRepeatStep();return}
   // A selected radio emits no change event when a saved answer is clicked again.
   const feeling=event.target.closest('[data-collect-form] input[name="symptoms"]');
-  if(feeling?.checked){const capture=feeling.form;syncCollectionSymptoms(capture);navigateCollection(capture,{view:['concerning','urgent'].includes(feeling.value)?'symptoms':'today'});storeCollectionDraft(capture);mission.scrollTop=0;syncMissionFrame();return}
+  if(feeling?.checked){const capture=feeling.form;syncCollectionSymptoms(capture);navigateCollection(capture,{view:'symptoms'});storeCollectionDraft(capture);mission.scrollTop=0;syncMissionFrame();return}
   const collectionNav=event.target.closest('[data-collection-measure],[data-collection-view],[data-collect-symptoms]');
   if(collectionNav){const capture=collectionNav.closest('[data-collect-form]');navigateCollection(capture,{measurement:collectionNav.dataset.collectionMeasure,view:collectionNav.hasAttribute('data-collect-symptoms')?'symptoms':collectionNav.dataset.collectionView});storeCollectionDraft(capture);mission.scrollTop=0;syncMissionFrame();return}
   const guideAbout=event.target.closest('[data-guide-about]');
@@ -1540,7 +1540,7 @@ mission.addEventListener('input',event=>{if(event.target.closest('[data-repeat-f
 mission.addEventListener('change',event=>{if(event.target.closest('[data-repeat-form]'))storeRepeatDraft();
   const capture=event.target.closest('[data-collect-form]');if(!capture)return;
   clearCollectionValidation(capture,event.target);syncCollectionSymptoms(capture);syncCollectionMeasurement(capture);
-  if(event.target.name==='symptoms'){const view=['concerning','urgent'].includes(event.target.value)?'symptoms':'today';if(capture.elements.collectionView.value!==view)navigateCollection(capture,{view})}
+  if(event.target.name==='symptoms'){const view='symptoms';if(capture.elements.collectionView.value!==view)navigateCollection(capture,{view})}
   storeCollectionDraft(capture);
 });
 hub.addEventListener('submit', event => {
