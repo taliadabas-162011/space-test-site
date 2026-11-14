@@ -31,3 +31,12 @@ test('a saved urgent symptom report remains explicit when resuming a draft',asyn
  assert.equal(collectionPayload(result).symptoms,'urgent');assert.equal(collectionPayload(result).values.water,'0');assert.equal(collectionPayload(result).details.symptomNote,'Keep this draft');assert.deepEqual(collectionPayload(result).details.symptomTags,['chest-pain']);assert.equal(fields[1].value,'none');
  const html=renderCollection({...options,fields:result,urgent:true});assert(html.includes('data-urgent-response'));assert(html.includes('Urgent report active'));assert(html.includes('value="urgent" checked'));
 });
+
+test('water milliliters are converted to liters, while liters stay unchanged',()=>{
+ assert.equal(collectionPayload([{name:'water',value:'1250'},{name:'waterUnit',value:'mL'}]).values.water,'1.25');
+ assert.equal(collectionPayload([{name:'water',value:'1.25'},{name:'waterUnit',value:'L'}]).values.water,'1.25');
+});
+test('sleep check keeps separate sleep indicators without inventing a quality rating',()=>{
+ const p=collectionPayload([{name:'sleepTimeInBed',value:'8'},{name:'sleepTimeAsleep',value:'7'},{name:'sleepAwakenings',value:'2'}]);
+ assert.equal(p.details.sleepTimeInBed,'8');assert.equal(p.details.sleepTimeAsleep,'7');assert.equal(p.details.sleepAwakenings,'2');assert.equal(p.details.sleepQuality,'');
+});

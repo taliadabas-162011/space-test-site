@@ -298,6 +298,26 @@
       next[personId][field].push({ value: details[field], time, recordedAt: recordedAt.toISOString() });
       count++;
     }
+    // Save optional sleep check details without converting them into a diagnosis or a subjective rating.
+    const sleepFields = ['sleepTimeInBed','sleepTimeAsleep','sleepLatency','sleepAwakenings'];
+    const sleepCheck = {};
+    for (const field of sleepFields) {
+      if (details[field] == null || details[field] === '') continue;
+      const n = Number(details[field]);
+      const max = field === 'sleepTimeInBed' || field === 'sleepTimeAsleep' ? 24 : field === 'sleepLatency' ? 1440 : 100;
+      if (!Number.isFinite(n) || n < 0 || n > max || (field === 'sleepTimeInBed' && n === 0) || (['sleepLatency','sleepAwakenings'].includes(field) && !Number.isInteger(n))) throw new Error('Check the sleep details.');
+      sleepCheck[field] = n;
+    }
+    if (sleepCheck.sleepTimeInBed != null && sleepCheck.sleepTimeAsleep != null && sleepCheck.sleepTimeAsleep > sleepCheck.sleepTimeInBed) throw new Error('Time asleep must not exceed time in bed.');
+    if (details.sleepDayImpact) {
+      if (!['none','some','much'].includes(details.sleepDayImpact)) throw new Error('Choose a valid daytime impact.');
+      sleepCheck.sleepDayImpact = details.sleepDayImpact;
+    }
+    if (Object.keys(sleepCheck).length) {
+      next[personId].sleepAssessment ||= [];
+      next[personId].sleepAssessment.push({ ...sleepCheck, time, recordedAt: recordedAt.toISOString(), source: 'Manual check-in' });
+      count++;
+    }
     if (!count && skippedDuplicates) return;
     if (!count) throw new Error('Enter a reading or select a self-report.');
     localStorage.setItem(storageKey, JSON.stringify(next));

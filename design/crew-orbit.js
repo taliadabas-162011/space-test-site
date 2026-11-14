@@ -1,6 +1,6 @@
 import { assessReadings } from './crew-reading-feedback.js?v=2';
 import {createRepeat,renderRepeat,repeatPayload} from './crew-repeat.js?v=1';
-import {renderCollection,collectionFields,collectionHasEntry,collectionPayload,syncCollectionSymptoms,syncCollectionMeasurement,navigateCollection,urgentCollectionFields,advanceMeasurementGuide,measurementGuides} from './crew-collection.js?v=14';
+import {renderCollection,syncSimpleCalculations,collectionFields,collectionHasEntry,collectionPayload,syncCollectionSymptoms,syncCollectionMeasurement,navigateCollection,urgentCollectionFields,advanceMeasurementGuide,measurementGuides} from './crew-collection.js?v=15';
 import {renderAssistance,advanceAssistance,readAssistance,writeAssistance} from './crew-assistance.js?v=9';
 import {createVoiceInput} from './crew-voice-input.js?v=4';
 import {isVitalView} from './crew-vital-aid.js?v=1';
@@ -934,7 +934,7 @@ function renderMissionView(force=false) {
   }else if(collectionMode){
     const now=new Date(),observedAt=`${localDateKey(now)}T${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
     mission.innerHTML=renderCollection({summary,fields:collectionDraftFields(),purpose:collectionMode,symptomOptions:CrewDesign.symptomOptions,observedAt,urgent:state.key==='emergency',urgentPreview:summary.symptomSource==='Scenario preview'});
-    initializeCustomSelects(mission);initializeCustomDateTimes(mission);syncCollectionSymptoms(mission.querySelector('[data-collect-form]'));syncCollectionMeasurement(mission.querySelector('[data-collect-form]'));
+    initializeCustomSelects(mission);initializeCustomDateTimes(mission);syncCollectionSymptoms(mission.querySelector('[data-collect-form]'));syncCollectionMeasurement(mission.querySelector('[data-collect-form]'));syncSimpleCalculations(mission.querySelector('[data-collect-form]'));
   }else{
     mission.innerHTML=renderMission({summary,histories,scenario,connected:deviceConnections.size,response,draft:checkinDraft,urgentReturn:urgentReturnView});
     if(state.key==='emergency'&&assistanceModeKey===activeAlertKey){
@@ -1536,10 +1536,10 @@ form.addEventListener('input', storeCheckinDraft);
 form.addEventListener('change', storeCheckinDraft);
 form.addEventListener('toggle', event => { if (event.target.matches('details') && checkinDraft) storeCheckinDraft(); }, true);
 mission.addEventListener('toggle',event=>{const capture=event.target.closest('[data-collect-form]');if(!capture)return;if(event.target.matches('.collection-guide')&&event.target.open){event.target.querySelector('[data-guide-step]:not([hidden]) h3')?.focus({preventScroll:true});for(const other of capture.querySelectorAll('.collection-guide[open]'))if(other!==event.target)other.open=false;}syncMissionFrame();},true);
-mission.addEventListener('input',event=>{if(event.target.closest('[data-repeat-form]'))storeRepeatDraft();const capture=event.target.closest('[data-collect-form]');if(capture){clearCollectionValidation(capture,event.target);storeCollectionDraft(capture)}});
+mission.addEventListener('input',event=>{if(event.target.closest('[data-repeat-form]'))storeRepeatDraft();const capture=event.target.closest('[data-collect-form]');if(capture){clearCollectionValidation(capture,event.target);syncSimpleCalculations(capture);storeCollectionDraft(capture)}});
 mission.addEventListener('change',event=>{if(event.target.closest('[data-repeat-form]'))storeRepeatDraft();
   const capture=event.target.closest('[data-collect-form]');if(!capture)return;
-  clearCollectionValidation(capture,event.target);syncCollectionSymptoms(capture);syncCollectionMeasurement(capture);
+  clearCollectionValidation(capture,event.target);syncCollectionSymptoms(capture);syncCollectionMeasurement(capture);syncSimpleCalculations(capture);
   if(event.target.name==='symptoms'){const view='symptoms';if(capture.elements.collectionView.value!==view)navigateCollection(capture,{view})}
   storeCollectionDraft(capture);
 });
@@ -1560,6 +1560,9 @@ hub.addEventListener('submit', event => {
   if(capture){
     event.preventDefault();const invalid=[...capture.elements].find(input=>input.willValidate&&!input.validity.valid);if(invalid){const metric=invalid.closest('[data-collection-metric]');if(metric)navigateCollection(capture,{measurement:metric.dataset.collectionMetric});const guide=metric?.querySelector('[data-measure-guide]');if(guide)guide.open=false;invalid.setAttribute('aria-invalid','true');invalid.setAttribute('aria-describedby','collection-error');const trigger=invalid.closest('.crew-select')?.querySelector('.crew-select__trigger');trigger?.setAttribute('aria-invalid','true');trigger?.setAttribute('aria-describedby','collection-error');capture.querySelector('.collection-error').textContent=invalid.name==='context'?'Choose the measurement conditions.':invalid.validationMessage;if(invalid.tagName==='SELECT')focusCustomSelect(invalid,{preventScroll:true});else invalid.focus({preventScroll:true});return}
     const payload=collectionPayload(collectionFields(capture));
+    const bed=Number(payload.details.sleepTimeInBed),asleep=Number(payload.details.sleepTimeAsleep);
+    if(payload.details.sleepTimeInBed && payload.details.sleepTimeAsleep!=='' && asleep>bed){navigateCollection(capture,{view:'sleepQuality'});capture.querySelector('.collection-error').textContent='Time asleep must not exceed time in bed.';return}
+    if(Number(payload.values.water)>15){navigateCollection(capture,{measurement:'water'});capture.querySelector('.collection-error').textContent='Check the water amount and unit.';return}
     try{
       CrewDesign.saveOverview(people[0].id,payload.values,payload.symptoms,{...payload.details,source:'Manual check-in'});
       readingFeedback=assessReadings(payload.values,payload.details);
