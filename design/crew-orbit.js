@@ -16,7 +16,7 @@ import { connectCrewSensor } from '/space-test-site/design/crew-device.js?v=astr
 import { initializeCustomDateTimes, syncCustomDateTimes } from '/space-test-site/design/crew-datetime.js?v=3';
 import { compareHistory } from '/space-test-site/design/crew-insights.js?v=1';
 
-import { renderMission, missionState } from './crew-mission-ui.js?v=10';
+import { renderMission, missionState } from './crew-mission-ui.js?v=11';
 import { createCrewAlarm } from './crew-alarm.js?v=2';
 import { renderHistoryScene, initializeHistoryChart, updateHistoryScene } from './crew-history-scene.js?v=8';
 import { renderDeviceScene } from './crew-device-scene.js?v=2';
@@ -93,7 +93,6 @@ let selected = null;
 let recording = false;
 let anatomyMode = false;
 let anatomyFromOverview = false;
-let showOverviewReadings = false;
 let anatomyCategory = 'circulation';
 let anatomyMetric = 'pulse';
 let anatomyHeartFocused = false;
@@ -931,7 +930,7 @@ function renderMissionView(force=false) {
     mission.innerHTML=renderCollection({summary,fields:collectionDraftFields(),purpose:collectionMode,symptomOptions:CrewDesign.symptomOptions,observedAt,urgent:state.key==='emergency',urgentPreview:summary.symptomSource==='Scenario preview'});
     initializeCustomSelects(mission);initializeCustomDateTimes(mission);syncCollectionSymptoms(mission.querySelector('[data-collect-form]'));syncCollectionMeasurement(mission.querySelector('[data-collect-form]'));
   }else{
-    mission.innerHTML=renderMission({summary,histories,scenario,connected:deviceConnections.size,response,draft:checkinDraft,urgentReturn:urgentReturnView,showReadings:showOverviewReadings});
+    mission.innerHTML=renderMission({summary,histories,scenario,connected:deviceConnections.size,response,draft:checkinDraft,urgentReturn:urgentReturnView});
     if(state.key==='emergency'&&assistanceModeKey===activeAlertKey){
       mission.querySelector('.urgent-page')?.setAttribute('data-assisting','true');
       const focus=mission.querySelector('.care-focus'),silence=focus.querySelector('[data-alert-ack]');
@@ -1279,7 +1278,7 @@ hub.addEventListener('click', event => {
   if (historyField) { if(historyMetric===historyField.dataset.historySceneField)return; historyMetric = historyField.dataset.historySceneField; historyScenePosition = null; renderHistorySceneView(); timeline.querySelector(`[data-history-scene-field="${historyMetric}"]`)?.focus({ preventScroll: true }); return; }
   const historyDays = event.target.closest('[data-history-scene-days]');
   if (historyDays) { if(historyTrendDays===Number(historyDays.dataset.historySceneDays))return; historyTrendDays = Number(historyDays.dataset.historySceneDays); historyScenePosition = null; renderHistorySceneView(); timeline.querySelector(`[data-history-scene-days="${historyTrendDays}"]`)?.focus({ preventScroll: true }); return; }
-  if(event.target.closest('[data-toggle-overview-readings]')){showOverviewReadings=!showOverviewReadings;renderMissionView();return}
+  const readingsButton=event.target.closest('[data-open-readings-graphs]');if(readingsButton){contextHistory=[];historyMetric='pulse';historyScenePosition=null;showHistory(readingsButton);return}
   if(event.target.closest('[data-reveal-anatomy]')){anatomyFromOverview=true;showPerson(0);enterAnatomy();return}
   const task = event.target.closest('[data-mission-action]');
   if (task) {
