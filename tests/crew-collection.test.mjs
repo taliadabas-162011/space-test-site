@@ -40,3 +40,10 @@ test('sleep check keeps separate sleep indicators without inventing a quality ra
  const p=collectionPayload([{name:'sleepTimeInBed',value:'8'},{name:'sleepTimeAsleep',value:'7'},{name:'sleepAwakenings',value:'2'}]);
  assert.equal(p.details.sleepTimeInBed,'8');assert.equal(p.details.sleepTimeAsleep,'7');assert.equal(p.details.sleepAwakenings,'2');assert.equal(p.details.sleepQuality,'');
 });
+
+test('sleep quality is device-only and does not accept invented manual sleep results',()=>{
+ const html=renderCollection({...options,fields:[{name:'collectionView',value:'sleepQuality'}]});
+ assert.match(html,/Sleep data unavailable/);
+ assert.doesNotMatch(html,/name="sleepTimeInBed"/);
+ assert.doesNotMatch(html,/name="sleepQuality"/);
+});
