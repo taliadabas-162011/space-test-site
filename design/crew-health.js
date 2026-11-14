@@ -298,6 +298,19 @@
       next[personId][field].push({ value: details[field], time, recordedAt: recordedAt.toISOString() });
       count++;
     }
+    if (details.moodQuestionnaire) {
+      const { answers = {}, note = '' } = details.moodQuestionnaire;
+      if (!answers || typeof answers !== 'object' || Array.isArray(answers) || typeof note !== 'string' || note.length > 500) throw new Error('Check the mood questionnaire.');
+      for (const [key, answer] of Object.entries(answers)) {
+        const max = key === 'q10' ? 2 : 4;
+        if (!/^q(?:10|[1-9])$/.test(key) || !/^[0-4]$/.test(String(answer)) || Number(answer) > max) throw new Error('Check the mood questionnaire answers.');
+      }
+      if (Object.keys(answers).length || note.trim()) {
+        next[personId].moodQuestionnaires ||= [];
+        next[personId].moodQuestionnaires.push({ answers: {...answers}, note: note.trim(), time, recordedAt: recordedAt.toISOString(), source: 'Manual check-in' });
+        count++;
+      }
+    }
     // Save optional sleep check details without converting them into a diagnosis or a subjective rating.
     const sleepFields = ['sleepTimeInBed','sleepTimeAsleep','sleepLatency','sleepAwakenings'];
     const sleepCheck = {};

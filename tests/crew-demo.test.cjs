@@ -57,3 +57,6 @@ console.log('Urgent assistance remains available when observation storage fails.
 window.CrewDesign.saveOverview('alex',{temperature:36.8},'',{temperatureSite:'oral',context:'rest'});
 assert.equal(window.CrewDesign.history('alex','temperature').at(-1).site,'oral');
 assert.throws(()=>window.CrewDesign.saveOverview('alex',{temperature:36.8},'',{temperatureSite:'invalid'}),/temperature site/);
+window.CrewDesign.saveOverview('alex', {}, '', {moodQuestionnaire:{answers:{q2:'3',q10:'2'},note:'Example'}});
+const moodEntry=JSON.parse(data.get('crew-health-demo-observations-v2')).alex.moodQuestionnaires.at(-1);
+assert.equal(moodEntry.answers.q10,'2');assert.equal(moodEntry.note,'Example');

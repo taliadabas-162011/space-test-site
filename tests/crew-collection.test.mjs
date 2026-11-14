@@ -47,3 +47,11 @@ test('sleep quality is device-only and does not accept invented manual sleep res
  assert.doesNotMatch(html,/name="sleepTimeInBed"/);
  assert.doesNotMatch(html,/name="sleepQuality"/);
 });
+
+test('mood questionnaire contains ten questions and keeps answers and note',()=>{
+ const html=renderCollection({...options,fields:[{name:'collectionView',value:'mood'}]});
+ for(let i=1;i<=10;i++)assert.match(html,new RegExp(`name="moodQ${i}"`));
+ assert.match(html,/not sent to anyone/);
+ const p=collectionPayload([{name:'moodQ1',value:'4',checked:true},{name:'moodQ10',value:'2',checked:true},{name:'moodNote',value:'A note'}]);
+ assert.equal(p.details.mood,'low');assert.equal(p.details.moodQuestionnaire.answers.q10,'2');assert.equal(p.details.moodQuestionnaire.note,'A note');
+});

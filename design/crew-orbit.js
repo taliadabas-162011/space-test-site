@@ -1,6 +1,6 @@
 import { assessReadings } from './crew-reading-feedback.js?v=2';
 import {createRepeat,renderRepeat,repeatPayload} from './crew-repeat.js?v=1';
-import {renderCollection,syncSimpleCalculations,collectionFields,collectionHasEntry,collectionPayload,syncCollectionSymptoms,syncCollectionMeasurement,navigateCollection,urgentCollectionFields,advanceMeasurementGuide,measurementGuides} from './crew-collection.js?v=17';
+import {renderCollection,syncSimpleCalculations,collectionFields,collectionHasEntry,collectionPayload,syncCollectionSymptoms,syncCollectionMeasurement,navigateCollection,urgentCollectionFields,advanceMeasurementGuide,measurementGuides} from './crew-collection.js?v=18';
 import {renderAssistance,advanceAssistance,readAssistance,writeAssistance} from './crew-assistance.js?v=9';
 import {createVoiceInput} from './crew-voice-input.js?v=4';
 import {isVitalView} from './crew-vital-aid.js?v=1';

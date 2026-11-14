@@ -1,5 +1,5 @@
 // Cache only the application shell and bundled assets, never observation data.
-const CACHE = 'crew-health-static-v70';
+const CACHE = 'crew-health-static-v71';
 const ROOT = '/space-test-site/';
 const FILES = [
   "",
