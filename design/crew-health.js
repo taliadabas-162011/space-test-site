@@ -210,7 +210,7 @@
   }
   function history(personId, field) {
     if (!crew.some(person => person.id === personId) || !metrics[field]) return [];
-    const entries = entriesFor(personId, field).map(item => ({ ...structuredClone(item), source: item.source?.startsWith('Simulated') ? 'Scenario history' : item.source }));
+    const entries = entriesFor(personId, field).map(item => structuredClone(item));
     if (Object.hasOwn(scenarios[currentScenario].values, field)) entries.push({ value: structuredClone(scenarios[currentScenario].values[field]), time: new Date(scenarioTime).toISOString(), recordedAt: new Date(scenarioTime).toISOString(), source: 'Scenario preview', context: 'rest' });
     return entries.sort((a,b)=>Date.parse(a.time)-Date.parse(b.time));
   }

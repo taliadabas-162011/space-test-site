@@ -13,7 +13,7 @@ test('every selectable history period uses actual observations within that windo
   let previous=0;
   for(const days of [30,90,120,365]){
    const {points}=historySeries({histories:records,reports,field,days,now});
-   assert(points.length>0,`${field}: ${days} days`);assert(points.length>=previous);previous=points.length;
+   if(['saliva','urine'].includes(field))assert(reports.immunity.some(r=>r.sample===field&&Date.parse(r.time)>=now-days*86400000));else assert(points.length>0,`${field}: ${days} days`);assert(points.length>=previous);previous=points.length;
    assert(points.every(row=>row.time>=now-days*86400000&&row.time<=now));
    if(days===365)assert(points[0].time<now-330*86400000,field+' must not stop at 120 days');
   }

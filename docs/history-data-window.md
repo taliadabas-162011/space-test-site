@@ -16,9 +16,9 @@ When a numeric 90-, 120- or 365-day series contains multiple readings on the sam
 
 ## Meaningful variation
 
-The authored year combines small, calendar-stable baseline variation with four short recovery periods. Shorter sleep, reduced activity, neutral/low mood, poorer reported sleep and mild fatigue/headache occur together, followed by recovery. These are constructed examples for evaluating the interface, not a physiological model or a claim that one signal causes another. No random values or new diagnoses are generated on reload.
+The authored year combines small, calendar-stable baseline variation with irregularly spaced two- to four-night recovery periods. Shorter sleep, reduced activity, neutral/low mood, poorer reported sleep and mild fatigue/headache occur together, followed by recovery. These are constructed examples for evaluating the interface, not a physiological model or a claim that one signal causes another. Date-keyed bounded anchors interpolate into irregular drift at different time scales for each metric. There are no repeating sine waves or every-fifth-day oxygen spikes. Recovery timing and duration vary, as do qualitative laboratory examples. No values are rerolled and no new diagnoses are generated on reload. Stable runs of rounded oxygen values remain legitimate; tests reject prolonged repeating nonconstant waveforms rather than demanding a different value every day.
 
-For the November 2026 fixture, resting pulse spans 66–90 bpm, oxygen 96–100%, sleep 6.1–8.5 h, logged water 1.8–2.8 L, exercise 72–137 minutes, temperature 36.3–37.1 °C, fasting glucose 78–96 mg/dL and body mass 69–70.8 kg. Bounds and variety are checked over multiple calendar windows. These are example values, not individual treatment targets. Routine oxygen changes by at most one percentage point between consecutive authored days. Serious oxygen reduction remains in the explicit urgent preview, paired with its symptom report and response flow.
+For the November 2026 fixture, resting pulse spans 67–82 bpm, oxygen 96–100%, sleep 6.1–8.5 h, logged water 1.9–2.8 L, exercise 76–138 minutes, temperature 36.4–37.1 °C, fasting glucose 79–92 mg/dL and body mass 69.3–70.5 kg. Bounds and variety are checked over multiple calendar windows. These are example values, not individual treatment targets. Routine oxygen changes by at most one percentage point between consecutive authored days. Serious oxygen reduction remains in the explicit urgent preview, paired with its symptom report and response flow.
 
 General references used to keep examples plausible:
 
@@ -29,3 +29,9 @@ General references used to keep examples plausible:
 - [NASA astronaut exercise](https://www.nasa.gov/general/astronaut-exercise/): provides context for activity duration. The example's partial sessions are not a recommended mission schedule.
 
 Water logs do not establish hydration status. DNA copy counts do not have an invented universal “healthy” range or an immunity score. Laboratory results retain their sample, qualitative/numeric form and units; interpretation still requires the actual assay and medical context.
+
+## Legacy presentation repair
+
+An earlier stored 120-day fixture used `Simulated sensor` and `Simulated check-in` sources. The newer refresh only replaced `Scenario history`, while the history API relabelled all `Simulated…` sources as `Scenario history`. The old 09:00 rows therefore survived and won the long chart’s latest-per-day selection over new midnight examples. This caused the repeated oxygen spike and affected other histories too.
+
+Refresh now recognizes that fixture only when at least 100 dates jointly match its oxygen, sleep, water and exercise formulas, matching timestamps and original source labels. Recognized rows move unchanged into `alex.presentationArchive`, and the current authored year supplies the active presentation series. The archive remains in the same observation store on subsequent saves. Ambiguous or isolated simulated readings, device IDs/sequences, manual entries, unknown sources and all original personal-storage keys remain untouched. Migration is idempotent. The history API preserves original source labels instead of disguising them.

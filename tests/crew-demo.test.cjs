@@ -30,6 +30,7 @@ assert.equal(window.CrewDesign.summary('alex').pulse.value, baselinePulse);
 assert.equal(window.CrewDesign.getProfile().name, 'Personal profile');
 window.CrewDesign.saveOverview('alex', { pulse: 76 }, '', { source: 'Simulated sensor', context: 'rest' });
 assert.equal(window.CrewDesign.history('alex', 'pulse').length, 366);
+assert.equal(window.CrewDesign.history('alex', 'pulse').at(-1).source,'Simulated sensor','history retains actual provenance');
 for (const [key, value] of before) assert.equal(data.get(key), value);
 console.log('Scenarios preview values without writing history, retain the original name, and preserve personal records.');
 

@@ -93,3 +93,45 @@ test('short-sleep episodes have coherent self-reports and activity, rather than 
  }
  assert(nights>=9&&nights<=15);
 });
+
+test('the recognizable legacy fixture is archived once across measurements without touching real observations',()=>{
+ const now=new Date(2026,10,9,14),old={alex:{}};
+ const append=(field,value,time,context)=>{(old.alex[field]||=[]).push({value,time,recordedAt:time,source:['pulse','oxygen'].includes(field)?'Simulated sensor':'Simulated check-in',...(context?{context}:{})})};
+ for(let ago=119;ago>=0;ago--){
+  const d=new Date(now);d.setDate(d.getDate()-ago);d.setHours(9,0,0,0);const time=d.toISOString();
+  append('pulse',65+Math.round(2*Math.sin(ago/5))+(ago<5?11:0),time,'rest');append('oxygen',97+(ago%5===0?1:0),time,'rest');
+  append('sleep',Math.round((7.4+Math.sin(ago/6)*.6)*10)/10,time);append('water',Math.round((2.2+Math.sin(ago/7)*.25)*10)/10,time);append('exercise',85+(ago%7)*5,time);
+  append('mood',ago%10===0?'neutral':'good',time);append('sleepQuality',ago%9===0?'mixed':'restful',time);
+  if(ago%3===0){append('pressure',{systolic:116+ago%5,diastolic:74+ago%4},time,'rest');append('temperature',36.7,time,'rest')}
+  if(ago%7===0){append('glucose',88,time,'fasting');append('weight',70,time)}
+  if(!ago)append('symptoms','none',time);
+ }
+ const original=structuredClone(old),personal=[];
+ for(const [field,rows] of Object.entries(old.alex)){
+  const row={...rows.at(-1),time:now.toISOString(),recordedAt:now.toISOString(),source:'Manual check-in'};rows.push(row);personal.push([field,row]);
+ }
+ // A real device observation with the old-looking source still must survive.
+ const device={...old.alex.oxygen[0],deviceSequence:0,deviceId:'oximeter-1'};old.alex.oxygen.push(device);
+ const single={value:76,time:new Date(+now-3600000).toISOString(),recordedAt:new Date(+now-3600000).toISOString(),source:'Simulated sensor'};old.alex.pulse.push(single);
+ const before=JSON.stringify(old),fresh=refreshRecords(old,now);
+ assert.equal(JSON.stringify(old),before);
+ for(const [field,rows] of Object.entries(original.alex))assert.equal(JSON.stringify(fresh.alex.presentationArchive[field]),JSON.stringify(rows),field);
+ for(const [field,row] of personal)assert.equal(JSON.stringify(fresh.alex[field].find(r=>r.source==='Manual check-in')),JSON.stringify(row),field);
+ assert.equal(JSON.stringify(fresh.alex.oxygen.find(r=>r.deviceId)),JSON.stringify(device));assert.equal(JSON.stringify(fresh.alex.pulse.find(r=>r.source==='Simulated sensor')),JSON.stringify(single));
+ assert.equal(JSON.stringify(refreshRecords(fresh,now)),JSON.stringify(fresh),'repeat refresh cannot duplicate archived rows');
+ const incomplete=structuredClone(original);for(const rows of Object.values(incomplete.alex))rows.splice(0,Math.max(0,rows.length-20));
+ assert.equal(refreshRecords(incomplete,now).alex.presentationArchive,undefined,'isolated simulated readings are not a recognized fixture');
+});
+
+test('numeric histories do not repeat a fixed multi-day waveform across the year',()=>{
+ for(const now of [new Date(2026,10,14,12),new Date(2027,4,20,12),new Date(2028,1,29,12)]){
+  const r=makeRecords(now).alex;
+  for(const field of ['pulse','oxygen','sleep','water','exercise','pressure','temperature','glucose','weight']){
+   const rows=r[field].map(row=>JSON.stringify(row.value));
+   for(let lag=2;lag<=14;lag++){
+    let streak=0,max=0;for(let i=lag;i<rows.length;i++){streak=rows[i]===rows[i-lag]?streak+1:0;if(streak>=25&&new Set(rows.slice(i-streak+1,i+1)).size>1)max=Math.max(max,streak)}
+    assert(max<25,`${field} repeats a ${lag}-sample pattern for ${max} observations`);
+   }
+  }
+ }
+});
