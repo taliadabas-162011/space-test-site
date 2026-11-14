@@ -1,4 +1,4 @@
-import { Scene, Vector3, TextureLoader, MeshPhysicalMaterial, Vector2, RepeatWrapping, Plane }
+import { Scene, Vector3, Box3, TextureLoader, MeshPhysicalMaterial, Vector2, RepeatWrapping, Plane }
   from '/space-test-site/design/vendor/three/three.module.min.js';
 
 // The body and organs are the original Vibrant Wellness assets. Their mesh
@@ -26,9 +26,11 @@ function bodyBounds(scene) {
  */
 export async function createCrewAnatomy({ loader, parent, model }) {
   if (!loader?.loadAsync || !parent?.add || !BODY[model]) throw new TypeError('A loader, parent, and female or male model are required.');
-  const [body, heart, brain, normalMap] = await Promise.all([
+  const [body, heart, brain, kidney, pancreas, normalMap] = await Promise.all([
     loader.loadAsync(BODY[model]), loader.loadAsync('/space-test-site/design/assets/anatomy/heart.glb'),
-    loader.loadAsync('/space-test-site/design/assets/anatomy/brain.glb'), new TextureLoader().loadAsync('/space-test-site/design/assets/anatomy/Plastic015A_1K-JPG_NormalGL.jpg'),
+    loader.loadAsync('/space-test-site/design/assets/anatomy/brain.glb'),
+    loader.loadAsync(`/space-test-site/design/assets/anatomy/VH_${model === 'female' ? 'F' : 'M'}_Kidney_R.glb`),
+    loader.loadAsync(`/space-test-site/design/assets/anatomy/VH_${model === 'female' ? 'F' : 'M'}_Pancreas.glb`), new TextureLoader().loadAsync('/space-test-site/design/assets/anatomy/Plastic015A_1K-JPG_NormalGL.jpg'),
   ]);
   normalMap.wrapS = normalMap.wrapT = RepeatWrapping;
   normalMap.repeat.set(2, 2);
@@ -41,6 +43,19 @@ export async function createCrewAnatomy({ loader, parent, model }) {
   root.scale.setScalar(scale);
   root.position.set(-center.x * scale, -bounds.min.y * scale, -center.z * scale);
   root.add(body.scene, heart.scene, brain.scene);
+  // Reference organs come from a different coordinate system. Fit each as an
+  // educational illustration inside the existing body's normalized bounds.
+  function placeOrgan(organ, name, fraction, x, y) {
+    organ.scene.updateMatrixWorld(true);
+    const box = new Box3().setFromObject(organ.scene), dimensions = box.getSize(new Vector3()), middle = box.getCenter(new Vector3());
+    const factor = size.y * fraction / Math.max(dimensions.x, dimensions.y, dimensions.z);
+    const group = new Scene(); group.name = name;
+    organ.scene.position.sub(middle); group.add(organ.scene); group.scale.setScalar(factor);
+    group.position.set(center.x + size.y*x, bounds.min.y + size.y*y, center.z);
+    root.add(group); return group;
+  }
+  const kidneyGroup = placeOrgan(kidney, 'kidney', .15, -.11, .57);
+  const pancreasGroup = placeOrgan(pancreas, 'pancreas', .18, .02, .58);
 
   // The reference uses MeshPhysicalMaterial with transmission, clearcoat,
   // iridescence and a repeating normal texture. A cool emissive Fresnel rim
@@ -83,8 +98,10 @@ export async function createCrewAnatomy({ loader, parent, model }) {
     roughness: 0.34, metalness: 0.04, clearcoat: 0.35,
     transparent: true, opacity: 0, depthWrite: false,
   });
+  const kidneyMaterial = new MeshPhysicalMaterial({ color:0xc96478, emissive:0x70283a, emissiveIntensity:.5, roughness:.36, transparent:true, opacity:0, depthWrite:false });
+  const pancreasMaterial = new MeshPhysicalMaterial({ color:0xefc38f, emissive:0x78512a, emissiveIntensity:.45, roughness:.4, transparent:true, opacity:0, depthWrite:false });
   const revealPlane = new Plane(new Vector3(0, 1, 0), -BODY_HEIGHT * 1.1);
-  for (const material of [skin, heartMaterial, brainMaterial]) material.clippingPlanes = [revealPlane];
+  for (const material of [skin, heartMaterial, brainMaterial, kidneyMaterial, pancreasMaterial]) material.clippingPlanes = [revealPlane];
   const geometries = new Set(), discardedMaterials = new Set();
   function replace(scene, material, order) {
     scene.traverse(node => {
@@ -98,6 +115,8 @@ export async function createCrewAnatomy({ loader, parent, model }) {
   replace(body.scene, skin, 2);
   replace(heart.scene, heartMaterial, 1);
   replace(brain.scene, brainMaterial, 1);
+  replace(kidney.scene, kidneyMaterial, 1);
+  replace(pancreas.scene, pancreasMaterial, 1);
   discardedMaterials.forEach(material => material.dispose());
   parent.add(root);
   const heartNode = heart.scene.getObjectByName('heart');
@@ -115,14 +134,14 @@ export async function createCrewAnatomy({ loader, parent, model }) {
       root.visible = opacity > 0.001;
       skin.opacity = 0.66 * opacity * skinVisibility;
       heartMaterial.opacity = 0.94 * opacity * heartVisibility;
-      brainMaterial.opacity = 0;
+      brainMaterial.opacity = 0; kidneyMaterial.opacity = 0; pancreasMaterial.opacity = 0;
     },
     setReveal(progress, ground) {
       const amount = Math.max(0, Math.min(1, Number.isFinite(progress) ? progress : 0));
       revealPlane.constant = -(ground + BODY_HEIGHT * (1.05 - 1.1 * amount));
     },
     setFocus(category) {
-      focus = category === 'circulation' ? 'circulation' : 'overview';
+      focus = ['circulation','recovery','kidney','pancreas'].includes(category) ? category : 'overview';
       if (focus !== 'circulation') heartDetail = false;
     },
     setHeartDetail(enabled) { heartDetail = Boolean(enabled) && focus === 'circulation'; },
@@ -134,10 +153,14 @@ export async function createCrewAnatomy({ loader, parent, model }) {
       const blend = reducedMotion ? 1 : 1 - Math.exp(-5 * Math.max(0, delta));
       heartVisibility += (target - heartVisibility) * blend;
       skinVisibility += ((heartDetail ? 0 : 1) - skinVisibility) * blend;
-      skin.opacity = 0.66 * opacity * skinVisibility;
+      skin.opacity = 0.66 * opacity * (focus === 'overview' ? 1 : 0);
       heartMaterial.opacity = 0.94 * opacity * heartVisibility;
+      brainMaterial.opacity = focus === 'recovery' ? .95 * opacity : 0;
+      kidneyMaterial.opacity = focus === 'kidney' ? .95 * opacity : 0;
+      pancreasMaterial.opacity = focus === 'pancreas' ? .95 * opacity : 0;
       heart.scene.visible = heartMaterial.opacity > 0.001;
-      brain.scene.visible = false;
+      brain.scene.visible = brainMaterial.opacity > .001;
+      kidneyGroup.visible = kidneyMaterial.opacity > .001; pancreasGroup.visible = pancreasMaterial.opacity > .001;
       const pulse = reducedMotion ? 0 : (0.5 + 0.5 * Math.sin(time * 2.6));
       heartMaterial.emissiveIntensity = 0.38 + pulse * 0.16;
       if (heartNode && heartScale) heartNode.scale.copy(heartScale).multiplyScalar(1 + pulse * 0.018);
@@ -145,7 +168,7 @@ export async function createCrewAnatomy({ loader, parent, model }) {
     dispose() {
       root.removeFromParent();
       geometries.forEach(geometry => geometry.dispose());
-      skin.dispose(); heartMaterial.dispose(); brainMaterial.dispose(); normalMap.dispose();
+      skin.dispose(); heartMaterial.dispose(); brainMaterial.dispose(); kidneyMaterial.dispose(); pancreasMaterial.dispose(); normalMap.dispose();
     },
   };
 }

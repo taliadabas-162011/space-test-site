@@ -156,3 +156,9 @@
 .crew-anatomy-metric-switch button[aria-pressed="true"] strong,.crew-anatomy-metric-switch button[aria-pressed="true"] em{visibility:hidden}
 @media(max-width:767px){.crew-anatomy-metric-switch{gap:10px}.crew-anatomy-metric-switch button>span{font-size:12px}}
 @media(max-width:400px){.crew-anatomy-metric-switch button strong{font-size:17px}.crew-anatomy-metric-switch button[data-anatomy-metric-select="pressure"] strong small{display:block;margin:3px 0 0}}
+.crew-anatomy-hotspot--kidney{left:calc(var(--anatomy-abdomen-x,50%) - 34px);top:var(--anatomy-abdomen-y,53%)}
+.crew-anatomy-hotspot--kidney .crew-anatomy-hotspot-label{left:auto;right:calc(100% + 8px)}
+.crew-anatomy-hotspot--pancreas{left:calc(var(--anatomy-abdomen-x,50%) + 34px);top:var(--anatomy-abdomen-y,53%)}
+.crew-anatomy[data-organ-focused="true"] .crew-anatomy-hotspots{display:none}
+.crew-anatomy-credit{margin:24px 0 0;color:#b9d0dc;font-size:11px;line-height:1.5}.crew-anatomy-credit a{color:#bce7f9}
+.crew-anatomy-sections{flex-wrap:wrap;gap:8px 16px}

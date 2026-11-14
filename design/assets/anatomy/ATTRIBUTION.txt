@@ -1,0 +1,6 @@
+Human Reference Atlas kidney and pancreas reference models, female and male,
+are adapted (repositioned, scaled and recolored) from HuBMAP Consortium / Indiana University
+Human Reference Atlas 3D Reference Object Library, https://humanatlas.io/3d-reference-library
+Source files: https://github.com/hubmapconsortium/ccf-releases/tree/main/v1.2/models
+License: Creative Commons Attribution 4.0 International, https://creativecommons.org/licenses/by/4.0/
+Models are illustrative and do not represent a specific astronaut's anatomy or organ health.

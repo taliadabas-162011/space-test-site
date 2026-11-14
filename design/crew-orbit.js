@@ -5,9 +5,9 @@ import {createVoiceInput} from './crew-voice-input.js?v=4';
 import {isVitalView} from './crew-vital-aid.js?v=1';
 import {createLiquidInterface} from './crew-liquid-ui.js?v=8';
 import {responseKey,readResponse,recordResponse,handoffText} from './crew-care.js?v=3';
-import { createCrewStage } from '/space-test-site/design/crew-motion-stage.js?v=astronaut-33';
+import { createCrewStage } from '/space-test-site/design/crew-motion-stage.js?v=astronaut-34';
 import { renderObservationCheckin, renderObservationIdentity, renderObservationOverview, renderObservationProfile, renderObservationMobile, updateObservationCheckin } from '/space-test-site/design/crew-observation-ui.js?v=astronaut-9';
-import { renderAnatomyUI, setAnatomyCategory, setAnatomyMetric } from '/space-test-site/design/crew-anatomy-ui.js?v=astronaut-4';
+import { renderAnatomyUI, setAnatomyCategory, setAnatomyMetric } from '/space-test-site/design/crew-anatomy-ui.js?v=astronaut-5';
 import { renderEmergencyGuide } from '/space-test-site/design/crew-guidance.js?v=astronaut-3';
 import { initializeCustomSelects, syncCustomSelects, focusCustomSelect } from '/space-test-site/design/crew-select.js?v=astronaut-10';
 import { renderHealthTimeline } from '/space-test-site/design/crew-timeline-ui.js?v=astronaut-6';
@@ -96,6 +96,7 @@ let anatomyFromOverview = false;
 let anatomyCategory = 'circulation';
 let anatomyMetric = 'pulse';
 let anatomyHeartFocused = false;
+let anatomyOrganFocused = false;
 let anatomyHeartDetail = false;
 let pendingAnatomyFocus = '';
 let historyReturn = null;
@@ -135,7 +136,7 @@ let historyCalendarMonth = new Date(today.getFullYear(), today.getMonth(), 1);
 const deviceConnections = new Map();
 const deviceSaveTimes = new Map();
 const deviceLatestReadings = new Map();
-const metricCategories = { pulse: 'circulation', pressure: 'circulation', oxygen: 'circulation', glucose: 'daily', sleep: 'recovery', exercise: 'recovery', temperature: 'daily', water: 'daily' };
+const metricCategories = { pulse: 'circulation', pressure: 'circulation', oxygen: 'circulation', glucose: 'pancreas', sleep: 'recovery', temperature: 'recovery', water: 'kidney' };
 
 function symptomText(status, brief = false) {
   if (status === 'urgent') return brief ? 'Urgent symptoms reported' : 'Urgent symptoms reported · follow mission emergency procedures';
@@ -155,6 +156,7 @@ function renderAnatomy(summary, histories) {
   }));
   anatomyRoot.innerHTML = renderAnatomyUI(summary, anatomyCategory, histories, anatomyMetric);
   anatomyRoot.querySelector('.crew-anatomy').dataset.heartFocused = String(anatomyHeartFocused);
+  anatomyRoot.querySelector('.crew-anatomy').dataset.organFocused = String(anatomyOrganFocused);
   anatomyRoot.querySelector('.crew-anatomy').dataset.organExpanded = String(anatomyHeartDetail);
   const heartButton = anatomyRoot.querySelector('[data-heart-detail]');
   if (heartButton) {
@@ -1429,11 +1431,14 @@ hub.addEventListener('click', event => {
   }
   if (event.target.closest('button[data-figure-anatomy]') && !suppressFigureClick) enterAnatomy();
   if (event.target.closest('[data-anatomy-exit]')) { if(anatomyFromOverview){anatomyFromOverview=false;showMission();} else exitAnatomy(); }
+  if(event.target.closest('[data-anatomy-body]')){anatomyOrganFocused=false;anatomyHeartFocused=false;anatomyRoot.querySelector('.crew-anatomy').dataset.organFocused='false';stage?.focusAnatomyRegion?.('overview');return}
   const category = event.target.closest('[data-anatomy-category]');
   if (category) {
+    anatomyOrganFocused=true;
     anatomyCategory = category.dataset.anatomyCategory;
     const root = anatomyRoot.querySelector('.crew-anatomy');
     setAnatomyCategory(root, anatomyCategory);
+    root.dataset.organFocused='true';
     anatomyMetric = root.dataset.metric;
     if (anatomyHeartDetail) stage?.focusHeartDetail?.(false);
     anatomyHeartDetail = false;
@@ -1441,6 +1446,7 @@ hub.addEventListener('click', event => {
     anatomyHeartFocused = anatomyCategory === 'circulation';
     root.dataset.heartFocused = String(anatomyHeartFocused);
     stage?.focusAnatomyRegion?.(anatomyCategory);
+    if(anatomyCategory === 'circulation') stage?.focusHeartDetail?.(true);
   }
   const heartDetail = event.target.closest('button[data-heart-detail]');
   if (heartDetail) {
@@ -1659,14 +1665,16 @@ async function enterAnatomy(category = 'circulation', metric = '', edit = false)
     const opened = await stage.setAnatomy(true, people[current].model);
     if (!opened || request !== anatomyRequest || selected !== current || recording) return;
     anatomyMode = true;
-    anatomyCategory = ['circulation', 'recovery', 'daily'].includes(category) ? category : 'circulation';
-    anatomyMetric = metricCategories[metric] === anatomyCategory ? metric : { circulation: 'pulse', recovery: 'sleep', daily: 'temperature' }[anatomyCategory];
+    anatomyOrganFocused = Boolean(metric);
+    anatomyCategory = ['circulation', 'recovery', 'kidney', 'pancreas'].includes(category) ? category : 'circulation';
+    anatomyMetric = metricCategories[metric] === anatomyCategory ? metric : { circulation: 'pulse', recovery: 'sleep', kidney: 'water', pancreas: 'glucose' }[anatomyCategory];
     hub.dataset.anatomy = 'true';
     anatomyRoot.hidden = false;
     anatomyHeartFocused = Boolean(metric && anatomyCategory === 'circulation');
     anatomyHeartDetail = false;
     anatomyRoot.innerHTML = renderAnatomyUI(CrewDesign.summary(people[current].id), anatomyCategory, anatomyHistory(people[current].id), anatomyMetric);
     anatomyRoot.querySelector('.crew-anatomy').dataset.heartFocused = String(anatomyHeartFocused);
+  anatomyRoot.querySelector('.crew-anatomy').dataset.organFocused = String(anatomyOrganFocused);
     initializeCustomSelects(anatomyRoot);
     initializeCustomDateTimes(anatomyRoot);
     if (metric) stage.focusAnatomyRegion?.(anatomyCategory);
@@ -1697,6 +1705,7 @@ function exitAnatomy() {
   anatomyRequest++;
   stage?.setAnatomy?.(false);
   anatomyMode = false;
+  anatomyOrganFocused = false;
   anatomyHeartFocused = false;
   anatomyHeartDetail = false;
   pendingAnatomyFocus = '';

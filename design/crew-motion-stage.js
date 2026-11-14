@@ -29,6 +29,9 @@ const ease = t => t < 0.5 ? 2 * t * t : 1 - ((-2 * t + 2) ** 2) / 2;
 const anatomyEase = t => t < 0.5 ? 4 * t * t * t : 1 - ((-2 * t + 2) ** 3) / 2;
 const ANATOMY_FOCUS = {
   circulation: { height: 1.46, desktop: 0.23, mobile: 0.43 },
+  recovery: { height: 1.73, desktop: 0.23, mobile: 0.43 },
+  kidney: { height: 1.08, desktop: 0.3, mobile: 0.5 },
+  pancreas: { height: 1.10, desktop: 0.3, mobile: 0.5 },
 };
 const HEART_DETAIL_FOCUS = { height: 1.46, desktop: 0.075, mobile: 0.12 };
 const angleDifference = (a, b) => ((b - a + Math.PI * 3) % TAU) - Math.PI;
@@ -314,11 +317,13 @@ export async function createCrewStage(canvas, onFrame = () => {}) {
     if (disposed || selected === null) return false;
     const index = selected;
     const model = models[index];
+    if (model.anatomy && model.anatomyBodyModel !== bodyModel) { model.anatomy.dispose(); model.anatomy = null; }
     if (!model.anatomy) {
-      const { createCrewAnatomy } = await import('/space-test-site/design/crew-anatomy.js?v=source-focus-4');
+      const { createCrewAnatomy } = await import('/space-test-site/design/crew-anatomy.js?v=source-focus-5');
       const anatomy = await createCrewAnatomy({ loader, parent: model.pivot, model: bodyModel });
       if (disposed || revision !== anatomyRevision || selected !== index) { anatomy.dispose(); return false; }
       model.anatomy = anatomy;
+      model.anatomyBodyModel = bodyModel;
       anatomy.setOpacity(0);
     }
     anatomyIndex = index;
@@ -335,7 +340,7 @@ export async function createCrewStage(canvas, onFrame = () => {}) {
   }
 
   function focusAnatomyRegion(region) {
-    if (!['circulation', 'recovery', 'daily'].includes(region) || anatomyIndex === null) return;
+    if (!['overview', 'circulation', 'recovery', 'kidney', 'pancreas'].includes(region) || anatomyIndex === null) return;
     // Only circulation has a corresponding anatomical visual. Sleep,
     // exercise, and hydration remain neutral whole-body contexts.
     anatomyFocusRegion = ANATOMY_FOCUS[region] ? region : null;
@@ -480,7 +485,7 @@ export async function createCrewStage(canvas, onFrame = () => {}) {
     if (anatomyIndex !== null && selected === anatomyIndex && anatomyMix > 0) {
       offset.copy(position).sub(target);
       const model = models[anatomyIndex];
-      const organ = anatomyFocusRegion === 'recovery' ? 'brain' : anatomyFocusRegion === 'circulation' ? 'heart' : null;
+      const organ = anatomyFocusRegion === 'recovery' ? 'brain' : anatomyFocusRegion === 'circulation' ? 'heart' : anatomyFocusRegion === 'kidney' ? 'kidney' : anatomyFocusRegion === 'pancreas' ? 'pancreas' : null;
       const focusNode = organ && model.anatomy?.root.getObjectByName(organ);
       if (focusNode) focusNode.getWorldPosition(anatomyPoint);
       else anatomyPoint.copy(model.pivot.position);

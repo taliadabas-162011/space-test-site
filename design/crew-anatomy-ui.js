@@ -1,7 +1,8 @@
 const CATEGORIES = {
   circulation: { title: 'Heart & circulation', nav: 'Heart', metrics: ['pulse', 'pressure', 'oxygen'] },
-  recovery: { title: 'Recovery', nav: 'Recovery', metrics: ['sleep', 'exercise'] },
-  daily: { title: 'Daily health', nav: 'Daily', metrics: ['glucose', 'temperature', 'water'] },
+  recovery: { title: 'Brain & sleep', nav: 'Brain', metrics: ['sleep', 'temperature'] },
+  kidney: { title: 'Kidney & water balance', nav: 'Kidney', metrics: ['water'] },
+  pancreas: { title: 'Pancreas & blood glucose', nav: 'Pancreas', metrics: ['glucose'] },
 };
 
 const METRICS = {
@@ -25,13 +26,13 @@ const METRICS = {
   },
   glucose: {
     label: 'Blood glucose', unit: 'mg/dL', min: 0, max: 9999, step: 1,
-    why: 'Blood glucose is the amount of sugar in the blood.',
+    why: 'The pancreas makes hormones that help regulate blood glucose. A reading alone does not diagnose a pancreas condition.',
     how: 'Follow the meter instructions and record whether the measurement was taken fasting or after a meal.',
     source: 'https://medlineplus.gov/lab-tests/blood-glucose-test/', sourceName: 'MedlinePlus',
   },
   sleep: {
     label: 'Sleep', unit: 'hrs', min: 0, max: 24, step: 0.1,
-    why: 'Sleep is one part of recovery and a measure in NASA spaceflight research.',
+    why: 'The brain helps regulate sleep. Sleep is one measure in NASA spaceflight research.',
     how: 'Record the hours slept during the most recent sleep period.',
     source: 'https://www.nasa.gov/reference/standard-measures/', sourceName: 'NASA Standard Measures',
   },
@@ -43,13 +44,13 @@ const METRICS = {
   },
   temperature: {
     label: 'Temperature', unit: '°C', min: 20, max: 50, step: 0.1,
-    why: 'Changes in body temperature can be a sign of illness.',
+    why: 'The brain helps regulate body temperature. A reading alone cannot diagnose an illness.',
     how: 'Use the thermometer as directed and use the same measurement site when comparing readings.',
     source: 'https://medlineplus.gov/ency/article/003400.htm', sourceName: 'MedlinePlus',
   },
   water: {
     label: 'Water intake', unit: 'L', min: 0, max: 15, step: 0.1,
-    why: 'Water intake is useful context alongside daily health and activity.',
+    why: 'The kidneys help regulate water balance. Water intake alone does not measure kidney function.',
     how: 'Record the total amount consumed over the last 24 hours.',
     source: 'https://www.nasa.gov/humans-in-space/the-human-body-in-space/', sourceName: 'NASA Human Research',
   },
@@ -179,18 +180,19 @@ export function renderAnatomyUI(summary, active = 'circulation', histories = {},
     const reports = [['mood', 'Mood'], ['sleepQuality', 'Sleep quality']].filter(([field]) => reportLabels[summary?.[field]?.value]);
     const selfReport = key === 'recovery' && reports.length ? `<details class="crew-anatomy-symptoms"><summary>Self-reported context ↗</summary>${reports.map(([field, label]) => `<p>${label}: ${reportLabels[summary[field].value]} · ${escapeHtml(recordedDate(summary[field].time))}</p>`).join('')}</details>` : '';
     return `<section class="crew-anatomy-view" id="crew-anatomy-panel-${key}" aria-labelledby="crew-anatomy-control-${key}" data-anatomy-panel="${key}"${key === active ? '' : ' hidden'}>
-      <div class="crew-anatomy-view-header"><h3>${category.title}</h3>${key === 'circulation' ? '<button class="crew-anatomy-heart-detail" type="button" data-heart-detail aria-pressed="false"><span>View heart</span> <i aria-hidden="true">↗</i></button>' : ''}</div>
+      <div class="crew-anatomy-view-header"><h3>${category.title}</h3></div>
       <div class="crew-anatomy-metric-switch" role="group" aria-label="${category.title} measurements">${selectors}</div>
       ${category.metrics.map(field => measurement(summary || {}, field, field === selectedMetric, histories)).join('')}
       ${selfReport}
+      ${key === 'kidney' || key === 'pancreas' ? `<p class="crew-anatomy-credit">3D organ model: Human Reference Atlas, <a href="https://humanatlas.io/3d-reference-library" target="_blank" rel="noopener noreferrer">view source</a> · <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a>. Illustrative anatomy; not a diagnosis.</p>` : ''}
       ${key === 'daily' && status ? `<details class="crew-anatomy-symptoms" data-anatomy-symptoms data-status="${status}"><summary>Symptom report ↗</summary><p>${symptoms(status)}${summary?.symptomTime ? ` · ${escapeHtml(recordedDate(summary.symptomTime))}` : ''}</p>${summary?.symptomNote ? `<p>${escapeHtml(summary.symptomNote)}</p>` : ''}</details>` : ''}
     </section>`;
   }).join('');
   return `<div class="crew-anatomy" role="region" data-category="${active}" data-metric="${activeMetric}" aria-label="${person} anatomy view">
     <button class="crew-anatomy-exit" type="button" data-anatomy-exit>← Back to suit</button>
     <div class="crew-anatomy-connector" aria-hidden="true"></div>
-    <div class="crew-anatomy-content"><nav class="crew-anatomy-sections" aria-label="Health sections">${navigation}</nav>${panels}</div>
-    <div class="crew-anatomy-hotspots">${heartHotspot}<button type="button" class="crew-anatomy-hotspot crew-anatomy-hotspot--head" aria-label="Explore recovery" aria-pressed="${active === 'recovery'}" data-anatomy-category="recovery"><span class="crew-anatomy-hotspot-ring" aria-hidden="true"></span><span class="crew-anatomy-hotspot-label"><span>Recovery</span></span></button><button type="button" class="crew-anatomy-hotspot crew-anatomy-hotspot--abdomen" aria-label="Explore daily health" aria-pressed="${active === 'daily'}" data-anatomy-category="daily"><span class="crew-anatomy-hotspot-ring" aria-hidden="true"></span><span class="crew-anatomy-hotspot-label"><span>Daily health</span></span></button></div>
+    <div class="crew-anatomy-content"><nav class="crew-anatomy-sections" aria-label="Health sections"><button type="button" data-anatomy-body>Body</button>${navigation}</nav>${panels}</div>
+    <div class="crew-anatomy-hotspots">${heartHotspot}<button type="button" class="crew-anatomy-hotspot crew-anatomy-hotspot--head" aria-label="Explore the brain" aria-pressed="${active === 'recovery'}" data-anatomy-category="recovery"><span class="crew-anatomy-hotspot-ring" aria-hidden="true"></span><span class="crew-anatomy-hotspot-label"><span>Explore brain</span></span></button><button type="button" class="crew-anatomy-hotspot crew-anatomy-hotspot--kidney" aria-label="Explore the kidney" aria-pressed="${active === 'kidney'}" data-anatomy-category="kidney"><span class="crew-anatomy-hotspot-ring" aria-hidden="true"></span><span class="crew-anatomy-hotspot-label"><span>Kidney</span></span></button><button type="button" class="crew-anatomy-hotspot crew-anatomy-hotspot--pancreas" aria-label="Explore the pancreas" aria-pressed="${active === 'pancreas'}" data-anatomy-category="pancreas"><span class="crew-anatomy-hotspot-ring" aria-hidden="true"></span><span class="crew-anatomy-hotspot-label"><span>Pancreas</span></span></button></div>
   </div>`;
 }
 
