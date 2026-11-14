@@ -1,9 +1,9 @@
 import {createSceneNavigation} from './crew-navigation.js?v=2';
-import {navigateImmunity,syncImmunity} from './crew-immunity.js?v=5';
+import {navigateImmunity,syncImmunity} from './crew-immunity.js?v=6';
 import {initializeQuestionnaires,setQuestionnairePage} from './crew-questionnaire.js?v=3';
 import { assessReadings } from './crew-reading-feedback.js?v=2';
-import {createRepeat,renderRepeat,repeatPayload} from './crew-repeat.js?v=3';
-import {renderCollection,syncSimpleCalculations,collectionFields,collectionHasEntry,collectionPayload,syncCollectionSymptoms,syncCollectionMeasurement,navigateCollection,urgentCollectionFields,advanceMeasurementGuide,measurementGuides} from './crew-collection.js?v=checkin-5';
+import {createRepeat,renderRepeat,repeatPayload} from './crew-repeat.js?v=4';
+import {renderCollection,syncSimpleCalculations,collectionFields,collectionHasEntry,collectionPayload,syncCollectionSymptoms,syncCollectionMeasurement,navigateCollection,urgentCollectionFields,advanceMeasurementGuide,resetMeasurementGuide,measurementGuides} from './crew-collection.js?v=checkin-6';
 import {renderAssistance,advanceAssistance,readAssistance,writeAssistance} from './crew-assistance.js?v=14';
 import {assistanceNarration,createVoicePlayer} from './crew-assistance-audio.js?v=5';
 import {voiceIcon} from './crew-voice-controls.js?v=3';
@@ -1269,6 +1269,7 @@ hub.addEventListener('keydown',event=>handleVoiceShortcut(event,{
  active:voiceInput.active,start:startVoiceAnswers,stop:()=>voiceInput.stop()
 }));
 hub.addEventListener('click', event => {
+  const guideSummary=event.target.closest('.collection-guide>summary');if(guideSummary&&!guideSummary.parentElement.open)resetMeasurementGuide(guideSummary.parentElement);
   if (event.target.closest('[data-alert-sound]')) {
     const urgent = hub.dataset.severity === 'urgent' && hub.dataset.alertAcknowledged !== 'true';
     if (urgent && alarm.state !== 'playing') { if(voiceInput.active)voiceInput.stop();stopAssistanceVoice();alertSoundEnabled = true; playAlertSound(); }
@@ -1300,7 +1301,7 @@ hub.addEventListener('click', event => {
   if(event.target.closest('[data-repeat-urgent]')){urgentReturnView='repeat';storeRepeatDraft();CrewDesign.requestUrgentAssistance(people[0].id);showMission();return}
   if(event.target.closest('[data-repeat-next]')){if(repeatState.step===measurementGuides[repeatState.field].steps.length-1)repeatState.phase='entry';else repeatState.step++;showRepeatStep();return}
   if(event.target.closest('[data-repeat-back]')){repeatState.step=Math.max(0,repeatState.step-1);showRepeatStep();return}
-  if(event.target.closest('[data-repeat-guide]')){storeRepeatDraft();repeatState.phase='guide';showRepeatStep();return}
+  if(event.target.closest('[data-repeat-guide]')){storeRepeatDraft();repeatState.step=0;repeatState.phase='guide';showRepeatStep();return}
   // A selected radio emits no change event when a saved answer is clicked again.
   const feeling=event.target.closest('[data-collect-form] input[name="symptoms"]');
   if(feeling?.checked){const capture=feeling.form;syncCollectionSymptoms(capture);if(capture.dataset.view!=='symptoms'){navigateCollection(capture,{view:'symptoms'});mission.scrollTop=0}storeCollectionDraft(capture);syncMissionFrame();return}
@@ -1584,7 +1585,7 @@ hub.addEventListener('change', event => {
 form.addEventListener('input', storeCheckinDraft);
 form.addEventListener('change', storeCheckinDraft);
 form.addEventListener('toggle', event => { if (event.target.matches('details') && checkinDraft) storeCheckinDraft(); }, true);
-mission.addEventListener('toggle',event=>{const capture=event.target.closest('[data-collect-form]');if(!capture)return;if(event.target.matches('.collection-guide')&&event.target.open){event.target.querySelector('[data-guide-step]:not([hidden]) h3')?.focus({preventScroll:true});for(const other of capture.querySelectorAll('.collection-guide[open]'))if(other!==event.target)other.open=false;}syncMissionFrame();},true);
+mission.addEventListener('toggle',event=>{const capture=event.target.closest('[data-collect-form]');if(!capture)return;if(event.target.matches('.collection-guide')&&event.target.open){resetMeasurementGuide(event.target);event.target.querySelector('[data-guide-step]:not([hidden]) h3')?.focus({preventScroll:true});for(const other of capture.querySelectorAll('.collection-guide[open]'))if(other!==event.target)other.open=false;}syncMissionFrame();},true);
 mission.addEventListener('input',event=>{if(event.target.closest('[data-repeat-form]'))storeRepeatDraft();const capture=event.target.closest('[data-collect-form]');if(capture){clearCollectionValidation(capture,event.target);syncSimpleCalculations(capture);storeCollectionDraft(capture)}});
 mission.addEventListener('change',event=>{if(event.target.closest('[data-repeat-form]'))storeRepeatDraft();
   const capture=event.target.closest('[data-collect-form]');if(!capture)return;

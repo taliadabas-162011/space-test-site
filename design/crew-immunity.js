@@ -15,6 +15,7 @@ export function navigateImmunity(form,sample,step=0){
  root.querySelector('.immunity-results').hidden=Boolean(guide);
  for(const other of root.querySelectorAll('[data-immunity-guide]'))other.hidden=other!==guide;
  if(!guide){root.querySelector('h2').focus({preventScroll:true});return}
+ if(step===0)for(const source of guide.querySelectorAll('details[open]'))source.open=false;
  const steps=[...guide.querySelectorAll('[data-immunity-step]')],position=Math.max(0,Math.min(steps.length-1,step));guide.dataset.step=String(position);
  for(const [i,el] of steps.entries())el.hidden=i!==position;
  guide.querySelector('[data-immunity-back]').disabled=position===0;guide.querySelector('[data-immunity-next]').textContent=position===steps.length-1?'Enter result →':'Next →';

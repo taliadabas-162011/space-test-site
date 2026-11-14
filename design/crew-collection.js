@@ -67,6 +67,7 @@ export function syncCollectionMeasurement(form){
  if(view==='measurements')preloadGuideImages(selected);
 }
 export function navigateCollection(form,{view,measurement}={}){
+ for(const guide of form.querySelectorAll('.collection-guide[open]'))guide.open=false;
  if(measurement){form.elements.measurementField.value=measurement;view='measurements'}
  if(view)form.elements.collectionView.value=view;
  syncCollectionMeasurement(form);
@@ -83,18 +84,27 @@ export function syncCollectionSymptoms(form){
  form.querySelector('[data-selected-symptoms]').textContent=names.length?`Also selected: ${names.join(' · ')}`:'';
  form.querySelector('[data-symptom-urgent]').hidden=!visible||!tags.some(tag=>['chest-pain','breathing-difficulty','fainting','new-weakness','speech-vision-change'].includes(tag));
 }
-export function advanceMeasurementGuide(button){
- const guide=button.closest('[data-measure-guide]'),steps=[...guide.querySelectorAll('[data-guide-step]')];
- const current=steps.findIndex(step=>!step.hidden);
- if(button.hasAttribute('data-guide-next')&&current===steps.length-1){guide.open=false;guide.dataset.about='false';const entry=guide.closest('[data-collection-metric]');(entry?.querySelector('input[type=radio]:checked')||entry?.querySelector('input'))?.focus({preventScroll:true});return}
- const next=Math.max(0,Math.min(steps.length-1,current+(button.hasAttribute('data-guide-next')?1:-1)));
+function showMeasurementGuideStep(guide,next,focus){
+ const steps=[...guide.querySelectorAll('[data-guide-step]')];
  steps.forEach((step,index)=>step.hidden=index!==next);
  guide.querySelector('[data-guide-back]').disabled=next===0;
  guide.querySelector('[data-guide-next]').textContent=next===steps.length-1?(guide.dataset.measureGuide==='symptoms'?'Log symptoms':'Enter result'):'Next';
  guide.querySelector('[data-guide-progress]').textContent=`${next+1} / ${steps.length}`;
  guide.dataset.step=String(next);
  const image=guide.querySelector('.measurement-filmstrip');if(image){const visual=guideVisual(guide.dataset.measureGuide,next);image.src=visual.url;image.style.width=`${visual.frames*100}%`;image.style.transform=`translateX(-${visual.frame*100/visual.frames}%)`;image.alt=measurementGuides[guide.dataset.measureGuide].steps[next][0];}
- steps[next].querySelector('h3').focus({preventScroll:true});
+ if(focus)steps[next].querySelector('h3').focus({preventScroll:true});
+}
+export function resetMeasurementGuide(guide){
+ guide.dataset.about='false';
+ const source=guide.querySelector('.measurement-source');if(source)source.hidden=true;
+ const visual=guide.querySelector('.measurement-visual');if(visual)visual.style.minHeight='';
+ showMeasurementGuideStep(guide,0,false);
+}
+export function advanceMeasurementGuide(button){
+ const guide=button.closest('[data-measure-guide]'),steps=[...guide.querySelectorAll('[data-guide-step]')];
+ const current=steps.findIndex(step=>!step.hidden);
+ if(button.hasAttribute('data-guide-next')&&current===steps.length-1){guide.open=false;guide.dataset.about='false';const entry=guide.closest('[data-collection-metric]');(entry?.querySelector('input[type=radio]:checked')||entry?.querySelector('input'))?.focus({preventScroll:true});return}
+ showMeasurementGuideStep(guide,Math.max(0,Math.min(steps.length-1,current+(button.hasAttribute('data-guide-next')?1:-1))),true);
 }
 
 export function syncSimpleCalculations(form){

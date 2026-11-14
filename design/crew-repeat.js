@@ -1,4 +1,4 @@
-import {collectionMetrics,renderCollectionMetric,collectionPayload} from './crew-collection.js?v=checkin-5';
+import {collectionMetrics,renderCollectionMetric,collectionPayload} from './crew-collection.js?v=checkin-6';
 import {measurementGuides,guideVisual} from './crew-measurement-guides.js?v=symptoms-2';
 import {readingStatus} from './crew-care.js?v=3';
 const esc=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
