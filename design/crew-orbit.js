@@ -1,3 +1,4 @@
+import {createSceneNavigation} from './crew-navigation.js?v=2';
 import {navigateImmunity,syncImmunity} from './crew-immunity.js?v=3';
 import {initializeQuestionnaires,setQuestionnairePage} from './crew-questionnaire.js?v=3';
 import { assessReadings } from './crew-reading-feedback.js?v=2';
@@ -6,11 +7,11 @@ import {renderCollection,syncSimpleCalculations,collectionFields,collectionHasEn
 import {renderAssistance,advanceAssistance,readAssistance,writeAssistance} from './crew-assistance.js?v=9';
 import {createVoiceInput} from './crew-voice-input.js?v=4';
 import {isVitalView} from './crew-vital-aid.js?v=1';
-import {createLiquidInterface} from './crew-liquid-ui.js?v=checkin-3';
+import {createLiquidInterface} from './crew-liquid-ui.js?v=anatomy-3';
 import {responseKey,readResponse,recordResponse,handoffText} from './crew-care.js?v=3';
-import { createCrewStage } from '/space-test-site/design/crew-motion-stage.js?v=astronaut-34';
+import { createCrewStage } from '/space-test-site/design/crew-motion-stage.js?v=anatomy-exit-4';
 import { renderObservationCheckin, renderObservationIdentity, renderObservationOverview, renderObservationProfile, renderObservationMobile, updateObservationCheckin } from '/space-test-site/design/crew-observation-ui.js?v=astronaut-9';
-import { renderAnatomyUI, setAnatomyCategory, setAnatomyMetric } from '/space-test-site/design/crew-anatomy-ui.js?v=astronaut-5';
+import { renderAnatomyUI, setAnatomyCategory, setAnatomyMetric } from '/space-test-site/design/crew-anatomy-ui.js?v=liquid-1';
 import { renderEmergencyGuide } from '/space-test-site/design/crew-guidance.js?v=astronaut-3';
 import { initializeCustomSelects, syncCustomSelects, focusCustomSelect } from '/space-test-site/design/crew-select.js?v=astronaut-10';
 import { renderHealthTimeline } from '/space-test-site/design/crew-timeline-ui.js?v=astronaut-6';
@@ -19,7 +20,7 @@ import { connectCrewSensor } from '/space-test-site/design/crew-device.js?v=astr
 import { initializeCustomDateTimes, syncCustomDateTimes } from '/space-test-site/design/crew-datetime.js?v=3';
 import { compareHistory } from '/space-test-site/design/crew-insights.js?v=1';
 
-import { renderMission, missionState } from './crew-mission-ui.js?v=14';
+import { renderMission, missionState } from './crew-mission-ui.js?v=15';
 import { createCrewAlarm } from './crew-alarm.js?v=2';
 import { renderHistoryScene, initializeHistoryChart, updateHistoryScene, demoHeartRateHistory } from './crew-history-scene.js?v=11';
 import { renderDeviceScene } from './crew-device-scene.js?v=2';
@@ -34,11 +35,11 @@ hub.dataset.single = 'true';
 hub.setAttribute('aria-label', 'Crew health overview');
 hub.innerHTML = `<div class="orbit-background" aria-hidden="true"></div><canvas class="orbit-canvas" aria-hidden="true"></canvas>
   <header class="orbit-header"><button class="mission-home" type="button" data-mission-action="overview" aria-label="Back to health overview"><span class="orbit-brand">CREW <i>/</i> HEALTH</span></button><div class="orbit-header-right"><button type="button" data-open-guidance>Guidance <span aria-hidden="true">↗</span></button><button type="button" data-emergency>Emergency <span aria-hidden="true">↗</span></button></div></header>
-  <nav class="mission-tools" aria-label="Health tools"><button type="button" data-mission-action="overview" aria-current="page">Overview</button><button type="button" data-mission-action="history">History</button><button type="button" data-mission-action="device">Devices</button></nav><button class="scene-return" type="button" data-scene-back hidden>← Overview</button><div class="scene-explore" data-scene-explore tabindex="0" role="group" aria-label="Explore astronaut. Drag to orbit; arrow keys to turn; plus and minus to zoom; Home to reset."></div><div class="scene-orbit-tools"><span>Drag to explore</span><button type="button" data-scene-reset aria-label="Reset astronaut view">↺</button></div><section class="orbit-mission" aria-label="Personal health overview" hidden></section><div class="orbit-scenario-control"><label><span class="scenario-caption">Scenario preview</span><select data-scenario aria-label="Scenario preview"><option value="routine">Routine</option><option value="emergency">Urgent response</option></select></label><button type="button" data-alert-sound aria-pressed="true">Audio enabled</button></div><button class="care-alert-return" type="button" data-mission-action="overview">Return to urgent response ↗</button><div class="orbit-intro"><h1 tabindex="-1">Space health</h1><p>One crew member · one personal record</p></div>
+  <nav class="mission-tools" aria-label="Health tools"><button type="button" data-mission-action="overview" aria-current="page">Overview</button><button type="button" data-mission-action="history">History</button><button type="button" data-mission-action="device">Devices</button><button type="button" data-mission-action="checkin" aria-label="Daily check-in"><span class="nav-label-full">Daily check-in</span><span class="nav-label-short" aria-hidden="true">Check-in</span></button><button type="button" data-mission-action="anatomy">Anatomy</button></nav><button class="scene-return" type="button" data-scene-back hidden>← Overview</button><div class="scene-explore" data-scene-explore tabindex="0" role="group" aria-label="Explore astronaut. Drag to orbit; arrow keys to turn; plus and minus to zoom; Home to reset."></div><div class="scene-orbit-tools"><span>Drag to explore</span><button type="button" data-scene-reset aria-label="Reset astronaut view">↺</button></div><section class="orbit-mission" aria-label="Personal health overview" hidden></section><div class="orbit-scenario-control"><label><span class="scenario-caption">Scenario preview</span><select data-scenario aria-label="Scenario preview"><option value="routine">Routine</option><option value="emergency">Urgent response</option></select></label><button type="button" data-alert-sound aria-pressed="true">Audio enabled</button></div><button class="care-alert-return" type="button" data-mission-action="overview">Return to urgent response ↗</button><div class="orbit-intro"><h1 tabindex="-1">Space health</h1><p>One crew member · one personal record</p></div>
   <div class="orbit-actors">${people.map((person, index) => `<section class="orbit-actor" data-actor="${index}"><button class="orbit-hit" type="button" data-select="${index}" aria-label="Open astronaut health profile"></button><div class="orbit-actor-label"><span>ASTRONAUT PROFILE</span><h2></h2><div class="orbit-actor-status"></div><button type="button" data-record="${index}">Readings today <span aria-hidden="true">↗</span></button></div><div class="orbit-actor-readings"></div></section>`).join('')}</div>
   <div class="orbit-mobile-summary"></div>
   <nav class="orbit-mobile-crew" aria-label="Choose a crew member">${people.map((person, index) => `<button type="button" data-select="${index}">${person.name.split(' ')[0]} <span aria-hidden="true">↗</span></button>`).join('')}</nav>
-  <div class="orbit-profile" hidden><button class="orbit-back" type="button" data-all>← Overview</button><button class="orbit-profile-edit" type="button" data-edit-profile>Edit profile <span aria-hidden="true">↗</span></button><div class="orbit-profile-identity"><div class="orbit-profile-name"></div></div><p class="orbit-anatomy-error" role="alert" hidden></p><button class="orbit-figure-hit" type="button" data-figure-anatomy aria-label="Explore this astronaut’s anatomy" disabled></button><div class="orbit-scanline" aria-hidden="true"></div><div class="orbit-profile-readings" role="region" aria-label="Health readings" tabindex="0"></div><form class="orbit-form" hidden></form><div class="orbit-anatomy-root" hidden></div><p class="orbit-gesture">Drag to explore the scene</p><nav class="orbit-switch" aria-label="Astronaut"><span class="orbit-position"></span></nav></div>
+  <div class="orbit-profile" hidden><button class="orbit-back" type="button" data-all>← Overview</button><button class="orbit-profile-edit" type="button" data-edit-profile>Edit profile <span aria-hidden="true">↗</span></button><div class="orbit-profile-identity"><div class="orbit-profile-name"></div></div><p class="orbit-anatomy-error" role="alert" hidden></p><p class="anatomy-loading" role="status" hidden>Loading anatomy…</p><button class="orbit-figure-hit" type="button" data-figure-anatomy aria-label="Explore this astronaut’s anatomy" disabled></button><div class="orbit-scanline" aria-hidden="true"></div><div class="orbit-profile-readings" role="region" aria-label="Health readings" tabindex="0"></div><form class="orbit-form" hidden></form><div class="orbit-anatomy-root" hidden></div><p class="orbit-gesture">Drag to explore the scene</p><nav class="orbit-switch" aria-label="Astronaut"><span class="orbit-position"></span></nav></div>
   <section class="orbit-onboarding profile-workspace" hidden aria-labelledby="profile-setup-title"><form novalidate class="collection-page profile-page" data-profile-form><header class="collection-heading"><div><h1 tabindex="-1" id="profile-setup-title">Your profile</h1><p>Your details stay on this device.</p></div></header><div class="collection-editor profile-editor"><div class="profile-name-field"><label class="collection-label" for="profile-name">Full name <small>Required</small></label><div class="collection-value profile-name-value"><input id="profile-name" name="name" maxlength="48" autocomplete="name" required placeholder="Your name"></div></div><div class="profile-personal-values"><div><label class="collection-label" for="profile-age">Age <small>Optional</small></label><div class="collection-value"><input id="profile-age" name="age" aria-label="Age in years" type="number" min="0" max="120" step="1" inputmode="numeric" placeholder="—"><span>years</span></div></div><div><label class="collection-label" for="profile-mass">Body mass <small>Optional</small></label><div class="collection-value"><input id="profile-mass" name="bodyMass" type="number" min="0.1" max="400" step="0.1" inputmode="decimal" placeholder="—"><span>kg</span></div></div></div><div class="profile-anatomy-field"><label class="collection-label" for="profile-model">Anatomy model <small>Required</small></label><select id="profile-model" name="model" required><option value="">Choose an anatomy model</option><option value="female">Feminine anatomy</option><option value="male">Masculine anatomy</option></select><small>Choose the model shown when you explore anatomy.</small></div><p id="profile-error" class="orbit-profile-error collection-error" role="alert"></p></div><div class="mission-figure-space collection-figure profile-figure" data-figure-space></div><footer class="collection-footer"><div class="collection-save"><button type="button" data-cancel-profile hidden>Cancel</button><button type="submit">Save profile</button></div></footer></form></section>
   <section class="orbit-section-panel" hidden role="region" aria-label="Dashboard section"><button class="orbit-section-close" type="button" data-section-close>Close <span aria-hidden="true">×</span></button><div class="orbit-section-content"></div></section>
   <div class="orbit-emergency" role="region" aria-label="Emergency guidance" hidden></div>
@@ -95,13 +96,13 @@ let stage;
 let selected = null;
 let recording = false;
 let anatomyMode = false;
-let anatomyFromOverview = false;
 let anatomyCategory = 'circulation';
 let anatomyMetric = 'pulse';
 let anatomyHeartFocused = false;
 let anatomyOrganFocused = false;
 let anatomyHeartDetail = false;
 let pendingAnatomyFocus = '';
+let pendingAnatomyNavigationFocus=false;
 let historyReturn = null;
 let savingAnatomyField = null;
 let anatomyRequest = 0;
@@ -432,6 +433,7 @@ function setContextPanel(panel, source) {
   hub.dataset.panel = panel;
   const scenePage = panel === 'history' || panel === 'device';
   if (scenePage) {
+    profile.hidden=true;
     hub.dataset.workspace = 'scene';
     stage?.overview();
     stage?.setMissionView?.(true);
@@ -924,6 +926,7 @@ function renderMissionView(force=false) {
     if (key !== activeAlertKey) { activeAlertKey = key; assistanceModeKey='';assistanceView='steps';assistanceStarted=false;playAlertSound(); }
   } else { activeAlertKey = ''; alarm.stop(); }
   if(voiceInput.active&&(state.key!=='emergency'||assistanceModeKey!==activeAlertKey||(!['steps','chest','fracture','other'].includes(assistanceView)&&!isVitalView(assistanceView))))voiceInput.stop();
+  if(collectionMode)setActiveDashboard('checkin');
   stage?.setSceneView?.(collectionMode?'collection':state.key);
   hub.dataset.collecting=String(Boolean(collectionMode));
   if(!force&&collectionMode==='guided-repeat'&&mission.querySelector('[data-repeat-form]')){syncMissionFrame();return}
@@ -1027,7 +1030,7 @@ function startCheckin(fromReading=false,purpose='daily') {
   if(missionState(summary,CrewDesign.scenarioInfo()).key==='emergency'&&summary.symptomSource!=='Scenario preview'){fields=urgentCollectionFields(fields,summary);collectionDraft={fields,purpose:collectionDraft?.purpose||purpose,details:[]}}
   if(fields.length&&checkinDraft)purpose=collectionDraft?.purpose||'full';
   if(purpose==='repeat')purpose='full';
-  showMission(false);collectionMode=purpose;renderMissionView();
+  showMission(false);collectionMode=purpose;setActiveDashboard('checkin');renderMissionView();
   if(fromReading&&!fields.length){const capture=mission.querySelector('[data-collect-form]');if(capture){capture.elements.measuredAt.value=`${selectedReadingDate}T${String(new Date().getHours()).padStart(2,'0')}:${String(new Date().getMinutes()).padStart(2,'0')}`;syncCustomDateTimes(capture)}}
   animateContext(mission);mission.querySelector('.collection-heading h1')?.focus({preventScroll:true});
 }
@@ -1091,11 +1094,23 @@ function showSection(section, source) {
   const title = sectionContent.querySelector('#section-title, #device-scene-title');
   title?.setAttribute('tabindex', '-1'); title?.focus({ preventScroll: true });
 }
-function navigateDashboard(section, source) {
+const navigateDashboard=createSceneNavigation({
+ needsRestore:section=>section!=='anatomy'&&(anatomyMode||figureButton.hasAttribute('aria-busy')),
+ restore:async()=>{hub.dataset.restoringSuit='true';stage?.resume();try{await exitAnatomy(false)}catch(error){console.error('Could not restore suit:',error)}finally{delete hub.dataset.restoringSuit}},
+ enter:openDashboard
+});
+async function openDashboard(section, source) {
   if (!CrewDesign.hasProfile()) { pendingDashboardSection = section; openOnboarding(false); return; }
   onboarding.hidden = true;
+  if (section === 'anatomy') {
+    if(anatomyMode||figureButton.hasAttribute('aria-busy'))return;
+    collectionDraftFields();collectionMode='';hub.dataset.collecting='false';
+    if(hub.dataset.panel)closeContextPanel(false);
+    showPerson(0);setActiveDashboard('anatomy');
+    await enterAnatomy();return;
+  }
   if (section === 'checkin') { startCheckin(); return; }
-  if (section === 'profile' || section === 'today') { showMission(); return; }
+  if (section === 'overview' || section === 'profile' || section === 'today') { showMission(); return; }
   if (section === 'history') {
     setActiveDashboard('history');
     if (selected === null) selected = 0;
@@ -1289,11 +1304,8 @@ hub.addEventListener('click', event => {
   if (historyField) { if(historyMetric===historyField.dataset.historySceneField)return; historyMetric = historyField.dataset.historySceneField; historyScenePosition = null; renderHistorySceneView(); timeline.querySelector(`[data-history-scene-field="${historyMetric}"]`)?.focus({ preventScroll: true }); return; }
   const historyDays = event.target.closest('[data-history-scene-days]');
   if (historyDays) { if(historyTrendDays===Number(historyDays.dataset.historySceneDays))return; historyTrendDays = Number(historyDays.dataset.historySceneDays); historyScenePosition = null; renderHistorySceneView(); timeline.querySelector(`[data-history-scene-days="${historyTrendDays}"]`)?.focus({ preventScroll: true }); return; }
-  const readingsButton=event.target.closest('[data-open-readings-graphs]');if(readingsButton){contextHistory=[];historyMetric='pulse';historyScenePosition=null;showHistory(readingsButton);return}
-  if(event.target.closest('[data-reveal-anatomy]')){anatomyFromOverview=true;showPerson(0);enterAnatomy();return}
   const task = event.target.closest('[data-mission-action]');
   if (task) {
-    if (task.dataset.missionAction === 'overview') { showMission(); return; }
     contextHistory = [];
     navigateDashboard(task.dataset.missionAction, task);
     return;
@@ -1439,7 +1451,6 @@ hub.addEventListener('click', event => {
     else showMission();
   }
   if (event.target.closest('button[data-figure-anatomy]') && !suppressFigureClick) enterAnatomy();
-  if (event.target.closest('[data-anatomy-exit]')) { if(anatomyFromOverview){anatomyFromOverview=false;showMission();} else exitAnatomy(); }
   if(event.target.closest('[data-anatomy-body]')){anatomyOrganFocused=false;anatomyHeartFocused=false;anatomyRoot.querySelector('.crew-anatomy').dataset.organFocused='false';stage?.focusAnatomyRegion?.('overview');return}
   const category = event.target.closest('[data-anatomy-category]');
   if (category) {
@@ -1447,6 +1458,7 @@ hub.addEventListener('click', event => {
     anatomyCategory = category.dataset.anatomyCategory;
     const root = anatomyRoot.querySelector('.crew-anatomy');
     setAnatomyCategory(root, anatomyCategory);
+    animateContext(root.querySelector(`[data-anatomy-panel="${anatomyCategory}"]`));
     root.dataset.organFocused='true';
     anatomyMetric = root.dataset.metric;
     if (anatomyHeartDetail) stage?.focusHeartDetail?.(false);
@@ -1475,12 +1487,13 @@ hub.addEventListener('click', event => {
     return;
   }
   const metric = event.target.closest('[data-anatomy-metric-select]');
-  if (metric && setAnatomyMetric(anatomyRoot.querySelector('.crew-anatomy'), metric.dataset.anatomyMetricSelect)) anatomyMetric = metric.dataset.anatomyMetricSelect;
+  if (metric && setAnatomyMetric(anatomyRoot.querySelector('.crew-anatomy'), metric.dataset.anatomyMetricSelect)){anatomyMetric = metric.dataset.anatomyMetricSelect;animateContext(anatomyRoot.querySelector(`[data-anatomy-metric-panel="${anatomyMetric}"]`))}
   const edit = event.target.closest('[data-anatomy-edit]');
   if (edit) {
     const entry = anatomyRoot.querySelector(`[data-anatomy-form="${edit.dataset.anatomyEdit}"]`);
     if (entry) {
       entry.hidden = !entry.hidden;
+      if(!entry.hidden)animateContext(entry);
       edit.setAttribute('aria-expanded', String(!entry.hidden));
       if (!entry.hidden) entry.querySelector('input')?.focus({ preventScroll: false });
     }
@@ -1661,7 +1674,7 @@ document.addEventListener('keydown', event => {
     return;
   }
   if (hub.hidden || selected === null || !mission.hidden || !onboarding.hidden) return;
-  if (event.key === 'Escape') { if (recording) hub.querySelector('[data-cancel]').click(); else if (anatomyMode) exitAnatomy(); else showOverview(); }
+  if (event.key === 'Escape') { if (recording) hub.querySelector('[data-cancel]').click(); else if (anatomyMode||figureButton.hasAttribute('aria-busy')||hub.dataset.restoringSuit) navigateDashboard('overview'); else showOverview(); }
   if (anatomyMode || event.target.closest('.orbit-profile-readings')) return;
   if (!recording && event.key === 'ArrowLeft') showPerson((selected + people.length - 1) % people.length);
   if (!recording && event.key === 'ArrowRight') showPerson((selected + 1) % people.length);
@@ -1669,7 +1682,7 @@ document.addEventListener('keydown', event => {
   if (!recording && event.key === 'ArrowUp') { stage?.scrubBy?.(-200); event.preventDefault(); }
 });
 async function enterAnatomy(category = 'circulation', metric = '', edit = false) {
-  if (!stage?.setAnatomy || selected === null || recording || anatomyMode) return;
+  if (!stage?.setAnatomy || selected === null || recording || anatomyMode||figureButton.hasAttribute('aria-busy')) return;
   profile.scrollTop = 0;
   syncProfileScroll();
   const current = selected;
@@ -1677,10 +1690,12 @@ async function enterAnatomy(category = 'circulation', metric = '', edit = false)
   figureButton.disabled = true;
   figureButton.setAttribute('aria-busy', 'true');
   hub.querySelector('.orbit-anatomy-error').hidden = true;
+  hub.dataset.anatomyLoading='true';hub.querySelector('.anatomy-loading').textContent='Loading anatomy…';hub.querySelector('.anatomy-loading').hidden=false;appNav.querySelector('[data-mission-action=anatomy]').setAttribute('aria-busy','true');
   try {
     const opened = await stage.setAnatomy(true, people[current].model);
     if (!opened || request !== anatomyRequest || selected !== current || recording) return;
     anatomyMode = true;
+    hub.querySelector('.anatomy-loading').textContent='Opening anatomy…';
     anatomyOrganFocused = Boolean(metric);
     anatomyCategory = ['circulation', 'recovery', 'kidney', 'pancreas'].includes(category) ? category : 'circulation';
     anatomyMetric = metricCategories[metric] === anatomyCategory ? metric : { circulation: 'pulse', recovery: 'sleep', kidney: 'water', pancreas: 'glucose' }[anatomyCategory];
@@ -1701,7 +1716,7 @@ async function enterAnatomy(category = 'circulation', metric = '', edit = false)
         anatomyRoot.querySelector(`[data-anatomy-edit="${anatomyMetric}"]`)?.setAttribute('aria-expanded', 'true');
         pendingAnatomyFocus = anatomyMetric;
       }
-    } else anatomyRoot.querySelector('[data-anatomy-exit]')?.focus({ preventScroll: true });
+    } else pendingAnatomyNavigationFocus=true;
   } catch (error) {
     if (request === anatomyRequest && selected === current) {
       const message = hub.querySelector('.orbit-anatomy-error');
@@ -1711,15 +1726,17 @@ async function enterAnatomy(category = 'circulation', metric = '', edit = false)
     }
   } finally {
     if (request === anatomyRequest) {
+      delete hub.dataset.anatomyLoading;if(!anatomyMode){hub.querySelector('.anatomy-loading').hidden=true;appNav.querySelector('[data-mission-action=anatomy]').removeAttribute('aria-busy')}
       figureButton.disabled = false;
       figureButton.removeAttribute('aria-busy');
     }
   }
 }
-function exitAnatomy() {
+function exitAnatomy(restoreFocus=true) {
   const wasOpen = anatomyMode;
   anatomyRequest++;
-  stage?.setAnatomy?.(false);
+  delete hub.dataset.anatomyLoading;hub.querySelector('.anatomy-loading').hidden=true;appNav.querySelector('[data-mission-action=anatomy]').removeAttribute('aria-busy');pendingAnatomyNavigationFocus=false;
+  const restored=stage?.setAnatomy?.(false);
   anatomyMode = false;
   anatomyOrganFocused = false;
   anatomyHeartFocused = false;
@@ -1730,11 +1747,12 @@ function exitAnatomy() {
   const available = typeof stage?.setAnatomy === 'function';
   figureButton.disabled = !available;
   figureButton.removeAttribute('aria-busy');
-  if (wasOpen) {
+  if (wasOpen&&restoreFocus) {
     profile.scrollTop = 0;
     syncProfileScroll();
-    figureButton.focus({ preventScroll: true });
+    appNav.querySelector('[data-mission-action=anatomy]').focus({ preventScroll: true });
   }
+  return restored;
 }
 
 function updateAnchors(anchors, state) {
@@ -1762,6 +1780,7 @@ function updateAnchors(anchors, state) {
     scanline.style.top = `${anchor.scan.y}px`;
     hub.dataset.scanning = String(Boolean(state?.scanning));
     hub.dataset.anatomyReady = String(Boolean(anatomyMode && (state?.anatomyProgress || 0) >= 0.85));
+    if(anatomyMode&&(state?.anatomyProgress||0)>=.85){hub.querySelector('.anatomy-loading').hidden=true;appNav.querySelector('[data-mission-action=anatomy]').removeAttribute('aria-busy');if(pendingAnatomyNavigationFocus){pendingAnatomyNavigationFocus=false;anatomyRoot.querySelector('[data-anatomy-category][aria-pressed=true]')?.focus({preventScroll:true})}}
     if (hub.dataset.anatomyReady === 'true' && pendingAnatomyFocus) {
       anatomyRoot.querySelector(`[data-anatomy-form="${pendingAnatomyFocus}"] input`)?.focus({ preventScroll: false });
       pendingAnatomyFocus = '';

@@ -1,3 +1,5 @@
+/* A low-specificity host anchors optics without overriding state-dependent positioning. */
+.liquid-surface{position:relative;isolation:isolate}
 /* Liquid composition: intrinsic content tracks reserve real space for the 3D stage. */
 .crew-orbit[data-ui-variant=glass]{--liquid-edge:#ffffff32;--liquid-highlight:#ffffff65;--liquid-tint:#b5d6ff08;--liquid-shadow:inset 0 1px 0 #ffffff40,inset 0 -1px 0 #ffffff0c,0 6px 24px #0002}
 

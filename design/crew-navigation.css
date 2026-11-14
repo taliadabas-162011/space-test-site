@@ -1,0 +1,37 @@
+/* One primary navigation, with the same glass selection behavior at every size. */
+.nav-label-short{display:none}
+.crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-tools{top:24px;right:5%;left:auto;transform:none;gap:2px;padding:5px;max-width:90%;isolation:isolate}
+.crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-tools:before{display:none}
+.crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-tools>button{min-height:40px;padding:9px 11px;font-size:12px;white-space:nowrap;gap:6px}
+.crew-orbit[data-restoring-suit=true] .orbit-profile{pointer-events:none}
+.crew-orbit[data-restoring-suit=true] .orbit-profile>*{visibility:hidden!important;pointer-events:none!important}
+.crew-orbit[data-ui-variant=glass][data-anatomy=true] .orbit-canvas,.crew-orbit[data-ui-variant=glass][data-restoring-suit=true] .orbit-canvas{opacity:1!important}
+@media(min-width:768px) and (max-width:1535px){
+ .crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-tools{top:80px}
+ .crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-page,.crew-orbit[data-ui-variant=glass] .collection-page{padding-top:160px}
+ .crew-orbit[data-ui-variant=glass][data-workspace=scene] :is(.orbit-timeline,.orbit-section-panel){top:165px!important}
+ .crew-orbit[data-ui-variant=glass] .crew-anatomy-content{top:155px}
+}
+@media(max-width:767px){
+ .crew-orbit[data-ui-variant=glass] .orbit-header{inset:23px 20px auto}
+ .crew-orbit[data-ui-variant=glass][data-ui-variant] .orbit-scenario-control{top:17px;left:auto;right:70px;width:170px;transform:none}
+ .crew-orbit[data-ui-variant=glass][data-ui-variant] .orbit-scenario-control>button{left:calc(100% + 10px);top:0;bottom:auto;width:40px;height:40px}
+ .crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-tools{top:76px;left:20px;right:20px;max-width:none;gap:2px;padding:4px;overflow-x:auto;scrollbar-width:none;border-radius:27px}
+ .crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-tools>button{flex:1;flex-direction:column;gap:5px;justify-content:center;min-width:54px;min-height:50px;padding:8px 5px;font-size:10px;line-height:1.2}
+ .crew-orbit[data-ui-variant=glass] .mission-tools .glass-icon{width:16px;height:16px}
+ .mission-tools .nav-label-full{display:none}.mission-tools .nav-label-short{display:inline}
+ .crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-page,.crew-orbit[data-ui-variant=glass] .collection-page{padding-top:165px}
+ .crew-orbit[data-ui-variant=glass][data-workspace=scene] :is(.orbit-timeline,.orbit-section-panel){top:188px!important}
+ .crew-orbit[data-ui-variant=glass] .scene-return{top:142px}
+ .crew-orbit[data-ui-variant=glass][data-workspace=mission] .orbit-canvas{top:165px!important}
+}
+@media(max-width:360px){
+ .crew-orbit[data-ui-variant=glass] .orbit-header{left:14px}
+ .crew-orbit[data-ui-variant=glass][data-ui-variant] .orbit-scenario-control{right:62px;width:150px}
+ .crew-orbit[data-ui-variant=glass][data-ui-variant] .mission-tools{left:12px;right:12px}
+}
+
+.crew-orbit[data-anatomy-loading=true] :is(.orbit-back,.orbit-profile-identity,.orbit-profile-readings,.orbit-switch,.orbit-gesture,.orbit-profile-edit){display:none}
+.anatomy-loading{position:absolute;left:5%;top:155px;margin:0;color:#d1dfe8;font-size:14px;line-height:1.5}.anatomy-loading[hidden]{display:none}
+
+.crew-orbit .orbit-anatomy-error{top:155px;left:5%;max-width:300px;font:inherit;font-size:13px;line-height:1.6}

@@ -54,3 +54,14 @@ export function placeSceneCamera(shot,aspect,exploration={yaw:0,pitch:0,zoom:0})
   const target=[cosYaw*x-sinPitch*sinYaw*y,shot.height+cosPitch*y,-sinYaw*x-sinPitch*cosYaw*y];
   return {target,position:[target[0]+sinYaw*cosPitch*distance,target[1]+sinPitch*distance,target[2]+cosYaw*cosPitch*distance]};
 }
+
+/** One direct move from the displayed world-space camera; no additional orbit or overshoot. */
+export function interpolateCameraPose(from,to,progress){
+ const weight=ease(clamp(progress,0,1));
+ return {
+  position:to.position.map((value,i)=>from.position[i]+(value-from.position[i])*weight),
+  target:to.target.map((value,i)=>from.target[i]+(value-from.target[i])*weight),
+  offset:from.offset+(to.offset-from.offset)*weight,
+  modelYaw:from.modelYaw+angleDelta(from.modelYaw,to.modelYaw)*weight,
+ };
+}

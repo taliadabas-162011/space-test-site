@@ -1,5 +1,5 @@
 import {orbitalMotion} from './crew-orbital-motion.js?v=1';
-import { createSceneDirector, sceneShot, placeSceneCamera } from './crew-scene-director.js?v=5';
+import { createSceneDirector, sceneShot, placeSceneCamera, interpolateCameraPose } from './crew-scene-director.js?v=6';
 import { createSceneOrbit } from './crew-scene-orbit.js?v=2';
 import { Scene, WebGLRenderer, PerspectiveCamera, Vector3, PointLight, Plane } from '/space-test-site/design/vendor/three/three.module.min.js';
 import { GLTFLoader } from '/space-test-site/design/vendor/three/examples/jsm/loaders/GLTFLoader.js';
@@ -97,6 +97,8 @@ export async function createCrewStage(canvas, onFrame = () => {}) {
   let anatomyMix = 0;
   let anatomyMove = null;
   let anatomyRevision = 0;
+  let anatomyExit = null;
+  let anatomyCameraMove=null;
   const anatomyFocus = { height: 1.05, scale: 1, center: 0 };
   let anatomyFocusMove = null;
   let anatomyFocusRegion = null;
@@ -185,7 +187,7 @@ export async function createCrewStage(canvas, onFrame = () => {}) {
     throw error;
   }
 
-  function dimensions(rect,shot) {
+  function dimensions(rect,shot,offsetOverride) {
     const w = Math.max(1, Math.round(rect.width));
     const h = Math.max(1, Math.round(rect.height));
     const mobile = window.innerWidth < 768;
@@ -193,7 +195,7 @@ export async function createCrewStage(canvas, onFrame = () => {}) {
       anatomyFocusMobile = mobile;
       if (anatomyFocusRegion) moveAnatomyFocus(anatomyFocusRegion);
     }
-    const nextOffset = shot ? 0 : mobile && selected !== null ? -0.12 : framing;
+    const nextOffset = offsetOverride ?? (shot ? 0 : mobile && selected !== null ? -0.12 : framing);
     const nextVertical = 0;
     const nextRatio=Math.min(Math.max(1,window.devicePixelRatio||1),1.75,Math.sqrt(3000000/(w*h)));
     const resized = w !== width || h !== height || Math.abs(nextRatio-pixelRatio)>.01;
@@ -303,17 +305,43 @@ export async function createCrewStage(canvas, onFrame = () => {}) {
     };
   }
 
+  function beginAnatomyCameraMove(){
+    anatomyCameraMove=reducedMotion.matches?null:{start:performance.now(),duration:1100,from:{position:camera.position.toArray(),target:target.toArray(),offset:projectionOffset,modelYaw:models[0].pivot.rotation.y}};
+  }
+
+  function finishAnatomyExit(){
+    if(anatomyIndex!==null){
+      const model=models[anatomyIndex];
+      if(!reducedMotion.matches)model.poseTransition=capturePoseTransition(model);
+      model.neutralPose=null;
+    }
+    anatomyIndex=null;
+    if(anatomyExit){anatomyExit.resolve(true);anatomyExit=null}
+  }
+
   async function setAnatomy(enabled, bodyModel) {
     const revision = ++anatomyRevision;
     if (!enabled) {
+      if(anatomyExit)return anatomyExit.promise;
       anatomyFocusRegion = null;
       heartDetail = false;
       if (anatomyIndex !== null) models[anatomyIndex].anatomy?.setHeartDetail(false);
       moveAnatomyFocus(null);
-      anatomyMove = { from: anatomyMix, to: 0, start: performance.now(), duration: reducedMotion.matches ? 0 : 1100 };
+      if(anatomyIndex===null||anatomyMix===0||reducedMotion.matches){
+        anatomyMix=0;anatomyMove=null;finishAnatomyExit();
+        if(paused)render(performance.now());
+        return true;
+      }
+      beginAnatomyCameraMove();
+      let resolve;
+      const promise=new Promise(done=>{resolve=done});
+      anatomyExit={promise,resolve};
+      anatomyMove = { from: anatomyMix, to: 0, start: performance.now(), duration: 1100 };
       if (paused) render(performance.now());
-      return true;
+      return promise;
     }
+    if(anatomyExit){anatomyExit.resolve(false);anatomyExit=null}
+    if(anatomyCameraMove)beginAnatomyCameraMove();
     if (disposed || selected === null) return false;
     const index = selected;
     const model = models[index];
@@ -326,16 +354,17 @@ export async function createCrewStage(canvas, onFrame = () => {}) {
       model.anatomyBodyModel = bodyModel;
       anatomy.setOpacity(0);
     }
+    const from=anatomyIndex===index?anatomyMix:0;
     anatomyIndex = index;
     anatomyFocusRegion = null;
     heartDetail = false;
     model.anatomy.setFocus('overview');
     model.anatomy.setHeartDetail(false);
     moveAnatomyFocus(null);
-    anatomyMix = 0;
+    anatomyMix = from;
     const start = performance.now();
     model.neutralPose = { start, bones: model.refinement.restPose().map(({ bone, rotation }) => ({ bone, from: bone.quaternion.clone(), to: rotation })) };
-    anatomyMove = { from: 0, to: 1, start: start + (reducedMotion.matches ? 0 : 650), duration: reducedMotion.matches ? 0 : 1900 };
+    anatomyMove = { from, to: 1, start: start + (reducedMotion.matches||from>0 ? 0 : 650), duration: reducedMotion.matches ? 0 : from>0?(1-from)*1100:1900 };
     return true;
   }
 
@@ -409,23 +438,18 @@ export async function createCrewStage(canvas, onFrame = () => {}) {
     const framingTarget = Math.max(recordingFraming, recordFraming) + anatomyFraming;
     framing += (framingTarget - framing) * (isReduced || paused ? 1 : 1 - Math.exp(-5 * dt));
     const rect = canvas.getBoundingClientRect();
-    const shot=missionView?director.update(sceneView,sceneShot(sceneView,{frame:sceneFrame,aspect:rect.width/Math.max(1,rect.height),screenWidth:window.innerWidth,variant:interfaceVariant}),now,isReduced||paused):null;
-    dimensions(rect,shot);
+    const shot=missionView?director.update(sceneView,sceneShot(sceneView,{frame:sceneFrame,aspect:rect.width/Math.max(1,rect.height),screenWidth:window.innerWidth,variant:interfaceVariant}),now,isReduced||paused||Boolean(anatomyCameraMove)):null;
+    const bridgeProgress=anatomyCameraMove?(isReduced?1:clamp((now-anatomyCameraMove.start)/anatomyCameraMove.duration,0,1)):1;
+    dimensions(rect,shot,anatomyCameraMove?anatomyCameraMove.from.offset*(1-ease(bridgeProgress)):undefined);
     if (anatomyMove) {
       const t = !isReduced && anatomyMove.duration ? clamp((now - anatomyMove.start) / anatomyMove.duration, 0, 1) : 1;
       anatomyMix = anatomyMove.from + (anatomyMove.to - anatomyMove.from) * ease(t);
       if (t === 1) {
-        if (anatomyMove.to === 0) {
-          if (anatomyIndex !== null) {
-            const model = models[anatomyIndex];
-            if (!isReduced) model.poseTransition = capturePoseTransition(model);
-            model.neutralPose = null;
-          }
-          anatomyIndex = null;
-        }
+        if (anatomyMove.to === 0) finishAnatomyExit();
         anatomyMove = null;
       }
     }
+    if(anatomyCameraMove&&missionView){layout=0;layoutMove=null;introIndex=null;missionMix=1}
     let introProgress = 0;
     if (layoutMove) {
       const t = !isReduced && layoutMove.duration ? clamp((now - layoutMove.start) / layoutMove.duration, 0, 1) : 1;
@@ -482,7 +506,7 @@ export async function createCrewStage(canvas, onFrame = () => {}) {
     alertLight.intensity += ((missionView && sceneView === 'emergency' ? 95 : 0) - alertLight.intensity) * follow;
     if (missionMix > .001) { position.lerp(missionPosition, missionMix); target.lerp(missionTarget, missionMix); }
     updateAnatomyFocus(now, isReduced);
-    if (anatomyIndex !== null && selected === anatomyIndex && anatomyMix > 0) {
+    if (anatomyIndex !== null && anatomyMix > 0 && !(anatomyCameraMove&&missionView)) {
       offset.copy(position).sub(target);
       const model = models[anatomyIndex];
       const organ = anatomyFocusRegion === 'recovery' ? 'brain' : anatomyFocusRegion === 'circulation' ? 'heart' : anatomyFocusRegion === 'kidney' ? 'kidney' : anatomyFocusRegion === 'pancreas' ? 'pancreas' : null;
@@ -496,7 +520,7 @@ export async function createCrewStage(canvas, onFrame = () => {}) {
       target.y += (focusHeight - target.y) * anatomyMix;
       position.copy(target).add(offset.multiplyScalar(1 + (anatomyFocus.scale - 1) * anatomyMix));
     }
-    if (portraitRoom && selected !== null) {
+    if (portraitRoom && selected !== null && !(anatomyCameraMove&&missionView)) {
       offset.copy(position).sub(target);
       position.copy(target).add(offset.multiplyScalar(1 + 0.55 * portraitRoom * layout));
     }
@@ -509,6 +533,12 @@ export async function createCrewStage(canvas, onFrame = () => {}) {
       offset.applyAxisAngle(horizontalAxis, -pointer.smoothY * 0.1);
       position.copy(target).add(offset);
     }
+    let bridgePose=null;
+    if(anatomyCameraMove){
+      bridgePose=interpolateCameraPose(anatomyCameraMove.from,{position:position.toArray(),target:target.toArray(),offset:0,modelYaw:LINE_YAW[0]+angleDifference(LINE_YAW[0],cameraRig.yaw[0])*layout},bridgeProgress);
+      position.fromArray(bridgePose.position);target.fromArray(bridgePose.target);
+      if(bridgeProgress===1)anatomyCameraMove=null;
+    }
     camera.position.copy(position);
     camera.lookAt(target);
     camera.updateMatrixWorld();
@@ -516,7 +546,7 @@ export async function createCrewStage(canvas, onFrame = () => {}) {
     models.forEach((model, i) => {
       const anchor = cameraRig.anchors[i];
       model.pivot.position.set(LINE_POSITIONS[i] + (anchor[0] - LINE_POSITIONS[i]) * layout, anchor[1] * layout, anchor[2] * layout);
-      model.pivot.rotation.y = LINE_YAW[i] + angleDifference(LINE_YAW[i], cameraRig.yaw[i]) * layout;
+      model.pivot.rotation.y = i===0&&bridgePose?bridgePose.modelYaw:LINE_YAW[i] + angleDifference(LINE_YAW[i], cameraRig.yaw[i]) * layout;
       // Ease the reference's visibility threshold to avoid figures popping
       // while the wider astronaut composition is still on screen.
       const overviewFade = 1 - ease(clamp((layout - 0.04) / 0.24, 0, 1));
@@ -624,6 +654,7 @@ export async function createCrewStage(canvas, onFrame = () => {}) {
     if (disposed) return;
     pause();
     disposed = true;
+    if(anatomyExit){anatomyExit.resolve(false);anatomyExit=null}
     window.removeEventListener('pointermove', onPointer);
     window.removeEventListener('blur', resetPointer);
     document.removeEventListener('visibilitychange', onVisibilityChange);
@@ -647,5 +678,5 @@ export async function createCrewStage(canvas, onFrame = () => {}) {
   }
   dimensions(canvas.getBoundingClientRect());
   resume();
-  return { beginExplore() { sceneOrbit.begin(performance.now()); }, exploreTo(x, y) { sceneOrbit.move(x, y, performance.now()); }, endExplore(cancelled = false) { sceneOrbit.end(performance.now(), cancelled, reducedMotion.matches); }, rotateScene(yaw, pitch) { sceneOrbit.rotate(yaw, pitch); }, zoomScene(delta) { sceneOrbit.zoom(delta); }, resetScene() { sceneOrbit.reset(); }, focus, overview, setInterfaceVariant(value) { interfaceVariant = ['glass', 'focus'].includes(value) ? value : 'orbit'; }, setSceneFrame(value) { sceneFrame=value; }, setSceneView(value) { sceneView = value; }, setMissionView(value) { missionView = Boolean(value); }, setRecording, setRecordView, beginDrag, dragTo, endDrag, scrubBy, setAnatomy, focusAnatomyRegion, focusHeartDetail, pause, resume, dispose };
+  return { beginExplore() { sceneOrbit.begin(performance.now()); }, exploreTo(x, y) { sceneOrbit.move(x, y, performance.now()); }, endExplore(cancelled = false) { sceneOrbit.end(performance.now(), cancelled, reducedMotion.matches); }, rotateScene(yaw, pitch) { sceneOrbit.rotate(yaw, pitch); }, zoomScene(delta) { sceneOrbit.zoom(delta); }, resetScene() { sceneOrbit.reset(); }, focus, overview, setInterfaceVariant(value) { interfaceVariant = ['glass', 'focus'].includes(value) ? value : 'orbit'; }, setSceneFrame(value) { sceneFrame=value; }, setSceneView(value) { if(value!==sceneView&&anatomyCameraMove)beginAnatomyCameraMove();sceneView = value; }, setMissionView(value) { if(missionView!==Boolean(value)&&anatomyCameraMove)beginAnatomyCameraMove();missionView = Boolean(value); }, setRecording, setRecordView, beginDrag, dragTo, endDrag, scrubBy, setAnatomy, focusAnatomyRegion, focusHeartDetail, pause, resume, dispose };
 }

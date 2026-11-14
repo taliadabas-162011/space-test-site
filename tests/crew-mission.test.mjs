@@ -27,3 +27,4 @@ const fromRepeat=renderMission({summary:{...summary,symptoms:'urgent'},histories
 assert(!urgent.includes('data-urgent-signal="true"'),'a symptom alert must not invent an abnormal vital reading');
 
 const signals=renderMission({summary:{...summary,symptoms:'urgent',symptomSource:'Scenario preview',pulse:{...summary.pulse,value:124,source:'Scenario preview'},oxygen:{...summary.oxygen,value:90,source:'Scenario preview'}},histories,scenario:{key:'emergency',values:{pulse:124,oxygen:90}},now});assert.equal((signals.match(/data-urgent-signal="true"/g)||[]).length,2);assert(signals.includes('data-metric="pressure" data-open-metric="pressure" data-urgent-signal="false"'));
+assert.doesNotMatch(renderMission({summary,histories,scenario:{key:'routine'},now}),/data-open-readings-graphs|data-reveal-anatomy|mission-main-actions/,'overview does not duplicate primary navigation in its footer');

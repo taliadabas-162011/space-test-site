@@ -7,7 +7,7 @@ These rules apply throughout this repository. Follow the user's current request 
 - Design for a crew member using the interface every day: clear priorities, short paths and a visible next action. Keep routine work calm and urgent work immediately understandable.
 - Extend the established interface before inventing another interaction system. Preserve surrounding screens, stored data and working behavior when the task is scoped to one feature. Broader redesigns are welcome when requested.
 - Put primary destinations in the shared main navigation. Add new destinations there when appropriate; do not repeat the same destination in overview buttons, footers or another tab system. Contextual actions such as Save, Next and a measurement guide still belong beside their task.
-- Keep navigation state and the 3D scene in agreement. Leaving an exploration mode must restore the appropriate scene before the next camera move. Handle interrupted transitions and delayed asset loads as well as the normal path.
+- Keep navigation state and the 3D scene in agreement. Leaving an exploration mode must restore the appropriate scene as the destination opens. Do not block navigation while an animation finishes. Handle interrupted transitions and delayed asset loads as well as the normal path.
 
 ## Visual and interaction language
 
@@ -24,7 +24,7 @@ Read the relevant implementation and its callers before changing it. These are s
 
 | Concern | Existing implementation |
 | --- | --- |
-| Main navigation, view state and scene coordination | `design/crew-orbit.js` |
+| Main navigation, view state and scene coordination | `design/crew-orbit.js`, `design/crew-navigation.js`, `design/crew-navigation.css` |
 | Liquid Glass foundation and optical surfaces | `design/crew-liquid-base.css`, `design/crew-liquid.css`, `design/crew-liquid-ui.js` |
 | Moving selection lens and shared control behavior | `design/crew-liquid-controls.js`, `design/crew-liquid-interactions.css` |
 | Accessible selects and anchored popovers | `design/crew-select.js`, `design/crew-select.css`, `design/crew-popover.js` |

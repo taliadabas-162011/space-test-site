@@ -125,8 +125,8 @@ function historyMarkup(key, history) {
 function recordForm(key) {
   const metric = METRICS[key];
   const inputs = metric.pair
-    ? `<div class="crew-anatomy-entry-pair"><label>Systolic <input type="number" name="systolic" min="0" max="400" step="1" inputmode="numeric" required></label><span aria-hidden="true">/</span><label>Diastolic <input type="number" name="diastolic" min="0" max="300" step="1" inputmode="numeric" required></label></div>`
-    : `<label>${metric.label} <span>${metric.unit}</span><input type="number" name="value" min="${metric.min}" max="${metric.max}" step="${metric.step}" inputmode="${metric.step === 1 ? 'numeric' : 'decimal'}" required></label>`;
+    ? `<div class="crew-anatomy-entry-pair"><label>Systolic <span class="collection-value"><input type="number" name="systolic" min="0" max="400" step="1" inputmode="numeric" required></span></label><label>Diastolic <span class="collection-value"><input type="number" name="diastolic" min="0" max="300" step="1" inputmode="numeric" required></span></label></div>`
+    : `<label>${metric.label}<span class="collection-value"><input type="number" name="value" min="${metric.min}" max="${metric.max}" step="${metric.step}" inputmode="${metric.step === 1 ? 'numeric' : 'decimal'}" required><span>${metric.unit}</span></span></label>`;
   const context = key === 'glucose'
     ? `<label class="crew-anatomy-entry-context">Meal context<select name="glucoseContext"><option value="">Not specified</option><option value="fasting">Fasting</option><option value="after-meal">After a meal</option><option value="other">Other context</option></select></label>`
     : vitalFields.has(key) ? `<label class="crew-anatomy-entry-context">Measurement context<select name="context"><option value="">Not specified</option><option value="rest">At rest</option><option value="after-activity">After activity</option><option value="other">Other context</option></select></label>` : '';
@@ -173,9 +173,7 @@ export function renderAnatomyUI(summary, active = 'circulation', histories = {},
     const selectedMetric = key === active ? activeMetric : category.metrics[0];
     const selectors = category.metrics.map(field => {
       const metric = METRICS[field];
-      const value = valueFor(field, summary?.[field]);
-      const source = value === '—' ? 'Not recorded' : summary?.[field]?.recorded ? 'Recorded' : 'Sample';
-      return `<button type="button" data-anatomy-metric-select="${field}" aria-pressed="${field === selectedMetric}" aria-controls="crew-anatomy-detail-${field}"><span>${field === 'oxygen' ? 'Oxygen' : metric.label}</span><strong>${escapeHtml(value)}<small>${metric.unit}</small></strong><em>${source}</em></button>`;
+      return `<button type="button" data-anatomy-metric-select="${field}" aria-pressed="${field === selectedMetric}" aria-controls="crew-anatomy-detail-${field}"><span>${field === 'oxygen' ? 'Oxygen' : metric.label}</span></button>`;
     }).join('');
     const reports = [['mood', 'Mood'], ['sleepQuality', 'Sleep quality']].filter(([field]) => reportLabels[summary?.[field]?.value]);
     const selfReport = key === 'recovery' && reports.length ? `<details class="crew-anatomy-symptoms"><summary>Self-reported context ↗</summary>${reports.map(([field, label]) => `<p>${label}: ${reportLabels[summary[field].value]} · ${escapeHtml(recordedDate(summary[field].time))}</p>`).join('')}</details>` : '';
@@ -189,9 +187,7 @@ export function renderAnatomyUI(summary, active = 'circulation', histories = {},
     </section>`;
   }).join('');
   return `<div class="crew-anatomy" role="region" data-category="${active}" data-metric="${activeMetric}" aria-label="${person} anatomy view">
-    <button class="crew-anatomy-exit" type="button" data-anatomy-exit>← Back to suit</button>
-    <div class="crew-anatomy-connector" aria-hidden="true"></div>
-    <div class="crew-anatomy-content"><nav class="crew-anatomy-sections" aria-label="Health sections"><button type="button" data-anatomy-body>Body</button>${navigation}</nav>${panels}</div>
+    <div class="crew-anatomy-content"><header class="crew-anatomy-heading"><h2>Anatomy</h2><button type="button" class="crew-anatomy-body" data-anatomy-body>← Whole body</button></header><nav class="crew-anatomy-sections" aria-label="Body systems">${navigation}</nav>${panels}</div>
     <div class="crew-anatomy-hotspots">${heartHotspot}<button type="button" class="crew-anatomy-hotspot crew-anatomy-hotspot--head" aria-label="Explore the brain" aria-pressed="${active === 'recovery'}" data-anatomy-category="recovery"><span class="crew-anatomy-hotspot-ring" aria-hidden="true"></span><span class="crew-anatomy-hotspot-label"><span>Explore brain</span></span></button><button type="button" class="crew-anatomy-hotspot crew-anatomy-hotspot--kidney" aria-label="Explore the kidney" aria-pressed="${active === 'kidney'}" data-anatomy-category="kidney"><span class="crew-anatomy-hotspot-ring" aria-hidden="true"></span><span class="crew-anatomy-hotspot-label"><span>Kidney</span></span></button><button type="button" class="crew-anatomy-hotspot crew-anatomy-hotspot--pancreas" aria-label="Explore the pancreas" aria-pressed="${active === 'pancreas'}" data-anatomy-category="pancreas"><span class="crew-anatomy-hotspot-ring" aria-hidden="true"></span><span class="crew-anatomy-hotspot-label"><span>Pancreas</span></span></button></div>
   </div>`;
 }
