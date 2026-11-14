@@ -14,21 +14,22 @@ const document = { documentElement: { hasAttribute() { return true; } }, addEven
 const context = vm.createContext({ window, document, localStorage, URLSearchParams, console, structuredClone, CustomEvent: class {} });
 vm.runInContext(fs.readFileSync(path.join(base, 'crew-demo.js'), 'utf8'), context);
 const sample = window.CrewDemo.makeRecords(new Date('2026-11-09T12:00:00Z'));
-for (const key of ['pulse', 'oxygen', 'sleep', 'water', 'exercise', 'mood']) assert.equal(sample.alex[key].length, 120);
+for (const key of ['pulse', 'oxygen', 'sleep', 'water', 'exercise', 'mood', 'sleepQuality', 'symptoms']) assert.equal(sample.alex[key].length, 365);
 assert(sample.alex.pulse.every(row => row.source === 'Scenario history' && Date.parse(row.time) <= Date.parse('2026-11-09T12:00:00Z')));
 vm.runInContext(fs.readFileSync(path.join(base, 'crew-health.js'), 'utf8'), context);
 assert.equal(window.CrewDesign.demoMode, true);
-assert.equal(window.CrewDesign.history('alex', 'pulse').length, 120);
+assert.equal(window.CrewDesign.history('alex', 'pulse').length, 365);
 const savedBeforeScenario = new Map(data);
+const baselinePulse=window.CrewDesign.summary('alex').pulse.value;
 window.CrewDesign.setScenario('emergency');
 assert.equal(window.CrewDesign.summary('alex').symptoms, 'urgent');
 assert.equal(window.CrewDesign.summary('alex').pulse.value, 124);
 for (const [key,value] of savedBeforeScenario) assert.equal(data.get(key),value);
 window.CrewDesign.setScenario('routine');
-assert.equal(window.CrewDesign.summary('alex').pulse.value, 76);
+assert.equal(window.CrewDesign.summary('alex').pulse.value, baselinePulse);
 assert.equal(window.CrewDesign.getProfile().name, 'Personal profile');
 window.CrewDesign.saveOverview('alex', { pulse: 76 }, '', { source: 'Simulated sensor', context: 'rest' });
-assert.equal(window.CrewDesign.history('alex', 'pulse').length, 121);
+assert.equal(window.CrewDesign.history('alex', 'pulse').length, 366);
 for (const [key, value] of before) assert.equal(data.get(key), value);
 console.log('Scenarios preview values without writing history, retain the original name, and preserve personal records.');
 

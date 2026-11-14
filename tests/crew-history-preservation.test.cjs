@@ -26,7 +26,7 @@ for(const [field,value] of Object.entries(readings))test(`${field}: manual, repe
   assert.equal(JSON.stringify(after.slice(0,-1)),before[field]);
   assert.equal(JSON.stringify(after.at(-1).value),JSON.stringify(value));assert.equal(after.at(-1).source,source);
   for(const other of Object.keys(readings))if(other!==field)assert.equal(JSON.stringify(api.history('alex',other)),before[other],`${field} changed ${other}`);
-  const plotted=historySeries({histories:{[field]:after},field,now}).points;
+  const plotted=historySeries({histories:{[field]:after},field,days:365,now}).points;
   assert.equal(plotted.length,after.length);assert.equal(JSON.stringify(plotted.map(p=>p.value)),JSON.stringify(after.map(row=>row.value)));
   const reloaded=app(data).api;for(const other of Object.keys(readings))assert.equal(JSON.stringify(reloaded.history('alex',other)),JSON.stringify(api.history('alex',other)),`${other} changed on reload`);
   api.refreshPresentation();assert.equal(JSON.stringify(api.history('alex',field)),JSON.stringify(after));
@@ -42,10 +42,10 @@ test('existing flat glucose samples are refreshed while an entered 88 remains un
 test('immunity reports append separately, preserve units and survive reload without changing measurements',()=>{
  const {api,data}=app(),before=snapshot(api);
  api.saveOverview('alex',{},'',{immunityTests:{saliva:{result:'Not detected',unit:''},urine:{result:'120',unit:'copies/mL'}}});
- const rows=api.immunityHistory('alex');assert.equal(rows.length,2);assert.equal(rows[0].test,'EBV DNA');assert.equal(rows[1].test,'CMV DNA');assert.equal(rows[1].result,'120');assert.equal(rows[1].unit,'copies/mL');assert.equal(JSON.stringify(api.summary('alex').immunityChecks),JSON.stringify(rows));
+ const all=api.immunityHistory('alex'),rows=all.filter(row=>row.source==='Manual laboratory report');assert.equal(rows.length,2);assert.equal(rows[0].test,'EBV DNA');assert.equal(rows[1].test,'CMV DNA');assert.equal(rows[1].result,'120');assert.equal(rows[1].unit,'copies/mL');assert.equal(JSON.stringify(api.summary('alex').immunityChecks),JSON.stringify(all));
  for(const field of Object.keys(readings))assert.equal(snapshot(api)[field],before[field]);
- assert.equal(JSON.stringify(app(data).api.immunityHistory('alex')),JSON.stringify(rows));
- api.saveOverview('alex',{},'',{immunityTests:{saliva:{result:'150',unit:'copies/mL'}}});assert.equal(api.immunityHistory('alex').length,3);assert.equal(api.immunityHistory('alex')[0].result,'Not detected');
+ assert.equal(JSON.stringify(app(data).api.immunityHistory('alex')),JSON.stringify(all));
+ api.saveOverview('alex',{},'',{immunityTests:{saliva:{result:'150',unit:'copies/mL'}}});assert.equal(api.immunityHistory('alex').filter(row=>row.source==='Manual laboratory report').length,3);assert.equal(api.immunityHistory('alex').filter(row=>row.source==='Manual laboratory report')[0].result,'Not detected');
  const stored=new Map(data);assert.throws(()=>api.saveOverview('alex',{pulse:80},'',{immunityTests:{saliva:{result:'20',unit:''}}}));for(const [key,value] of stored)assert.equal(data.get(key),value);
 });
 test('manual sleep diary stores subjective quality, duration and calculated efficiency without a sensor',()=>{
@@ -56,7 +56,7 @@ test('manual sleep diary stores subjective quality, duration and calculated effi
 test('immunity accepts only structured qualitative reports or finite non-negative copies/mL, atomically',()=>{
  const {api,data}=app();
  for(const report of [{result:'0',unit:'copies/mL'},{result:'1.25e3',unit:'copies/mL'},{result:'Detected',unit:''},{result:'Detected below quantification limit',unit:''},{result:'Inconclusive',unit:''}])api.saveOverview('alex',{},'',{immunityTests:{saliva:report}});
- assert.equal(api.immunityHistory('alex')[0].result,'0');
+ assert.equal(api.immunityHistory('alex').filter(row=>row.source==='Manual laboratory report')[0].result,'0');
  for(const report of [{result:'10',unit:'IU/mL'},{result:'-1',unit:'copies/mL'},{result:'1e999',unit:'copies/mL'},{result:'0x20',unit:'copies/mL'},{result:'anything',unit:''},{result:'Not detected',unit:'copies/mL'},{result:'',unit:'copies/mL'},{result:4,unit:'copies/mL'}]){
   const before=new Map(data);assert.throws(()=>api.saveOverview('alex',{pulse:80},'',{immunityTests:{saliva:report}}));assert.deepEqual(data,before);
  }
