@@ -8,7 +8,6 @@
       const original = JSON.parse(localStorage.getItem('crew-health-profile-v1') || 'null');
       const presentationProfile = JSON.parse(localStorage.getItem(profileStorageKey) || 'null');
       if (original?.name && (!presentationProfile?.name || presentationProfile.name === 'Alex Rivera')) localStorage.setItem(profileStorageKey, JSON.stringify(original));
-      else if (localStorage.getItem(profileStorageKey) === null) localStorage.setItem(profileStorageKey, JSON.stringify({ name: 'Talia', model: 'female', age: '', bodyMass: '' }));
       if (localStorage.getItem(storageKey) === null) localStorage.setItem(storageKey, JSON.stringify(window.CrewDemo.makeRecords()));
     } catch (error) { console.warn('Could not prepare demo data:', error); }
   }
