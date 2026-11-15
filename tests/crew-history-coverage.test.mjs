@@ -24,3 +24,9 @@ test('missing personal data shows a clearly marked example without creating a re
  const blank=renderHistoryScene({field:'saliva',days:30,now:+now});
  assert.match(blank,/No numeric reports/);assert.doesNotMatch(blank,/data-history-chart/);
 });
+
+test('demo graph is clearly labeled and never offers a sample reading to repeat',()=>{
+ const now=new Date(2026,10,15,12),data=dataFor(now);
+ const markup=renderHistoryScene({...data,field:'oxygen',days:30,now:+now,demoOnly:true});
+ assert.match(markup,/Demo graph/);assert.match(markup,/not your measurements/);assert.match(markup,/Demo reading/);assert.doesNotMatch(markup,/data-repeat-measurement/);
+});
