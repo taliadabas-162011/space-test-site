@@ -102,3 +102,11 @@ test('immune plots separate samples, retain numeric zero and never turn qualitat
  assert.deepEqual(historySeries({reports,field:'urine',now}).points.map(p=>p.value),[45]);
  const html=renderHistoryScene({reports,field:'saliva',now});assert.match(html,/Latest report: Inconclusive/);assert.match(html,/copies\/mL/);assert.doesNotMatch(html,/<polyline/);assert.match(html,/is-laboratory/);assert.equal((html.match(/data-history-reading /g)||[]).length,2);
 });
+
+test('bone health remains a future feature without a fabricated graph',()=>{
+ const html=renderHistoryScene({field:'boneHealth',demoOnly:true});
+ assert.match(html,/Bone health/);assert.match(html,/Future feature/);
+ assert.match(html,/techport\.nasa\.gov\/projects\/34470/);
+ assert.match(html,/humanresearchroadmap\.nasa\.gov\/Gaps\/gap\.aspx\?i=815/);
+ assert.doesNotMatch(html,/data-history-chart|Demo graph/);
+});
