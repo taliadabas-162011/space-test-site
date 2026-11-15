@@ -71,7 +71,7 @@
         records.immunityChecks||=[];
         for(const sample of ['saliva','urine']){
           const count=Math.round((sample==='saliva'?120:40)+(sample==='saliva'?55:18)*drift(day,23,sample==='saliva'?121:122));
-          const qualitative=key(day,sample==='saliva'?123:124)<.25;
+          const qualitative=Math.floor(day/14)%2===0 && key(day,sample==='saliva'?123:124)<.5;
           records.immunityChecks.push({sample,test:sample==='saliva'?'EBV DNA':'CMV DNA',result:qualitative?'Not detected':String(count),unit:qualitative?'':'copies/mL',time,recordedAt:time,source:'Scenario history'});
         }
       }

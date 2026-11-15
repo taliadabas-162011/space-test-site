@@ -24,7 +24,7 @@ import { compareHistory } from '/space-test-site/design/crew-insights.js?v=1';
 
 import { renderMission, missionState } from './crew-mission-ui.js?v=15';
 import { createCrewAlarm } from './crew-alarm.js?v=2';
-import { renderHistoryScene, initializeHistoryChart, updateHistoryScene } from './crew-history-scene.js?v=15';
+import { renderHistoryScene, initializeHistoryChart, updateHistoryScene } from './crew-history-scene.js?v=16';
 import { renderDeviceScene } from './crew-device-scene.js?v=2';
 
 const { CrewDesign } = window;
@@ -478,7 +478,8 @@ function showEmergency(source) {
 function historySceneData() {
   const personId = people[selected ?? 0].id;
   const histories = anatomyHistory(personId);
-  return { summary: CrewDesign.summary(personId), histories, reports: { immunity: CrewDesign.immunityHistory(personId), mood: CrewDesign.selfReportHistory(personId, 'mood'), sleepQuality: CrewDesign.selfReportHistory(personId, 'sleepQuality'), symptoms: CrewDesign.symptomHistory(personId).map(entry => ({ ...entry, tags: (entry.tags || []).map(tag => CrewDesign.symptomOptions[tag] || tag) })) }, field: historyMetric || 'pulse', days: historyTrendDays, position: historyScenePosition };
+  const example = window.CrewDemo.makeRecords().alex;
+  return { example: { histories: example, reports: { mood: example.mood, sleepQuality: example.sleepQuality, immunity: example.immunityChecks } }, summary: CrewDesign.summary(personId), histories, reports: { immunity: CrewDesign.immunityHistory(personId), mood: CrewDesign.selfReportHistory(personId, 'mood'), sleepQuality: CrewDesign.selfReportHistory(personId, 'sleepQuality'), symptoms: CrewDesign.symptomHistory(personId).map(entry => ({ ...entry, tags: (entry.tags || []).map(tag => CrewDesign.symptomOptions[tag] || tag) })) }, field: historyMetric || 'pulse', days: historyTrendDays, position: historyScenePosition };
 }
 let cleanupHistoryChart = () => {};
 function renderHistorySceneView() {
