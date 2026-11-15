@@ -14,7 +14,7 @@ const spaceContext={
  exercise:['In microgravity, muscles and bones are used differently and can weaken. Exercise helps astronauts maintain strength and cardiovascular fitness.','https://www.nasa.gov/ochmo-tb-031-exercise-overview-2/'],
  mood:['Isolation, confinement and distance from Earth can affect mood and mental well-being. Checking in helps you notice how you are feeling.','https://www.nasa.gov/hrp/hazard-isolation-and-confinement/'],
  sleepQuality:['Noise, light, schedules and the confined spacecraft environment can affect sleep. Tracking sleep helps you notice changes in rest and recovery.','https://www.nasa.gov/directorates/esdmd/hhp/risk-of-performance-decrements-and-adverse-health-outcomes-resulting-from-sleep-loss-circadian-desynchronization-and-work-overload/'],
- immunity:['Spaceflight stressors can affect the immune system. Laboratory tests can help the medical team investigate specific changes.','https://www.nasa.gov/hrp/risks/'],
+ immunity:['Spaceflight stressors, including microgravity, radiation, and disturbed sleep, can affect the immune system. Laboratory tests can help the medical team investigate specific changes.','https://www.nasa.gov/hrp/risks/'],
  symptoms:['Spaceflight can affect the body in different ways. Recording symptoms helps you notice changes and share them with your medical team.','https://www.nasa.gov/hrp/risks/']
 };
 const renderSpaceContext=key=>{const item=spaceContext[key];return item?`<aside class="collection-space-context" aria-label="Related hazards"><strong>Related hazards</strong><p>${esc(item[0])}</p><a href="${item[1]}" target="_blank" rel="noopener noreferrer">NASA source ↗</a></aside>`:''};
