@@ -19,3 +19,11 @@ load(second).saveProfile('Alex Morgan', 'male', '30', '');
 assert.equal(load(first).getProfile().name, 'Jordan Smith');
 assert.equal(load(second).getProfile().name, 'Alex Morgan');
 console.log('Profiles are created per browser and persist across reloads.');
+
+const oldDemo = new Map([['crew-health-demo-profile-v1', JSON.stringify({name:'Talia',model:'female',age:'',bodyMass:''})]]);
+assert.equal(load(oldDemo).hasProfile(), false, 'the old automatic demo profile prompts for setup');
+assert.equal(JSON.parse(oldDemo.get('crew-health-demo-profile-v1')).name, 'Talia', 'opening setup does not delete the old profile');
+load(oldDemo).saveProfile('Rana Samir', 'female', '21', '56');
+assert.equal(load(oldDemo).getProfile().name, 'Rana Samir');
+const savedTalia = new Map([['crew-health-demo-profile-v1', JSON.stringify({name:'Talia',model:'female',age:'',bodyMass:'',createdAt:'2026-11-15T12:00:00Z'})]]);
+assert.equal(load(savedTalia).getProfile().name,'Talia', 'a genuinely saved profile is preserved');

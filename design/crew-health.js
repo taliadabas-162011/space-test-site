@@ -15,6 +15,8 @@
     try {
       const value = JSON.parse(localStorage.getItem(profileStorageKey) || 'null');
       if (!value || typeof value.name !== 'string' || !value.name.trim()) return null;
+      // Ignore the old automatically generated demo profile; keep genuine saved profiles.
+      if (demoMode && value.name === 'Talia' && value.model === 'female' && value.age === '' && value.bodyMass === '' && !value.createdAt) return null;
       return { name: value.name.trim().slice(0, 48), model: value.model === 'female' ? 'female' : 'male', age: value.age !== '' && value.age != null && Number.isFinite(Number(value.age)) && Number(value.age) >= 0 && Number(value.age) <= 120 ? Number(value.age) : '', bodyMass: Number.isFinite(Number(value.bodyMass)) && Number(value.bodyMass) > 0 && Number(value.bodyMass) <= 400 ? Number(value.bodyMass) : '' };
     } catch (_) { return null; }
   }
