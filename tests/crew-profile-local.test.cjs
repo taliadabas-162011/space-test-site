@@ -12,10 +12,10 @@ function load(data) {
 }
 const first = new Map(), second = new Map();
 assert.equal(load(first).hasProfile(), false, 'a new browser starts without a profile');
-load(first).saveProfile('Jordan Smith', 'female', '25', '');
+load(first).saveProfile('Jordan Smith', 'female', '25', '60');
 assert.equal(load(first).getProfile().name, 'Jordan Smith', 'the profile survives a reload');
 assert.equal(load(second).hasProfile(), false, 'another browser does not inherit the first profile');
-load(second).saveProfile('Alex Morgan', 'male', '30', '');
+load(second).saveProfile('Alex Morgan', 'male', '30', '75');
 assert.equal(load(first).getProfile().name, 'Jordan Smith');
 assert.equal(load(second).getProfile().name, 'Alex Morgan');
 console.log('Profiles are created per browser and persist across reloads.');
@@ -27,3 +27,6 @@ load(oldDemo).saveProfile('Rana Samir', 'female', '21', '56');
 assert.equal(load(oldDemo).getProfile().name, 'Rana Samir');
 const savedTalia = new Map([['crew-health-demo-profile-v1', JSON.stringify({name:'Talia',model:'female',age:'',bodyMass:'',createdAt:'2026-11-15T12:00:00Z'})]]);
 assert.equal(load(savedTalia).getProfile().name,'Talia', 'a genuinely saved profile is preserved');
+
+assert.throws(() => load(new Map()).saveProfile('Test Name', 'female', '', '60'), /valid age/);
+assert.throws(() => load(new Map()).saveProfile('Test Name', 'female', '25', ''), /valid body mass/);

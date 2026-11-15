@@ -151,8 +151,8 @@
     const safeModel = model === 'female' ? 'female' : 'male';
     const parsedAge = age === '' ? '' : Number(age);
     const parsedMass = bodyMass === '' ? '' : Number(bodyMass);
-    if (parsedAge !== '' && (!Number.isInteger(parsedAge) || parsedAge < 0 || parsedAge > 120)) throw new Error('Enter a valid age.');
-    if (parsedMass !== '' && (!Number.isFinite(parsedMass) || parsedMass <= 0 || parsedMass > 400)) throw new Error('Enter a valid body mass.');
+    if (parsedAge === '' || (!Number.isInteger(parsedAge) || parsedAge < 0 || parsedAge > 120)) throw new Error('Enter a valid age.');
+    if (parsedMass === '' || (!Number.isFinite(parsedMass) || parsedMass <= 0 || parsedMass > 400)) throw new Error('Enter a valid body mass.');
     const nextProfile = { name: cleanName, model: safeModel, age: parsedAge, bodyMass: parsedMass, createdAt: savedProfile?.createdAt || new Date().toISOString() };
     localStorage.setItem(profileStorageKey, JSON.stringify(nextProfile));
     savedProfile = nextProfile;
