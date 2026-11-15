@@ -3,7 +3,7 @@ import {navigateImmunity,syncImmunity} from './crew-immunity.js?v=6';
 import {initializeQuestionnaires,setQuestionnairePage} from './crew-questionnaire.js?v=3';
 import { assessReadings } from './crew-reading-feedback.js?v=2';
 import {createRepeat,renderRepeat,repeatPayload} from './crew-repeat.js?v=4';
-import {renderCollection,syncSimpleCalculations,collectionFields,collectionHasEntry,collectionPayload,syncCollectionSymptoms,syncCollectionMeasurement,navigateCollection,urgentCollectionFields,advanceMeasurementGuide,resetMeasurementGuide,measurementGuides} from './crew-collection.js?v=space-context-1';
+import {renderCollection,syncSimpleCalculations,collectionFields,collectionHasEntry,collectionPayload,syncCollectionSymptoms,syncCollectionMeasurement,navigateCollection,urgentCollectionFields,advanceMeasurementGuide,resetMeasurementGuide,measurementGuides} from './crew-collection.js?v=space-context-2';
 import {renderAssistance,advanceAssistance,readAssistance,writeAssistance} from './crew-assistance.js?v=14';
 import {assistanceNarration,createVoicePlayer} from './crew-assistance-audio.js?v=5';
 import {voiceIcon} from './crew-voice-controls.js?v=3';
@@ -24,7 +24,7 @@ import { compareHistory } from '/space-test-site/design/crew-insights.js?v=1';
 
 import { renderMission, missionState } from './crew-mission-ui.js?v=15';
 import { createCrewAlarm } from './crew-alarm.js?v=2';
-import { renderHistoryScene, initializeHistoryChart, updateHistoryScene } from './crew-history-scene.js?v=14';
+import { renderHistoryScene, initializeHistoryChart, updateHistoryScene } from './crew-history-scene.js?v=15';
 import { renderDeviceScene } from './crew-device-scene.js?v=2';
 
 const { CrewDesign } = window;

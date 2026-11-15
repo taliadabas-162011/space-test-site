@@ -68,7 +68,7 @@ export function renderHistoryScene({ summary = {}, histories = {}, reports = {},
   const lastReport=labReports.at(-1);
   const labText=lastReport?`Latest report: ${esc(lastReport.result)} ${esc(lastReport.unit||'')} · ${esc(date(stamp(lastReport.time)))}. `:'';
   const contextText = [context === null ? '' : CONTEXT[context] || 'Context not recorded',field==='temperature'?(site?`${site.charAt(0).toUpperCase()+site.slice(1)} temperature`:'Site not recorded'):''].filter(Boolean).join(' · ');
-  const nav = Object.entries(FIELDS).filter(([key]) => key !== 'weight').map(([key, [name]]) => `<button type="button" data-history-scene-field="${key}" aria-pressed="${key === field}">${name}</button>`).join('');
+  const nav = Object.entries(FIELDS).filter(([key]) => !['weight', 'symptoms'].includes(key)).map(([key, [name]]) => `<button type="button" data-history-scene-field="${key}" aria-pressed="${key === field}">${name}</button>`).join('');
   const range = [30, 90, 120, 365].map(n => `<button type="button" data-history-scene-days="${n}" aria-pressed="${n === days}">${n} days</button>`).join('');
   const valueText = p => `${display(field, p.value)}${unit ? ` ${unit}` : ''}`;
   const details = p => field === 'symptoms' ? [p.tags.join(', '), p.onset == null ? '' : `Began ${date(p.onset, true)}`, p.progression ? title(p.progression) : '', p.note].filter(Boolean).join(' · ') : '';
