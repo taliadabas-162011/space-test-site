@@ -1,4 +1,4 @@
-import {renderBoneFuture} from './crew-bone-future.js?v=1';
+import {renderBoneFuture} from './crew-bone-future.js?v=2';
 import {renderImmunity,immunityPayload} from './crew-immunity.js?v=3';
 import {moodQuestions,renderQuestionnaire,syncQuestionnaire} from './crew-questionnaire.js?v=3';
 import {measurementGuides,renderMeasurementGuide,guideVisual,preloadGuideImages} from './crew-measurement-guides.js?v=symptoms-2';

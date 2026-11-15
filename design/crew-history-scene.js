@@ -1,4 +1,4 @@
-import {renderBoneFuture} from './crew-bone-future.js?v=1';
+import {renderBoneFuture} from './crew-bone-future.js?v=2';
 const FIELDS = {
   pulse: ['Heart rate', 'bpm'], pressure: ['Blood pressure', 'mmHg'], oxygen: ['Oxygen saturation', '%'],
   glucose: ['Blood glucose', 'mg/dL'], temperature: ['Temperature', '°C'], sleep: ['Sleep', 'hrs'],
